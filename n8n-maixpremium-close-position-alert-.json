@@ -1,0 +1,352 @@
+{
+  "updatedAt": "2024-12-19T03:26:05.005Z",
+  "createdAt": "2024-03-29T15:46:48.521Z",
+  "id": "EbvlEcNJgTcrbQAZ",
+  "name": "MaixPremium - Close Position Alert",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "var position = $node[\"Microsoft SQL\"].json;\nvar trade = $node[\"SQL Query\"].json[\"trade\"];\nvar updateQuery = ``;\nvar telegramPushMessage = ``\n\nfunction calculatePNLPercentage(entryPrice, leverage, direction, closingPrice) {\n  pnlPercentage = 0;\n  if (entryPrice !== 0) {\n        if (direction === 'LONG') {\n            pnlPercentage = ((closingPrice - entryPrice) / entryPrice) * leverage * 100;\n        } else if (direction === 'SHORT') {\n            pnlPercentage = ((entryPrice - closingPrice) / entryPrice) * leverage * 100;\n        }\n    }\n  return pnlPercentage;\n}\n\nif(position)\n{\n  trade.pnlPercentage = calculatePNLPercentage(position.EntryPrice, position.Leverage, position.Direction, trade.closingPrice);\n\n  // Calculate the difference in milliseconds\n  trade.duration = Math.abs(new Date().getTime() - new Date(position.OpenedDate).getTime())\n  // Calculate the difference in days, hours, minutes, and seconds\n  const days = Math.floor(trade.duration / (1000 * 60 * 60 * 24));\n  const hours = Math.floor((trade.duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));\n  const minutes = Math.floor((trade.duration % (1000 * 60 * 60)) / (1000 * 60));\n  const seconds = Math.floor((trade.duration % (1000 * 60)) / 1000);\n\n  var durationStr = days > 0 \n    ? `${days} days, ${hours} hours`\n    : hours > 0\n      ? `${hours} hours, ${minutes} minutes`\n      : `${minutes} minutes, ${seconds} seconds`;\n  \n  updateQuery = \n    `\n    UPDATE TradeSignalPremium\n    SET ClosingPrice = ${trade.closingPrice},\n        PNLPercentage =${trade.pnlPercentage},\n        ClosedDate = GETUTCDATE(),\n        TradeDurationInSecond = ${ trade.duration/ 1000}\n    WHERE Id = ${position.Id}\n    `\n\n  telegramPushMessage = \n`<b>#POSITION_CLOSED</b>\n\n✦ Trading Pair:  <b>${  trade.tradingPair}</b>\n✦ Direction:  <b>${  position.Direction}</b>\n✦ Entry Price:  <b>${position.EntryPrice.toFixed(4)}</b>\n✦ Closing Price:  <b>${trade.closingPrice.toFixed(4)}</b>\n✦ Leverage:  <b>${position.Leverage}x</b>\n✦ Position Duration:  <b>${durationStr}</b>    \n✦ PNL:  <b>${trade.pnlPercentage.toFixed(4)}%</b>\n\n<i>Disclaimer: Not Financial Advice, Do Your Own Research</i>`\n}\n  \n\nreturn {\n  updateQuery: updateQuery,\n  telegramPushMessage: telegramPushMessage\n};"
+      },
+      "id": "ce87807e-b650-49d6-893f-32f88a68558d",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"SQL Query\"].json[\"query\"] }}"
+      },
+      "id": "e7f92bb6-9280-4c2f-bbc5-593eeba70089",
+      "name": "Microsoft SQL",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        280
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 103.57.210.11 - sa2 - T_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "37b873c9-5e7c-4e79-91ba-cb56a403aa1c",
+        "options": {}
+      },
+      "id": "b1e5b173-5ab3-44b0-aceb-4c7871226fc1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        280
+      ],
+      "webhookId": "37b873c9-5e7c-4e79-91ba-cb56a403aa1c"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code\"].json[\"updateQuery\"] }}"
+      },
+      "id": "a09bc19f-0dec-41d2-88a1-3458c99fdc64",
+      "name": "Update Signal To DB",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        1740,
+        180
+      ],
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 103.57.210.11 - sa2 - T_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "54b549be-1cbb-41d1-8513-24278b4841d6",
+              "leftValue": "={{$node[\"Microsoft SQL\"].json[\"Id\"]}}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d14636ab-a390-4d4e-996d-315acc2c5267",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var setting = {\n  webhook_OpenPosition_Url: \"https://n8n.yoong.xyz/webhook/4cae4474-51eb-445c-b676-68c3edda2922\", // WF: MaixPremium - Open Position Alert\n  webhook_ClosePosition_Url: \"https://n8n.yoong.xyz/webhook/37b873c9-5e7c-4e79-91ba-cb56a403aa1c\", // WF: MaixPremium - Close Position Alert\n}\n\n\nreturn setting;"
+      },
+      "id": "18529f09-b22a-49a4-83cf-94f5a9c0e8dd",
+      "name": "evn",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var trade = $node[\"Webhook\"].json[\"body\"][\"trade\"];\n\nvar query = \n`\nSELECT TOP(1) * \nFROM TradeSignalPremium\nWHERE \n  TradingPair = N'${trade.tradingPair}'\n  AND TradeSignalJson LIKE N'%${trade.traderName}%'\n  AND ClosedDate IS NULL\n`\n\nreturn {\n  trade: trade,\n  query: query\n};"
+      },
+      "id": "5b303243-2e32-445a-8378-2ed51766645b",
+      "name": "SQL Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "-4192623258",
+        "text": "={{ $node[\"Code\"].json[\"telegramPushMessage\"] }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Trade on Binance Now",
+                    "additionalFields": {
+                      "url": "https://accounts.binance.com/register?ref=66065403"
+                    }
+                  },
+                  {
+                    "text": "View More",
+                    "additionalFields": {
+                      "url": "https://maix8.com"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "b1cceade-2694-418b-bc71-f19493035b3c",
+      "name": "Telegram: (MAIX - Premium Signals) (a Sơn, a Lâm)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2140,
+        180
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wgY9dLz5D0eEhJic",
+          "name": "Telegram @MaixCryptoTradingbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-4142931508",
+        "text": "={{ $node[\"Code\"].json[\"telegramPushMessage\"] }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Trade on Binance Now",
+                    "additionalFields": {
+                      "url": "https://accounts.binance.com/register?ref=66065403"
+                    }
+                  },
+                  {
+                    "text": "View More",
+                    "additionalFields": {
+                      "url": "https://maix8.com"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "eb603c62-86b8-47b8-b1ec-f0926cf1239f",
+      "name": "Telegram: (MAIX - Premium Signals) (a Vinh)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1960,
+        180
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wgY9dLz5D0eEhJic",
+          "name": "Telegram @MaixCryptoTradingbot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Update Signal To DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "evn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Signal To DB": {
+      "main": [
+        [
+          {
+            "node": "Telegram: (MAIX - Premium Signals) (a Vinh)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evn": {
+      "main": [
+        [
+          {
+            "node": "SQL Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SQL Query": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: (MAIX - Premium Signals) (a Vinh)": {
+      "main": [
+        [
+          {
+            "node": "Telegram: (MAIX - Premium Signals) (a Sơn, a Lâm)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "tVa1fbkE9BESGesN"
+  },
+  "staticData": {
+    "node:Time Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3171cd50-d152-4cab-adb8-80ca7542840f",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-03-29T15:46:48.521Z",
+      "createdAt": "2024-03-29T15:46:48.521Z",
+      "role": "workflow:owner",
+      "workflowId": "EbvlEcNJgTcrbQAZ",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
