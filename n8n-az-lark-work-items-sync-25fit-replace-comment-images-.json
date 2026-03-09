@@ -1,0 +1,954 @@
+{
+  "updatedAt": "2024-01-11T15:22:09.497Z",
+  "createdAt": "2024-01-11T15:03:06.046Z",
+  "id": "gQMGEnOCF54gYgsc",
+  "name": "Az Lark - Work Items Sync - 25Fit Replace Comment Images",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/auth/v3/app_access_token/internal",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{ \"app_id\" : \"cli_a466e82acaf8d010\", \"app_secret\" : \"f7aFFUOj1okYt5EtypATvhWxpLJ0HNSp\"  }",
+        "options": {}
+      },
+      "id": "0fa682b5-cee1-4beb-bd49-7af1bf8346a1",
+      "name": "Lark. Get Access Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2300,
+        1220
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "f20b077c-01b3-44cf-a2b8-e2ce255a862e",
+      "name": "5min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2760,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"TeamProject\": \"25FIT\",\n  \"StatusRecordId_25Fit\": \"recB23Vxmz\"\n}"
+      },
+      "id": "3163395e-2293-41c1-8e04-60d84c73ff1f",
+      "name": "env",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2540,
+        1220
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "var allWorkItems = $node[\"Lark. Get All Records\"].json[\"data\"][\"items\"];\n\nconst urlRegex = /\\b((https?|ftp|file):\\/\\/|(www|ftp)\\.)[-A-Z0-9+&@#\\/%?=~_|$!:,.;]*[A-Z0-9+&@#\\/%=~_|$]/ig;\n\nvar attachments = [];\n\nfor (let workItem of allWorkItems) {\n  var workItemJson = workItem[\"fields\"][\"CommentsJson\"];\n  \n  // Extract URLs\n  var urls = workItemJson.match(urlRegex);\n\n  for (let index = 0; index < urls.length; index++) {\n  if(urls[index].includes(\"/attachments/\"))\n  {\n    attachments.push({\n      record_id: workItem.record_id,\n      fileName: decodeURI(urls[index].substring(urls[index].indexOf(\"/attachments/\") + \"/attachments/\".length, urls[index].length).replace(\"?fileName=\", \" - \")),\n      url: urls[index],\n      CommentsJson: workItem.fields.CommentsJson\n    })\n  }\n  }\n}\n\nif(attachments != null && attachments.length > 0)\n  return attachments;\nelse return [];"
+      },
+      "id": "67db4eae-f8a0-4d57-9cb4-fe3123adc796",
+      "name": "New Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1880,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://open.larksuite.com/open-apis/bitable/v1/apps/Hsu9b4sqiaTQmVsdxaUlO3SUgVt/tables/tblUVxnumbX8vlu7/records",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "CurrentValue.[CommentsJson].contains(\"/attachments/\")"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark. Get Access Token').item.json.app_access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "684c474d-024c-452f-8e5c-9ba2355f91d2",
+      "name": "Lark. Get All Records",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2080,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "d074c6ee-00ea-4f26-b00e-2664211b43cf",
+      "name": "Az: Max 1 work Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        20,
+        1560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var workItemJson = $node[\"Az: Max 1 work Items\"].json[\"fields\"][\"WorkItemJson\"];\n//return {  workItemJson: workItemJson };\n\nconst urlRegex = /\\b((https?|ftp|file):\\/\\/|(www|ftp)\\.)[-A-Z0-9+&@#\\/%?=~_|$!:,.;]*[A-Z0-9+&@#\\/%=~_|$]/ig;\n\n// Extract URLs\nvar urls = workItemJson.match(urlRegex);\n\nvar attachments = [];\n// Get Attachment URLs\n//urls = urls.filter((url) => url.includes(\"attachments\"))\nfor (let index = 0; index < urls.length; index++) {\nif(urls[index].includes(\"/attachments/\"))\n{\n  attachments.push({\n    fileName: decodeURI(urls[index].substring(urls[index].indexOf(\"/attachments/\") + \"/attachments/\".length, urls[index].length).replace(\"?fileName=\", \" - \")),\n    url: urls[index]\n  })\n}\n}\n\nif(attachments != null && attachments.length > 0)\n  return attachments;\nelse return [];"
+      },
+      "id": "0dba6a36-1257-48bc-98d6-308ec7c6903e",
+      "name": "Get All Attachments",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        1520
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "162dacf7-704b-4dfd-9d19-222fbd95096b",
+      "name": "1 attachment",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node[\"Get All Attachments1\"].json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "d0a3c5f3-a249-4f60-b239-799357f747c9",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        480,
+        940
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "0NDVTGOvYtw961d3",
+          "name": "25Fit AZ Basic Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $node[\"Get All Attachments1\"].json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1mZx6qD4GucaPL1MxfrEBbbz0Qw3RLxnQ",
+          "mode": "list",
+          "cachedResultName": "25Fit",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1mZx6qD4GucaPL1MxfrEBbbz0Qw3RLxnQ"
+        },
+        "options": {}
+      },
+      "id": "cc559cea-9887-4fca-b7f7-4afb4746dc84",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        420,
+        880
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wmx2bqC8j2AWZXvg",
+          "name": "Google Drive - yoongazuredevops@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  record_id: $node[\"Az: Max 1 work Items\"].json.record_id,\n  originalUrl: $node[\"Get All Attachments1\"].json.url ,\n  driveUrl: $node[\"Google Drive\"].json[\"webViewLink\"]\n}"
+      },
+      "id": "d859a144-ef02-4b08-8883-b5690c534a82",
+      "name": "Uploaded",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "unit": "seconds"
+      },
+      "id": "38d83d00-a0e3-4bbf-889d-e79b01eaa53a",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        940
+      ],
+      "webhookId": "12fc6530-a55c-40fd-867f-272b62560cbd"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/Hsu9b4sqiaTQmVsdxaUlO3SUgVt/tables/tblUVxnumbX8vlu7/records/batch_update",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $node['Lark. Get Access Token'].json.app_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.a }}",
+        "options": {}
+      },
+      "id": "cbcc2d87-2aed-48c2-b2c1-09ad86cfd28c",
+      "name": "Update Lark Work Item Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1600,
+        1240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nvar record_id = $node[\"Az: Max 1 work Items\"].json.record_id;\n\nvar larkInsertJson = {\n  \"records\": []\n};\n\n//return workItems[0];\n\nvar larkRecord = {\n\"record_id\": record_id,\n    \"fields\": {\n    \"AttachmentMappings\": $node[\"Replace\"].json.AttachmentMappings,\n    \"WorkItemReplacedAttachmentLinkJson\": $node[\"Replace\"].json.WorkItemReplacedAttachmentLinkJson,\n  }\n\n  };\n  \n  larkInsertJson.records.push(larkRecord);\n\nreturn {\n  a: larkInsertJson\n};"
+      },
+      "id": "7f37fc7c-8966-4c04-8f9f-5a1890ce9250",
+      "name": "Create Json",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        1240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var doneBranchUrlMapping = $input.all();\n\ndoneBranchUrlMapping = doneBranchUrlMapping.map((item) => item.json);\n\n\nvar record_id = $node[\"Az: Max 1 work Items\"].json.record_id;\nvar workItemJson = $node[\"Az: Max 1 work Items\"].json[\"fields\"][\"WorkItemJson\"];\ndoneBranchUrlMapping = doneBranchUrlMapping.filter((item) => item.record_id == record_id);\n\nfor (let index = 0; index < doneBranchUrlMapping.length; index++) {\n  workItemJson = workItemJson.replace(doneBranchUrlMapping[index].originalUrl, doneBranchUrlMapping[index].driveUrl)\n}\n\nreturn {\n  \"WorkItemReplacedAttachmentLinkJson\": workItemJson,\n  \"AttachmentMappings\": JSON.stringify(doneBranchUrlMapping)\n}\n"
+      },
+      "id": "4c3fcc88-8b03-421c-ae4f-c1bbc147b849",
+      "name": "Replace",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        1180
+      ]
+    },
+    {
+      "parameters": {
+        "unit": "seconds"
+      },
+      "id": "875def6b-ca29-4313-9c81-a29676f255e7",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1860,
+        1240
+      ],
+      "webhookId": "a792cc04-3ca4-4afd-a38b-8443ef50bbfa"
+    },
+    {
+      "parameters": {
+        "content": "OR((CurrentValue.[WorkItemReplacedAttachmentLinkJson] =\"\"),  (CurrentValue.[AttachmentMappings] =\"\"))\n\nOR((CurrentValue.[Id] =1399),  (CurrentValue.[Id] = 88))\n\nCurrentValue.[WorkItemJson].contains(\"/attachments/\"), ",
+        "height": 569.8081035623059,
+        "width": 963.8050847457628
+      },
+      "id": "04f27c17-e9e0-4def-987c-01bc9d209794",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2980,
+        1635.4037608444737
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.continue }}",
+              "operation": "equal",
+              "value2": 1
+            }
+          ]
+        }
+      },
+      "id": "c3c67fae-f618-4083-94d6-5b527ae8605f",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -1220,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "53e75ff2-567c-47f2-8036-f6d19fa77128",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -860,
+        740
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "fd099c20-0063-4e54-a2d1-ddcba74087ee",
+      "name": "Replace Me",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "id": "29d56f46-aa80-438c-b7a8-a85f3a98c4aa",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.url }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "403aec93-95d6-42a8-a06a-893aa774b423",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "283bbb17-8293-40fa-af10-a8b8f34e20ad",
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        40,
+        1180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var item = $node[\"Loop Over Items1\"].json;\n\nreturn item;"
+      },
+      "id": "61b45a1a-7fef-4e3f-b001-51ced6c440bf",
+      "name": "Get All Attachments1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var workItemJson = $node[\"Az: Max 1 work Items\"].json[\"fields\"][\"WorkItemJson\"];\n//return {  workItemJson: workItemJson };\n\nconst urlRegex = /\\b((https?|ftp|file):\\/\\/|(www|ftp)\\.)[-A-Z0-9+&@#\\/%?=~_|$!:,.;]*[A-Z0-9+&@#\\/%=~_|$]/ig;\n\n// Extract URLs\nvar urls = workItemJson.match(urlRegex);\n\nvar attachments = [];\n// Get Attachment URLs\n//urls = urls.filter((url) => url.includes(\"attachments\"))\nfor (let index = 0; index < urls.length; index++) {\nif(urls[index].includes(\"/attachments/\"))\n{\n  attachments.push({\n    \n    fileName: decodeURI(urls[index].substring(urls[index].indexOf(\"/attachments/\") + \"/attachments/\".length, urls[index].length).replace(\"?fileName=\", \" - \")),\n    url: urls[index]\n  })\n}\n}\n\nif(attachments != null && attachments.length > 0)\n  return attachments;\nelse return [];"
+      },
+      "id": "7438c667-25e0-4e39-bd2f-67aa4a6c5348",
+      "name": "Get All Attachments2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        1920
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "b0ef66b7-9bc7-4237-b7ed-aeeaffa7c3c6",
+      "name": "Loop Over Items2",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1560,
+        1200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "5c0e72de-70e7-427f-a755-840019479491",
+      "name": "Replace Me1",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1380
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "faa2e333-9cc5-495f-9966-5da86fb80512",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1200,
+        1380
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "0NDVTGOvYtw961d3",
+          "name": "25Fit AZ Basic Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1mZx6qD4GucaPL1MxfrEBbbz0Qw3RLxnQ",
+          "mode": "list",
+          "cachedResultName": "25Fit",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1mZx6qD4GucaPL1MxfrEBbbz0Qw3RLxnQ"
+        },
+        "options": {}
+      },
+      "id": "c892be4d-6c40-4b21-b242-27dbeba922c7",
+      "name": "Google Drive1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -980,
+        1380
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wmx2bqC8j2AWZXvg",
+          "name": "Google Drive - yoongazuredevops@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  CommentsJson: $node[\"Loop Over Items2\"].json.CommentsJson,\n    record_id: $node[\"Loop Over Items2\"].json.record_id,\n  originalUrl: $node[\"Loop Over Items2\"].json.url ,\n  driveUrl: $node[\"Google Drive1\"].json[\"webViewLink\"]\n}"
+      },
+      "id": "9abef739-8317-497e-9a96-dfbdec5b6e7c",
+      "name": "Uploaded1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -780,
+        1380
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var doneBranchUrlMapping = $input.all();\ndoneBranchUrlMapping = doneBranchUrlMapping.map((item) => item.json);\n\nfunction groupBy(arr, prop) {\n    const map = new Map(Array.from(arr, obj => [obj[prop], []]));\n    arr.forEach(obj => map.get(obj[prop]).push(obj));\n    return Array.from(map.values());\n}\n\nvar groupedUrls  = groupBy(doneBranchUrlMapping, \"record_id\")\n\n// Create Lark Update Json\nvar larkInsertJson = {\n  \"records\": []\n};\n\nfor (let groupedItem of groupedUrls) {\n  var record_id = groupedItem[0].record_id;\n  var workItemJson = groupedItem[0].CommentsJson;\n  \n  var replaceUrls = groupedItem.map((item) => ({originalUrl: item.originalUrl, driveUrl: item.driveUrl}));\n  for (let index = 0; index < replaceUrls.length; index++) {\n    workItemJson = workItemJson.replace(replaceUrls[index].originalUrl, replaceUrls[index].driveUrl)\n  }\n\n  var larkRecord = {\n    \"record_id\": record_id,\n      \"fields\": {\n        \"CommentsAttachmentMappings\": JSON.stringify(replaceUrls),\n        \"CommentsReplacedAttachmentLinkJson\": workItemJson,\n    }\n  \n    };\n    \n  larkInsertJson.records.push(larkRecord);\n}\n\nreturn {\n  a: larkInsertJson\n};"
+      },
+      "id": "51bc286b-115e-4ceb-8c28-29c9dfef6fbb",
+      "name": "Replace1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        1180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nvar record_id = $node[\"Az: Max 1 work Items\"].json.record_id;\n\nvar larkInsertJson = {\n  \"records\": []\n};\n\n//return workItems[0];\n\nvar larkRecord = {\n\"record_id\": record_id,\n    \"fields\": {\n    \"AttachmentMappings\": $node[\"Replace\"].json.AttachmentMappings,\n    \"WorkItemReplacedAttachmentLinkJson\": $node[\"Replace\"].json.WorkItemReplacedAttachmentLinkJson,\n  }\n\n  };\n  \n  larkInsertJson.records.push(larkRecord);\n\nreturn {\n  a: larkInsertJson\n};"
+      },
+      "id": "ef34ec32-1835-4ae5-b234-d0a9fa603118",
+      "name": "Create Json1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/Hsu9b4sqiaTQmVsdxaUlO3SUgVt/tables/tblUVxnumbX8vlu7/records/batch_update",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $node['Lark. Get Access Token'].json.app_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.a }}",
+        "options": {}
+      },
+      "id": "fc48212e-1886-478e-8ce0-24b0b2a8ad9c",
+      "name": "Update Lark Work Item Record1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -860,
+        1180
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "seconds"
+      },
+      "id": "a48c33a5-8ee1-4b89-bcc1-ae8c80dd7d97",
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        1380
+      ],
+      "webhookId": "ef92cb5f-8939-4d6c-98c4-119595e9ec9c"
+    }
+  ],
+  "connections": {
+    "Lark. Get Access Token": {
+      "main": [
+        [
+          {
+            "node": "Lark. Get All Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5min": {
+      "main": [
+        [
+          {
+            "node": "env",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "env": {
+      "main": [
+        [
+          {
+            "node": "Lark. Get Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Items": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lark. Get All Records": {
+      "main": [
+        [
+          {
+            "node": "New Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Az: Max 1 work Items": {
+      "main": [
+        [
+          {
+            "node": "Get All Attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Attachments": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uploaded": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Uploaded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Json": {
+      "main": [
+        [
+          {
+            "node": "Update Lark Work Item Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Lark Work Item Record": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace": {
+      "main": [
+        [
+          {
+            "node": "Create Json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Az: Max 1 work Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Replace",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get All Attachments1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Attachments1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Replace1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Uploaded1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uploaded1": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace1": {
+      "main": [
+        [
+          {
+            "node": "Update Lark Work Item Record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Replace Me1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:5min": {
+      "recurrencyRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "5254b079-6667-423d-9ae1-54e1184bb1f4",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-01-11T15:03:06.046Z",
+      "createdAt": "2024-01-11T15:03:06.046Z",
+      "role": "workflow:owner",
+      "workflowId": "gQMGEnOCF54gYgsc",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
