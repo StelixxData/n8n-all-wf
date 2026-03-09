@@ -1,0 +1,1143 @@
+{
+  "updatedAt": "2025-02-06T16:24:29.089Z",
+  "createdAt": "2025-02-06T14:55:12.991Z",
+  "id": "2ZK6gr0pKknyceCm",
+  "name": "Community - V2 - 2.2 - Telegram Distribution Processor Thang (bak)",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const distributionTarget  = $node[\"env\"].json[\"DistributionTarget\"];\nconst driveAccount = 'tuan@gnok.top'\n\nconst query = \n`\nSELECT t.Id, t.[Type], t.Text, t.MediaLink\nFROM XinhTelegramMedia t\nINNER JOIN (\n    SELECT TOP 1 m.MessageGroupedId\n    FROM XinhTelegramMedia m\n    LEFT JOIN XinhDistributionLog d ON m.Id = d.SourceId AND d.DistributionTarget <> '${ distributionTarget[\"Username\"] }'\n    WHERE d.SourceId IS NULL\n      AND m.Status = 'APPROVED'\n      AND m.DriveAccount = '${ driveAccount }'\n    ORDER BY NEWID()\n) AS sub ON t.MessageGroupedId = sub.MessageGroupedId\nWHERE t.Status = 'APPROVED'\n  AND t.DriveAccount = '${ driveAccount }';\n`\n\nreturn {\n  query: query\n}\n"
+      },
+      "id": "f7f51f0c-68ac-4db5-b8ec-b7a0b9e95f8c",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        560
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code\"].json[\"query\"] }}"
+      },
+      "id": "1bf82f45-1cfe-45b1-a365-d18e33737dd9",
+      "name": "Microsoft SQL",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        560
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": false,
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const env =  {\n  \"DistributionTarget\": $node[\"Webhook\"].json[\"body\"][\"DistributionTarget\"],\n  \"TelegramBotAccessToken\": $node[\"TeleBotDecryptToken\"].json[\"outputText\"]\n}\n\nif(env.DistributionTarget.Username.startsWith(\"@\") == 0)\n  env.DistributionTarget.Username = \"@\" + env.DistributionTarget.Username;\n\nreturn env;"
+      },
+      "id": "6fa14a8e-f115-4f73-a741-188e01d65246",
+      "name": "env",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        560
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.MediaLink }}",
+          "mode": "url"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "id": "1e2bed3d-1a46-4593-ab18-3bd575bf14e7",
+      "name": "Share File",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1600,
+        520
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xGF0GLlaZtQfE7xj",
+          "name": "Google Drive - tuan@gnok.top"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.MediaLink.replace(\"https://drive.google.com/file/d/\", \"\").replace(\"/view?usp=drivesdk\", \"\") }}/permissions/anyoneWithLink",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "35143688-a6e0-4d42-a2cc-b53d25ff30b9",
+      "name": "Revoke Share File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        520
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xGF0GLlaZtQfE7xj",
+          "name": "Google Drive - tuan@gnok.top"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "55b1218c-da11-48b6-8e7b-80c1d685bddf",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        520
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const medias = $items(\"Microsoft SQL\");\nconst json = \n{\n    \"chat_id\": $node[\"env\"].json[\"DistributionTarget\"][\"Username\"],\n    \"media\": []\n}\n\nmedias.forEach((item) =>{\n  json.media.push(\n    {\n      \"type\": item.json.Type.replace(\"FileType.\", \"\").toLowerCase(),\n      \"media\": item.json.MediaLink.replace(\"https://drive.google.com/file/d/\", \"https://drive.google.com/uc?id=\").replace(\"/view?usp=drivesdk\", \"\") + \"&export=download\",\n      \"caption\": item.json.Text ?? \"\"\n    });\n})\n\n\nreturn {\n  \"postData\": JSON.stringify(json)\n}\n"
+      },
+      "id": "aa114990-856e-49bc-9465-93f0256bac81",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2020,
+        520
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/bot{{ $node[\"env\"].json[\"TelegramBotAccessToken\"] }}/sendMediaGroup",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.postData }}",
+        "options": {}
+      },
+      "id": "23f1b5f0-3505-4129-97bf-d3357d5c141e",
+      "name": "sendMediaGroup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        520
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return $items(\"Microsoft SQL\");"
+      },
+      "id": "af7b357f-cbda-4c5f-9788-7ba69d7cc02d",
+      "name": "All Links",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2460,
+        520
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const distributionLink = $node[\"env\"].json[\"DistributionTarget\"][\"Link\"] + '/' + $node[\"sendMediaGroup\"].json[\"result\"][0][\"message_id\"];\nconst medias = $items(\"Microsoft SQL\");\nlet queries = [];\n\nmedias.forEach((item) => {\n  queries.push(`\n    INSERT INTO [dbo].[XinhDistributionLog] \n    (\n        [SourceId], \n        [DistributionTarget],\n        [DistributionLink]\n    )\n    VALUES \n    (\n        ${ item.json.Id },\n        N'${ $node[\"env\"].json[\"DistributionTarget\"][\"Link\"] }',\n        N'${ distributionLink }'\n    );\n  `)\n})\n\nreturn {\n  query: queries.join('\\n') + '\\n Select top 1 1'\n}"
+      },
+      "id": "d8b8e18f-7374-47a9-8ce2-c652ad30aacb",
+      "name": "Distribution Log",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2820,
+        520
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"PrepareLogData\"].json[\"query\"] }}"
+      },
+      "id": "60ea712c-6d3a-4a06-9b70-991c62f6308c",
+      "name": "Add Log",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        3240,
+        20
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.yoong.xyz/webhook/reaction8-c59fe239-b27e-4b6e-a86e-24c9e9b2439e",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $node[\"sendMediaGroup\"].json }}",
+        "options": {}
+      },
+      "id": "ca3423cd-27e4-410c-99ff-80a2ab06879c",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3240,
+        520
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.MediaLink }}",
+          "mode": "url"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "id": "5119e11e-df37-42a4-9a22-9d1410ed02be",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2000,
+        760
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0bHKCm5aLWAfAeSb",
+          "name": "Google Drive - smars@gnok.top"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// {\n//   \"text\": \"Tweeting with media!\",\n//   \"media\": {\n//     \"media_ids\": [\n//       \"1455952740635586573\"\n//     ]\n//   }\n// }\n\nfunction randomInt(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n\nconst additionalTexts = [\n  \"🫡 https://t.me/gai_xinhh\",\n  \"Còn nhiều lắm 👉🏻: https://t.me/gai_xinhh\",\n  \"Check ở bio 🥵\",\n  \"https://t.me/gai_xinhh 👀👀👀\",\n  \"Full HD không che 💦: https://t.me/gai_xinhh\",\n  \"Ib để nhận thêm 🤫\", \n  \"Link ở đây nè: https://t.me/gai_xinhh\",\n  \"Xem thêm tại đây ➡️: https://t.me/gai_xinhh\",\n  \"Nhiều gái xinh lắm lắm: https://t.me/gai_xinhh\", \n  \"Cực phẩm 😋: https://t.me/gai_xinhh\",\n  \"Đảm bảo chất lượng 🔥: https://t.me/gai_xinhh\",\n  \"Nóng bỏng tay 🥵: https://t.me/gai_xinhh\",\n  \"Mỗi ngày một em xinh 💋: https://t.me/gai_xinhh\",\n  \"Ghé thăm kênh mình nhé 😉: https://t.me/gai_xinhh\",\n  \"Tuyển mem VIP 💎: https://t.me/gai_xinhh\" ,\n  \"Hí ae, link full HD bên dưới nhé 🤫 \\nhttps://t.me/gai_xinhh\",\n  \"Gái xinh chất lượng cao đây, click link bio nha 😉\",\n  \"Muốn xem thêm thì vào đây 💦: https://t.me/gai_xinhh\",\n  \"Hàng tuyển chọn kỹ càng, đảm bảo anh em hài lòng 🔥: https://t.me/gai_xinhh\",\n  \"Đừng quên follow kênh để cập nhật hình mới mỗi ngày nha anh em 🤤\",\n  \"Inbox mình để nhận thêm ảnh độc quyền nhé 📩\",\n  \"Chấm cái (.) để mình gửi ... cho 😜\",\n  \"ae nhanh tay thì còn, chậm tay cũng còn luôn =)) https://t.me/gai_xinhh\",\n  \"Kênh kín dành riêng cho ae đó 🤫\",\n  \"ae có thích livestream không?\",\n  \"Gái xinh mọi miền tổ quốc 🤤🤤🤤 https://t.me/gai_xinhh\",\n  \"Thiên đường đang chờ đón ae 😇: https://t.me/gai_xinhh\",\n  \"Lưu ý: chỉ dành cho người trên 18 tuổi 🔞\" \n]\nconst additionalText = additionalTexts[randomInt(0, additionalTexts.length - 1)];\n\nconst medias = $items(\"Microsoft SQL\");\nconst json = \n{\n  \"text\": medias.find(item => item.json.text !== null)?.json.text,\n  \"media\": {\n    \"media_ids\": $node[\"Aggregate2\"].json[\"data\"].map(item => item.media_id_string).slice(0, 4)\n  }\n}\nif(json.text)\n  json.text += \"\\n\" + additionalText;\nelse \n  json.text = additionalText;\nreturn {\n  \"postData\": JSON.stringify(json)\n}\n"
+      },
+      "id": "5927eef0-f1f5-4d16-9619-18149a6925dd",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2540,
+        760
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.x.com/2/tweets",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twitterOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.postData }}",
+        "options": {}
+      },
+      "id": "5ad2115c-4d78-4238-8626-7d96df6d0469",
+      "name": "Create Tweet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2720,
+        760
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "D47OWNn8MH6a9M2Z",
+          "name": "X OAuth 1.0 - @AidanNg10"
+        },
+        "twitterOAuth2Api": {
+          "id": "mOVEl5bsMRTRJrcQ",
+          "name": "X Oauth 2.0 - @Gai_Xinhhh"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://upload.twitter.com/1.1/media/upload.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twitterOAuth1Api",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "media",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "31d2b9e6-4ca0-4d1f-9510-04b346ae25bd",
+      "name": "Upload Media",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2180,
+        760
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "Nqfz2xhZuwdZ9XCU",
+          "name": "X OAuth 1.0 - @Gai_Xinhhh"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// X allow maximum 4 image/video\nvar text =  $node[\"Aggregate1\"].json[\"data\"].find(item => item.Text !== null)?.Text;\nvar fourItem = $node[\"Aggregate1\"].json[\"data\"].filter(item => item.Type.replace(\"FileType.\", \"\").toLowerCase() !== 'video').slice(0, 4);\nfourItem[0].Text = text;\n\nconst newItems = [];\nfourItem.forEach((item) => {\n  newItems.push({json: item})\n})\nreturn newItems;"
+      },
+      "id": "c891943e-bda5-4830-bdf2-4ad17b44a52d",
+      "name": "Take 4",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1820,
+        760
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "485b595f-182e-44cf-ac97-850504fa6df4",
+      "name": "Aggregate2",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2360,
+        760
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "a9f6fc40-0ec7-428d-9195-06b59ab2c358",
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1620,
+        760
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f49bf8cd-683a-4f45-b37c-98b8ba79efde",
+        "options": {}
+      },
+      "id": "0342264a-f11e-4305-9cea-fe8c1bfea2ee",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        -120
+      ],
+      "webhookId": "f49bf8cd-683a-4f45-b37c-98b8ba79efde",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "Replaced by Download Request & Download Media, reason:\n1. We use upload file instead of downloadable link (Lark doesn't provide it)",
+        "height": 320,
+        "width": 580
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        400
+      ],
+      "id": "1556602d-b40b-48b7-b155-6e0c12d67f7b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT TOP 1 g.Id, g.ChatId, 'https://t.me/' + g.Username as Link, g.Username, b.Token, g.GroupType\nFROM TelegramGroups g\nJOIN TelegramUserBots b ON g.DistributeBot = b.Username\nWHERE g.GroupType = '{{ `HAI` }}'\n    AND g.SyncStatus = 'SYNCED'\n    AND g.[Type] = 'channel'\n    AND (DATEPART(hour, GETDATE()) * 60 + DATEPART(minute, GETDATE())) % g.DistributeIntervalMinute <= {{ 1000 }};"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        220
+      ],
+      "id": "f037f1c0-f83a-46e0-9ebb-74212a8b0fe6",
+      "name": "GetGroupToDistribute",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json\nreturn {\n  body : {\n    DistributionTarget: {\n    Id: input[\"ChatId\"],\n    Link: input[\"Link\"],\n    Username: input[\"Username\"],\n    GroupType: input[\"GroupType\"]\n  },\n  BotAccessToken: input[\"Token\"]\n  }\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        220
+      ],
+      "id": "37e6a7a3-218a-4421-b46d-f5497613023d",
+      "name": "FakeWebhookRequest"
+    },
+    {
+      "parameters": {
+        "content": "Fake webhook request",
+        "height": 280,
+        "width": 620,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        140
+      ],
+      "id": "cd829227-37a8-43b8-ad9f-90303195ef22",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n9n.yoong.xyz/webhook/aes-f545f8a6-0c16-4131-8162-8caa8c41f5ad",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"text\": \"{{$json[\"body\"][\"BotAccessToken\"]}}\",\n    \"action\": \"DECRYPT\"\n}",
+        "options": {}
+      },
+      "id": "c337c1e9-1626-43d1-8dee-15148b8f2b2f",
+      "name": "TeleBotDecryptToken",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- SELECT t.Id, t.[Type], t.[Text], t.MediaLink, t.ChatId, ca.Credentials\n-- FROM XinhTelegramMedia t\n-- INNER JOIN (\n--     SELECT TOP 1 m.MessageGroupedId, m.ChatId\n--     FROM XinhTelegramMedia m\n--     LEFT JOIN XinhDistributionLog d ON m.Id = d.SourceId AND d.DistributionTarget <> '{{ $json.Link }}'\n--     JOIN TelegramGroupSource tg ON m.ChatId = tg.ChatId\n--     WHERE d.SourceId IS NULL\n--       AND ( m.Status  = 'APPROVED'  OR m.Status  = 'CONTENT-AI-APPROVED')\n--       AND tg.GroupType = '{{ $json.GroupType }}'\n--       AND m.Type = 'FileType.PHOTO'\n--     ORDER BY NEWID()\n-- ) AS sub ON t.MessageGroupedId = sub.MessageGroupedId \n--     AND t.ChatId = sub.ChatId\n-- JOIN CommunityAccount ca ON t.DriveAccount = ca.\"User\"\n\n\nSELECT t.Id, t.[Type], t.[Text], t.MediaLink, t.ChatId, ca.Credentials\nFROM XinhTelegramMedia t\nJOIN CommunityAccount ca ON t.DriveAccount = ca.\"User\"\nWHERE t.Id = 44640"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        1340,
+        160
+      ],
+      "id": "5f5f8e1f-98d7-4d4e-b842-332e4577ce6f",
+      "name": "GetMediaToDeliver",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Replaced by GetMediaToDeliver, reason:\n1. Reduce Code node\n2. This currently get the media suitable to GG Drive",
+        "height": 320,
+        "width": 460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        400
+      ],
+      "id": "ef7731eb-0c3c-46c8-adfc-6e5ffa8aae3b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\nconst { CustomFile } = require(\"telegram/client/uploads\");\n\nconst stringSession = ''; // leave empty so this will be bot \n// const apiId = \"22794803\";\n// const apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\n// below is appid of Gnoc account\nconst apiId = \"22294946\";\nconst apiHash = \"db398a821ea8c8da64143b6def94a784\";\n\n// const BOT_TOKEN = $('TeleBotDecryptToken').first().json.outputText\n// @rosebibot\n// const BOT_TOKEN = '7519120919:AAEffyAkzUwU6IEFWi-Kzjk7B9iw--LIvj4'\n\n// @chubquabot\nconst BOT_TOKEN = '7533178977:AAHKVB9Nl3iyukAkaCmaYzxEzBfuj1cIVyE'\n\nlet client = new TelegramClient(\n        new StringSession(stringSession),\n        apiId,\n        apiHash,\n        { connectionRetries: 5 }\n);\nconst distributedGroup = $('LinkAndGroupTypeToGetMedia').first().json;\nasync function run() {\n  try {\n    // await client.connect();\n    await client.start({\n      botAuthToken: BOT_TOKEN,\n    });\n    \n    let medias = $input.all();\n    // let fileSend = [];\n    // let message = '';\n    // for (let i = 0; i < medias.length; i ++) {\n    //   let buffer = await this.helpers.getBinaryDataBuffer(i, 'data');\n    //   let fileName = medias[i][\"binary\"][\"data\"][\"fileName\"];\n    //   let fileSize = buffer.length;\n    //   let file = new CustomFile(fileName, fileSize, \"\", buffer);\n    //   let uploadedFile = await client.uploadFile({\n    //     file: file,\n    //     workers: 1\n    //   });\n      \n    //   fileSend.push(uploadedFile);\n    //   let text = medias[i][\"json\"][\"text\"]\n    //   if (text && text.length && text.trim() != '') {\n    //     message = text;\n    //   }\n    // }\n\n    // let result = await client.sendMultiMedia(distributedGroup[\"Username\"], {\n    //     message: message,\n    //     file: fileSend,\n    // });\n\n    // let result = await client.invoke(\n    // new Api.messages.SendMedia({\n    //   peer: '@DocLaTelegram',\n    //   multiMedia: \n    //     new Api.InputSingleMedia({\n    //       media: new Api.InputMediaUploadedPhoto({\n    //         file: await client.uploadFile({\n    //           file: new CustomFile(\n    //             medias[0][\"binary\"][\"data\"][\"fileName\"],\n    //             await this.helpers.getBinaryDataBuffer(0, 'data').length,\n    //             \"\",\n    //             await this.helpers.getBinaryDataBuffer(0, 'data')\n    //           ),\n    //           workers: 1,\n    //         })\n    //       }),\n    //       message: \"Hello there!\",\n    //     })\n      \n    // })\n    // );\n\n\n    var fileBuffer = await this.helpers.getBinaryDataBuffer(0, 'data');\n    var fileSize = fileBuffer.length;\n    var fileName = medias[0][\"binary\"][\"data\"][\"fileName\"];\n\n    console.log(fileSize)\n    console.log(fileName)\n    \n      const result = await client.invoke(\n    new Api.messages.SendMedia({\n      peer: \"@DocLaTelegram\",\n      media: new Api.InputMediaUploadedPhoto({\n        file: await client.uploadFile({\n          file: new CustomFile(\n                fileName,\n                fileSize,\n                \"\",\n                fileBuffer\n          ),\n          workers: 1,\n        })\n      }),\n      message: \"nnman hello\"\n    })\n  );\n    \n  //    const result = await client.invoke(\n  //   new Api.messages.SendMessage({\n  //     peer: distributedGroup[\"Username\"],\n  //     message: \"Hello there!\"\n  //   })\n  // );\n    \n    console.log(result)\n    \n    return {\n      mediasDistributed: true,\n      id: result[0][\"id\"]\n    };\n  } catch(ex){\n    return {\n      mediasDistributed: false,\n      error: ex\n    };\n  } finally {\n    await client.disconnect();\n  }\n};\nconst result = await run();\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2100,
+        160
+      ],
+      "id": "dd864d9f-e97e-4880-afe7-c345b0fb2e75",
+      "name": "DistributeToTeleGroup"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = $('FakeWebhookRequest').first().json.body // should change to webhook\n// let data = $node[\"Webhook\"].json[\"body\"]\n\nif(data.DistributionTarget.Username.startsWith(\"@\") == 0)\n  data.DistributionTarget.Username = \"@\" + data.DistributionTarget.Username;\n\nreturn data[\"DistributionTarget\"]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        160
+      ],
+      "id": "907ab90b-5353-4c6a-8204-0c5523c65f95",
+      "name": "LinkAndGroupTypeToGetMedia"
+    },
+    {
+      "parameters": {
+        "content": "#### This can be reuse for different platform, just pass in:\n1. DistributionTarget - Link (from distribution log)\n2. Type of group (XINH, HAI, ...)\n#### Then get the suitable media to distribute",
+        "height": 320,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        0
+      ],
+      "id": "3fb4caa9-16fe-4452-9cd1-c0196ac98c44",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b5ec9701-1e95-4c7b-9ce0-a35fd26939da",
+              "leftValue": "={{ $json.mediasDistributed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2320,
+        160
+      ],
+      "id": "e60cf3f5-113c-4582-bbd1-0c47cac74567",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const distributedMedias = $('GetMediaToDeliver').all().map(x => x[\"json\"]);\nconst distributedGroup = $('GetGroupToDistribute').first().json;\nconst sentMsgId = $input.first().json.id\nconst values = distributedMedias.map(item => {\n  const { Id } = item;\n  return `(${Id}, '${distributedGroup[\"Link\"]}', '${distributedGroup[\"Link\"]}/${sentMsgId}' )`; // DISTRIBUTION LINK MUST BE COMBINED WITH THE ID OF Sent Msg\n}).join(',\\n');\nconst insertSQL = `\nBEGIN TRANSACTION;\n\nBEGIN TRY\n\n  INSERT INTO XinhDistributionLog \n    (SourceId, DistributionTarget, DistributionLink) \n  VALUES ${values};\n\nCOMMIT TRANSACTION;\nEND TRY\nBEGIN CATCH\n    ROLLBACK TRANSACTION;\nEND CATCH;\n`\nreturn {\n  query: insertSQL.replace(/\\s+/g, ' ').trim()\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3000,
+        20
+      ],
+      "id": "783ac83b-bdb7-44a0-abe4-f25669991e9d",
+      "name": "PrepareLogData"
+    },
+    {
+      "parameters": {
+        "content": "#### Replaced by the Telegram Distribution, reason:\n1. Because we not use downloadable link, so need to attach file, but HTTP Request Node can not attach multiple file\n##### We using BOT_TOKEN from decrypt not to login as Bot and send message.",
+        "height": 320,
+        "width": 740
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        400
+      ],
+      "id": "1765d85c-ceca-4e5e-8b21-179272bd9cf2",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "Telegram Distribution",
+        "height": 320,
+        "width": 720,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        0
+      ],
+      "id": "d3fd0928-5585-4088-8fc2-525494706731",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Distribution Log\"].json[\"query\"] }}"
+      },
+      "id": "91ba8a55-fce4-498d-8c04-d590f735fad5",
+      "name": "Add Log1",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        3020,
+        520
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH TopRecord AS\n(\n    SELECT TOP 1 x.Id, x.\"Type\", \"Text\", MediaLink , MessageGroupedId, x.ChatId\n    FROM XinhTelegramMedia x\n    JOIN TelegramGroupSource tg ON x.ChatId = tg.ChatId\n    WHERE \n    NOT EXISTS (\n        SELECT 1\n        FROM XinhDistributionLog xl\n        WHERE x.Id = xl.SourceId AND DistributionTarget <> '{{ $json.Link }}'\n    )\n    --AND \"Status\"  = 'APPROVED' -- THIS LINE WILL BE UNCOMMENT\n    AND MediaLink NOT LIKE 'https://drive.google.com%' -- THIS LINE MAY BE REMOVED\n    AND MessageGroupedId IS NOT NULL -- THIS LINE WILL BE REMOVED\n    AND tg.GroupType = '{{ $json.GroupType }}'\n    AND x.\"Type\" = 'FileType.PHOTO' -- THIS LINE WILL BE REMOVED \n)\nSELECT x.Id, x.\"Type\", x.\"Text\", x.MediaLink, x.MessageGroupedId, ChatId, ca.Credentials\nFROM XinhTelegramMedia x\nJOIN CommunityAccount ca ON x.DriveAccount = ca.\"User\"\nWHERE \n    (SELECT MessageGroupedId FROM TopRecord) IS NULL \n    AND x.Id = (SELECT Id FROM TopRecord)\n    OR \n    ( x.MessageGroupedId = (SELECT MessageGroupedId FROM TopRecord) AND x.ChatId = (SELECT ChatId from TopRecord)  )"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        -260
+      ],
+      "id": "7d2cba55-f556-4816-8628-e386296b2ed4",
+      "name": "GetMediaToDeliver1",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "Sử dụng code bên dưới vì perf tốt hơn"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -320
+      ],
+      "id": "cae0af8a-f03e-4305-8741-96e4f901f22b",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        140,
+        220
+      ],
+      "id": "f4c1e2a6-c5ea-424a-9da8-f7206d59591d",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ogmJgoLqdW6PB9NO",
+          "mode": "list",
+          "cachedResultName": "Lark Process"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        1840,
+        160
+      ],
+      "id": "197b1973-f0fe-46ee-a396-98e8773c55ba",
+      "name": "PublicMedia"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "a5fdc06d-a2e3-4e16-8969-62df3e826b40",
+      "name": "Aggregate3",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2740,
+        -340
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const medias = $items(\"GetMediaToDeliver\");\nlet json = \n{\n    \"chat_id\": $node[\"LinkAndGroupTypeToGetMedia\"].json[\"Username\"],\n    \"media\": []\n}\n\n// https://internal-api-drive-stream-sg.larksuite.com/space/api/box/stream/download/all/CuL1bFfNGoDlDBxD7qHlbWcXgTc/?mount_point=explorer&version=7449931496284045344\n// https://larksuite.com/space/api/box/stream/download/all/\n// https://larksuite.com/space/api/box/stream/download/all/\n\nmedias.forEach((item) =>{\n  json.media.push(\n    {\n      \"type\": item.json.Type.replace(\"FileType.\", \"\").toLowerCase(),\n      \"media\": \"https://larksuite.com/space/api/box/stream/download/all/\" + item.json.MediaLink,\n      \"caption\": item.json.Text ?? \"\"\n    });\n})\n\nreturn {\n  \"postData\": JSON.stringify(json)\n}\n"
+      },
+      "id": "d7be7bc3-ad1c-4896-90ff-f2491d5bd6fa",
+      "name": "Code3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2940,
+        -340
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/bot{{ $('TeleBotDecryptToken').first().json.outputText }}/sendMediaGroup",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.postData }}",
+        "options": {}
+      },
+      "id": "1ea86571-d4d3-4a78-93e5-68a1a7a80fdd",
+      "name": "sendMediaGroup1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3160,
+        -340
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all().map(i => i[\"json\"]);\n\nreturn input.map(i => {\n  return {\n    file_token: i[\"MediaLink\"],\n    action: 'DOWNLOAD',\n    credential: i[\"Credentials\"],\n    type: i[\"Type\"],\n    text: i[\"Text\"],\n  }\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        160
+      ],
+      "id": "1403019d-ff16-48db-9605-72768d100b9e",
+      "name": "DownloadRequest"
+    }
+  ],
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "env": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "main": [
+        [
+          {
+            "node": "Share File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share File": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "sendMediaGroup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sendMediaGroup": {
+      "main": [
+        [
+          {
+            "node": "All Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "All Links": {
+      "main": [
+        [
+          {
+            "node": "Revoke Share File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revoke Share File": {
+      "main": [
+        [
+          {
+            "node": "Distribution Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Distribution Log": {
+      "main": [
+        [
+          {
+            "node": "Add Log1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Upload Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Create Tweet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Media": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Take 4": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Take 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "GetGroupToDistribute": {
+      "main": [
+        [
+          {
+            "node": "FakeWebhookRequest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FakeWebhookRequest": {
+      "main": [
+        [
+          {
+            "node": "TeleBotDecryptToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TeleBotDecryptToken": {
+      "main": [
+        [
+          {
+            "node": "LinkAndGroupTypeToGetMedia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetMediaToDeliver": {
+      "main": [
+        [
+          {
+            "node": "DownloadRequest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkAndGroupTypeToGetMedia": {
+      "main": [
+        [
+          {
+            "node": "GetMediaToDeliver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DistributeToTeleGroup": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        []
+      ]
+    },
+    "PrepareLogData": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "GetGroupToDistribute",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PublicMedia": {
+      "main": [
+        [
+          {
+            "node": "DistributeToTeleGroup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "sendMediaGroup1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DownloadRequest": {
+      "main": [
+        [
+          {
+            "node": "PublicMedia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "KG3wK34JqO8YiJsO",
+    "saveDataSuccessExecution": "none"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        14
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b3d0ba2f-6650-48db-847d-166fd362efc4",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-02-06T14:55:12.991Z",
+      "createdAt": "2025-02-06T14:55:12.991Z",
+      "role": "workflow:owner",
+      "workflowId": "2ZK6gr0pKknyceCm",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
