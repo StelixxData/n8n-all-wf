@@ -1,0 +1,934 @@
+{
+  "updatedAt": "2024-12-29T12:31:41.581Z",
+  "createdAt": "2024-12-04T15:35:24.334Z",
+  "id": "Ab5Qe35VXxiBKhrx",
+  "name": "Community - 0 - Content Source Management",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "8dfa29bb-d7c3-4449-914b-ee1547ae66fc",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "b8481e7c-2d5a-4c13-b09f-6fe403952ba8",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        540,
+        360
+      ],
+      "webhookId": "f26d2df7-2229-412e-8188-54d5afc483a1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "//////////////////////\nconst { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\n\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\n\nconst returnData = [];\n\nasync function run() {\n    const client = new TelegramClient(\n      new StringSession(stringSession),\n      apiId,\n      apiHash,\n      { connectionRetries: 5 }\n    );\n\n    await client.connect();\n\n     const result = await client.invoke(\n    new Api.messages.GetHistory({\n      peer: \"ngamgaixinhtuoi\",\n      offsetId: 100,\n      // offsetDate: 43,\n      // addOffset: 0,\n      limit: 1,\n      // maxId: 0,\n      // minId: 0,\n      hash: BigInt(\"-4256187714564\"),\n    })\n  );\n  console.log(result); // prints the result\n    returnData.push(result);\n  await client.disconnect();\n  return returnData;\n};\n\nawait run();\nreturn returnData;"
+      },
+      "id": "587fc1f2-585b-4bf7-9eba-f8e6fc9cfe7b",
+      "name": "EditAdmin1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "login"
+      },
+      "id": "4783ca28-ddf4-4da0-b9f9-767295936dda",
+      "name": "Telegram CoPilot2",
+      "type": "@telepilotco/n8n-nodes-telepilot.telePilot",
+      "typeVersion": 1,
+      "position": [
+        900,
+        340
+      ],
+      "credentials": {
+        "telePilotApi": {
+          "id": "Hk8hPihzT5I3ZDuP",
+          "name": "Personal Telegram CoPilot - @islamiticDryas"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "chatId": "=@{{ $node[\"Microsoft SQL\"].json[\"Username\"] }}"
+      },
+      "id": "5a035ba6-3c43-4b17-9b23-de7831b2f565",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        1200
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "SN4VdH7gHc9Ajx0F",
+          "name": "Telegram - @generalmanagedbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "fe7adbbb-2ccd-4748-a367-219df68b2b00",
+      "name": "Get Chat Info",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Step 1: Lấy ra danh sách Id theo điều kiện\nSELECT TOP 1 Id\nINTO #TempIds\nFROM TelegramGroupSource\nWHERE SyncStatus IS NULL OR SyncStatus = ''\nORDER BY [CreatedDateTime] DESC;\n\n-- Step 2: Update cột SyncStatus = 'Processing' với các dòng có Id nằm trong ds bên trên\nUPDATE TelegramGroupSource\nSET SyncStatus = 'PROCESSING'\nWHERE Id IN (SELECT Id FROM #TempIds);\n\n-- Step 3: Lấy ra toàn bộ các cột có Id nằm trong ds bên trên\nSELECT *\nFROM TelegramGroupSource\nWHERE Id IN (SELECT Id FROM #TempIds);\n\n-- Step 4: Xóa bảng tạm\nDROP TABLE #TempIds;"
+      },
+      "id": "aea467a5-1a83-4cfc-b633-8ccd7e5b32d4",
+      "name": "Microsoft SQL",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        1200
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $node[\"Telegram\"].json[\"result\"];\nconst extraData = $node[\"Get FullChannel & Participants\"].json;\n\nconst query = \n`\nDECLARE @ChatId BIGINT = ${ data[\"id\"] };\nDECLARE @Title NVARCHAR(MAX) = N'${data[\"title\"]}';\nDECLARE @Username NVARCHAR(MAX) = N'${data['username']}';\nDECLARE @Type NVARCHAR(MAX) = N'${data[\"type\"]}';\nDECLARE @Description NVARCHAR(MAX) = N'${data[\"description\"] ?? \"\"}';\nDECLARE @LinkedChatId BIGINT = ${data[\"linked_chat_id\"] ?? null};\nDECLARE @MemberCount INT = ${ extraData[\"FullChat\"][\"fullChat\"][\"participantsCount\"] };\nDECLARE @ExtraData NVARCHAR(MAX) = N'${JSON.stringify({\"extraData\": extraData, \"data\": data}).replace(/'/g, \"''\") }';\nDECLARE @UpdatedDateTime DATETIMEOFFSET(7) = GETDATE(); \nDECLARE @SyncStatus NVARCHAR(50) = N'SYNCED';\nDECLARE @ConnectionAccount NVARCHAR(500) = N'${ extraData[\"ConnectionAccount\"] }';\n\nUPDATE [dbo].[TelegramGroupSource]\nSET \n    [ChatId] = @ChatId,\n    [Title] = @Title,\n    [Username] = @Username,\n    [Type] = @Type,\n    [Description] = @Description,\n    [LinkedChatId] = @LinkedChatId, \n    [MemberCount] = @MemberCount,\n    [ExtraData] = @ExtraData,\n    [UpdatedDateTime] = @UpdatedDateTime,\n    [SyncStatus] = @SyncStatus,\n    [ConnectionAccount] = @ConnectionAccount\nWHERE [Username] = @Username;\n\nSELECT TOP 1 1;\n`\n\nreturn {\n  query: query\n}\n"
+      },
+      "id": "2d7817f9-2adf-4589-8660-f1753690e8a8",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code\"].json[\"query\"] }}"
+      },
+      "id": "5e09413a-9a65-4d65-85f8-9ecc102f500f",
+      "name": "Microsoft SQL1",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        1680,
+        1200
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "44116251-b55a-4941-be03-88cc50bc00f5",
+      "name": "Schedule Retry",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        980
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code1\"].json[\"query\"] }}"
+      },
+      "id": "372897b9-339d-4ba5-9c05-f3f47b88e3ce",
+      "name": "MSSQL: Get1",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        860,
+        980
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": false,
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = \n`\nUPDATE TelegramGroupSource\nSET SyncStatus = NULL\nWHERE SyncStatus = 'PROCESSING';\n`\n\nreturn {\n  query: query\n}\n  "
+      },
+      "id": "c719765c-71ff-4fc1-90ba-c648252e3f5a",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        980
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "1a16fc65-4791-42ba-8ba7-ce75e0013d09",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1080,
+        1200
+      ],
+      "webhookId": "eb35fcc0-7f94-42e6-a4c5-b8e78c961c20"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $node[\"AddSources\"].json[\"body\"]\n\ndata.forEach(item => {\n  item.Username = item.Username.replace('https://t.me/', '').replace('t.me/', '').replace('@', '').trim();\n})\n\nreturn data;"
+      },
+      "id": "25f735a2-797d-4e99-8634-cd0eca3ce6ea",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        1460
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const queries = [];\n\nfor (const item of $input.all()) {\n  const query = \n    `\n    IF EXISTS (SELECT 1 FROM [dbo].[TelegramGroupSource] WHERE Username = N'${item.json['Username']}')\nBEGIN\n    UPDATE [dbo].[TelegramGroupSource]\n    SET \n        GroupType = N'${item.json['GroupType']}',  \n        Notes = N'${ item.json[\"Notes\"] }', \n        UpdatedDateTime = GETDATE(),\n        SyncStatus = NULL\n    WHERE Username = N'${item.json['Username']}';\nEND\nELSE\nBEGIN\n    INSERT INTO [dbo].[TelegramGroupSource] (\n      Username, \n      GroupType, \n      Notes,\n      UpdatedDateTime)\n    VALUES (\n      N'${item.json['Username']}', \n      N'${item.json['GroupType']}', \n      N'${ item.json[\"Notes\"] }',  \n      GETDATE());\nEND\n    `;\n\n  queries.push(query);\n}\n\nreturn {\n  query: queries.join('\\n') + '\\n' + 'SELECT TOP 1 1;'\n};"
+      },
+      "id": "9679eefd-cd70-4350-81fe-efd78cb4d8f1",
+      "name": "Code3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        1460
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code3\"].json[\"query\"] }}"
+      },
+      "id": "a990c393-f446-4eae-9458-e31cf085fa93",
+      "name": "Microsoft SQL2",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        1460
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\n\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\nconst groupOrChannelUsername = $node[\"Microsoft SQL\"].json[\"Username\"];\nlet returnData = {\n  \"ConnectionAccount\": \"@islamiticDryas\"\n};\n\nasync function run() {\n    const client = new TelegramClient(\n      new StringSession(stringSession),\n      apiId,\n      apiHash,\n      { connectionRetries: 5 }\n    );\n\n    await client.connect();\n\n    /// GetParticipants\n    const fullChat = await client.invoke(\n      new Api.channels.GetFullChannel({\n        channel: groupOrChannelUsername,\n      })\n    );\n    returnData.FullChat = fullChat;\n\n    await new Promise(resolve => setTimeout(resolve, 3000));\n  \n    /// GetBroadcastStats\n    // CHAT_ADMIN_REQUIRED \n    // const result = await client.invoke(\n    //   new Api.stats.GetBroadcastStats({\n    //     channel: groupOrChannelUsername,\n    //     dark: true,\n    //   })\n    // );\n    //  console.log(result)\n    // returnData.Participants = result;\n    await client.disconnect();\n\n  return returnData;\n};\n\nawait run();\nreturn returnData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        1200
+      ],
+      "id": "c4002d71-55e3-41e4-8625-b80b375fb036",
+      "name": "Get FullChannel & Participants"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "addsource-361e0ff4-9fa2-476d-b9d6-1bc22fcbb267",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        440,
+        1460
+      ],
+      "id": "0684053a-10b4-46d4-a0e2-b17579cca78f",
+      "name": "AddSources",
+      "webhookId": "361e0ff4-9fa2-476d-b9d6-1bc22fcbb267"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "EditAdmin1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Telegram CoPilot2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Chat Info": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "main": [
+        [
+          {
+            "node": "Get FullChannel & Participants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Retry": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "MSSQL: Get1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FullChannel & Participants": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AddSources": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "KG3wK34JqO8YiJsO",
+    "saveDataSuccessExecution": "none"
+  },
+  "staticData": {
+    "node:Schedule Retry": {
+      "recurrenceRules": []
+    },
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    },
+    "node:Get Chat Info": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "cd8454f3-3b0b-4eac-8d93-0a16bb395527",
+  "activeVersionId": "cd8454f3-3b0b-4eac-8d93-0a16bb395527",
+  "triggerCount": 3,
+  "shared": [
+    {
+      "updatedAt": "2024-12-04T15:35:24.334Z",
+      "createdAt": "2024-12-04T15:35:24.334Z",
+      "role": "workflow:owner",
+      "workflowId": "Ab5Qe35VXxiBKhrx",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-26T08:31:17.177Z",
+    "createdAt": "2026-02-26T08:31:17.177Z",
+    "versionId": "cd8454f3-3b0b-4eac-8d93-0a16bb395527",
+    "workflowId": "Ab5Qe35VXxiBKhrx",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "8dfa29bb-d7c3-4449-914b-ee1547ae66fc",
+        "name": "When clicking ‘Test workflow’",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          440,
+          740
+        ]
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "b8481e7c-2d5a-4c13-b09f-6fe403952ba8",
+        "name": "When chat message received",
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          540,
+          360
+        ],
+        "webhookId": "f26d2df7-2229-412e-8188-54d5afc483a1",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "jsCode": "//////////////////////\nconst { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\n\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\n\nconst returnData = [];\n\nasync function run() {\n    const client = new TelegramClient(\n      new StringSession(stringSession),\n      apiId,\n      apiHash,\n      { connectionRetries: 5 }\n    );\n\n    await client.connect();\n\n     const result = await client.invoke(\n    new Api.messages.GetHistory({\n      peer: \"ngamgaixinhtuoi\",\n      offsetId: 100,\n      // offsetDate: 43,\n      // addOffset: 0,\n      limit: 1,\n      // maxId: 0,\n      // minId: 0,\n      hash: BigInt(\"-4256187714564\"),\n    })\n  );\n  console.log(result); // prints the result\n    returnData.push(result);\n  await client.disconnect();\n  return returnData;\n};\n\nawait run();\nreturn returnData;"
+        },
+        "id": "587fc1f2-585b-4bf7-9eba-f8e6fc9cfe7b",
+        "name": "EditAdmin1",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          660,
+          740
+        ]
+      },
+      {
+        "parameters": {
+          "resource": "login"
+        },
+        "id": "4783ca28-ddf4-4da0-b9f9-767295936dda",
+        "name": "Telegram CoPilot2",
+        "type": "@telepilotco/n8n-nodes-telepilot.telePilot",
+        "typeVersion": 1,
+        "position": [
+          900,
+          340
+        ],
+        "credentials": {
+          "telePilotApi": {
+            "id": "Hk8hPihzT5I3ZDuP",
+            "name": "Personal Telegram CoPilot - @islamiticDryas"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "resource": "chat",
+          "chatId": "=@{{ $node[\"Microsoft SQL\"].json[\"Username\"] }}"
+        },
+        "id": "5a035ba6-3c43-4b17-9b23-de7831b2f565",
+        "name": "Telegram",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1280,
+          1200
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "SN4VdH7gHc9Ajx0F",
+            "name": "Telegram - @generalmanagedbot"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 15
+              }
+            ]
+          }
+        },
+        "id": "fe7adbbb-2ccd-4748-a367-219df68b2b00",
+        "name": "Get Chat Info",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          440,
+          1200
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "-- Step 1: Lấy ra danh sách Id theo điều kiện\nSELECT TOP 1 Id\nINTO #TempIds\nFROM TelegramGroupSource\nWHERE SyncStatus IS NULL OR SyncStatus = ''\nORDER BY [CreatedDateTime] DESC;\n\n-- Step 2: Update cột SyncStatus = 'Processing' với các dòng có Id nằm trong ds bên trên\nUPDATE TelegramGroupSource\nSET SyncStatus = 'PROCESSING'\nWHERE Id IN (SELECT Id FROM #TempIds);\n\n-- Step 3: Lấy ra toàn bộ các cột có Id nằm trong ds bên trên\nSELECT *\nFROM TelegramGroupSource\nWHERE Id IN (SELECT Id FROM #TempIds);\n\n-- Step 4: Xóa bảng tạm\nDROP TABLE #TempIds;"
+        },
+        "id": "aea467a5-1a83-4cfc-b633-8ccd7e5b32d4",
+        "name": "Microsoft SQL",
+        "type": "n8n-nodes-base.microsoftSql",
+        "typeVersion": 1.1,
+        "position": [
+          660,
+          1200
+        ],
+        "retryOnFail": true,
+        "credentials": {
+          "microsoftSql": {
+            "id": "sBluV7uBt8ahdNUT",
+            "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $node[\"Telegram\"].json[\"result\"];\nconst extraData = $node[\"Get FullChannel & Participants\"].json;\n\nconst query = \n`\nDECLARE @ChatId BIGINT = ${ data[\"id\"] };\nDECLARE @Title NVARCHAR(MAX) = N'${data[\"title\"]}';\nDECLARE @Username NVARCHAR(MAX) = N'${data['username']}';\nDECLARE @Type NVARCHAR(MAX) = N'${data[\"type\"]}';\nDECLARE @Description NVARCHAR(MAX) = N'${data[\"description\"] ?? \"\"}';\nDECLARE @LinkedChatId BIGINT = ${data[\"linked_chat_id\"] ?? null};\nDECLARE @MemberCount INT = ${ extraData[\"FullChat\"][\"fullChat\"][\"participantsCount\"] };\nDECLARE @ExtraData NVARCHAR(MAX) = N'${JSON.stringify({\"extraData\": extraData, \"data\": data}).replace(/'/g, \"''\") }';\nDECLARE @UpdatedDateTime DATETIMEOFFSET(7) = GETDATE(); \nDECLARE @SyncStatus NVARCHAR(50) = N'SYNCED';\nDECLARE @ConnectionAccount NVARCHAR(500) = N'${ extraData[\"ConnectionAccount\"] }';\n\nUPDATE [dbo].[TelegramGroupSource]\nSET \n    [ChatId] = @ChatId,\n    [Title] = @Title,\n    [Username] = @Username,\n    [Type] = @Type,\n    [Description] = @Description,\n    [LinkedChatId] = @LinkedChatId, \n    [MemberCount] = @MemberCount,\n    [ExtraData] = @ExtraData,\n    [UpdatedDateTime] = @UpdatedDateTime,\n    [SyncStatus] = @SyncStatus,\n    [ConnectionAccount] = @ConnectionAccount\nWHERE [Username] = @Username;\n\nSELECT TOP 1 1;\n`\n\nreturn {\n  query: query\n}\n"
+        },
+        "id": "2d7817f9-2adf-4589-8660-f1753690e8a8",
+        "name": "Code",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1480,
+          1200
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "{{ $node[\"Code\"].json[\"query\"] }}"
+        },
+        "id": "5e09413a-9a65-4d65-85f8-9ecc102f500f",
+        "name": "Microsoft SQL1",
+        "type": "n8n-nodes-base.microsoftSql",
+        "typeVersion": 1.1,
+        "position": [
+          1680,
+          1200
+        ],
+        "retryOnFail": true,
+        "credentials": {
+          "microsoftSql": {
+            "id": "sBluV7uBt8ahdNUT",
+            "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "id": "44116251-b55a-4941-be03-88cc50bc00f5",
+        "name": "Schedule Retry",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          440,
+          980
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "{{ $node[\"Code1\"].json[\"query\"] }}"
+        },
+        "id": "372897b9-339d-4ba5-9c05-f3f47b88e3ce",
+        "name": "MSSQL: Get1",
+        "type": "n8n-nodes-base.microsoftSql",
+        "typeVersion": 1,
+        "position": [
+          860,
+          980
+        ],
+        "retryOnFail": true,
+        "alwaysOutputData": false,
+        "credentials": {
+          "microsoftSql": {
+            "id": "sBluV7uBt8ahdNUT",
+            "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const query = \n`\nUPDATE TelegramGroupSource\nSET SyncStatus = NULL\nWHERE SyncStatus = 'PROCESSING';\n`\n\nreturn {\n  query: query\n}\n  "
+        },
+        "id": "c719765c-71ff-4fc1-90ba-c648252e3f5a",
+        "name": "Code1",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          660,
+          980
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "1a16fc65-4791-42ba-8ba7-ce75e0013d09",
+        "name": "Wait",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          1080,
+          1200
+        ],
+        "webhookId": "eb35fcc0-7f94-42e6-a4c5-b8e78c961c20"
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $node[\"AddSources\"].json[\"body\"]\n\ndata.forEach(item => {\n  item.Username = item.Username.replace('https://t.me/', '').replace('t.me/', '').replace('@', '').trim();\n})\n\nreturn data;"
+        },
+        "id": "25f735a2-797d-4e99-8634-cd0eca3ce6ea",
+        "name": "Code2",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          660,
+          1460
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const queries = [];\n\nfor (const item of $input.all()) {\n  const query = \n    `\n    IF EXISTS (SELECT 1 FROM [dbo].[TelegramGroupSource] WHERE Username = N'${item.json['Username']}')\nBEGIN\n    UPDATE [dbo].[TelegramGroupSource]\n    SET \n        GroupType = N'${item.json['GroupType']}',  \n        Notes = N'${ item.json[\"Notes\"] }', \n        UpdatedDateTime = GETDATE(),\n        SyncStatus = NULL\n    WHERE Username = N'${item.json['Username']}';\nEND\nELSE\nBEGIN\n    INSERT INTO [dbo].[TelegramGroupSource] (\n      Username, \n      GroupType, \n      Notes,\n      UpdatedDateTime)\n    VALUES (\n      N'${item.json['Username']}', \n      N'${item.json['GroupType']}', \n      N'${ item.json[\"Notes\"] }',  \n      GETDATE());\nEND\n    `;\n\n  queries.push(query);\n}\n\nreturn {\n  query: queries.join('\\n') + '\\n' + 'SELECT TOP 1 1;'\n};"
+        },
+        "id": "9679eefd-cd70-4350-81fe-efd78cb4d8f1",
+        "name": "Code3",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          860,
+          1460
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "{{ $node[\"Code3\"].json[\"query\"] }}"
+        },
+        "id": "a990c393-f446-4eae-9458-e31cf085fa93",
+        "name": "Microsoft SQL2",
+        "type": "n8n-nodes-base.microsoftSql",
+        "typeVersion": 1.1,
+        "position": [
+          1100,
+          1460
+        ],
+        "retryOnFail": true,
+        "credentials": {
+          "microsoftSql": {
+            "id": "sBluV7uBt8ahdNUT",
+            "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\n\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\nconst groupOrChannelUsername = $node[\"Microsoft SQL\"].json[\"Username\"];\nlet returnData = {\n  \"ConnectionAccount\": \"@islamiticDryas\"\n};\n\nasync function run() {\n    const client = new TelegramClient(\n      new StringSession(stringSession),\n      apiId,\n      apiHash,\n      { connectionRetries: 5 }\n    );\n\n    await client.connect();\n\n    /// GetParticipants\n    const fullChat = await client.invoke(\n      new Api.channels.GetFullChannel({\n        channel: groupOrChannelUsername,\n      })\n    );\n    returnData.FullChat = fullChat;\n\n    await new Promise(resolve => setTimeout(resolve, 3000));\n  \n    /// GetBroadcastStats\n    // CHAT_ADMIN_REQUIRED \n    // const result = await client.invoke(\n    //   new Api.stats.GetBroadcastStats({\n    //     channel: groupOrChannelUsername,\n    //     dark: true,\n    //   })\n    // );\n    //  console.log(result)\n    // returnData.Participants = result;\n    await client.disconnect();\n\n  return returnData;\n};\n\nawait run();\nreturn returnData;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          1200
+        ],
+        "id": "c4002d71-55e3-41e4-8625-b80b375fb036",
+        "name": "Get FullChannel & Participants"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "addsource-361e0ff4-9fa2-476d-b9d6-1bc22fcbb267",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          440,
+          1460
+        ],
+        "id": "0684053a-10b4-46d4-a0e2-b17579cca78f",
+        "name": "AddSources",
+        "webhookId": "361e0ff4-9fa2-476d-b9d6-1bc22fcbb267"
+      }
+    ],
+    "connections": {
+      "When clicking ‘Test workflow’": {
+        "main": [
+          [
+            {
+              "node": "EditAdmin1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "Telegram CoPilot2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram": {
+        "main": [
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Chat Info": {
+        "main": [
+          [
+            {
+              "node": "Microsoft SQL",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Microsoft SQL": {
+        "main": [
+          [
+            {
+              "node": "Get FullChannel & Participants",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code": {
+        "main": [
+          [
+            {
+              "node": "Microsoft SQL1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Retry": {
+        "main": [
+          [
+            {
+              "node": "Code1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code1": {
+        "main": [
+          [
+            {
+              "node": "MSSQL: Get1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "Telegram",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code2": {
+        "main": [
+          [
+            {
+              "node": "Code3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code3": {
+        "main": [
+          [
+            {
+              "node": "Microsoft SQL2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get FullChannel & Participants": {
+        "main": [
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AddSources": {
+        "main": [
+          [
+            {
+              "node": "Code2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
