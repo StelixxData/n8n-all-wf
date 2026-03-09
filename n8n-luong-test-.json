@@ -1,0 +1,67 @@
+{
+  "updatedAt": "2024-12-29T12:28:24.029Z",
+  "createdAt": "2024-12-29T11:00:52.169Z",
+  "id": "l3fRZlPTcjpJpfAD",
+  "name": "Luong Test",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8e597186-aa85-4edf-8aa6-89d8c421f865",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "//////////////////////\nconst { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\n\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\n\nlet returnData = [];\n\nasync function run() {\n    const client = new TelegramClient(\n      new StringSession(stringSession),\n      apiId,\n      apiHash,\n      { connectionRetries: 5 }\n    );\n\n    await client.connect();\n    await client.disconnect();\n};\n\nawait run();\nreturn {returnData};\n\n\n\n\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "9c72098f-036a-4d47-80c7-35b70e9acbfd",
+      "name": "Code"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d962318a-f9a5-486c-8f79-97ded4f7edc6",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2024-12-29T11:00:52.169Z",
+      "createdAt": "2024-12-29T11:00:52.169Z",
+      "role": "workflow:owner",
+      "workflowId": "l3fRZlPTcjpJpfAD",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
