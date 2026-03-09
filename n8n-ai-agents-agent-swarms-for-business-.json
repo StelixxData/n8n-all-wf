@@ -1,0 +1,505 @@
+{
+  "updatedAt": "2025-11-29T14:04:59.101Z",
+  "createdAt": "2025-11-20T10:31:25.371Z",
+  "id": "qagxehsGHlIeaQbm",
+  "name": "[AI Agents] Agent Swarms For Business",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Wj-CBYf8fORlmxekhIoTHejT1CM8rz39ToWIgV2Iylc",
+          "mode": "list",
+          "cachedResultName": "[AI Agents] Business Plan - Prompts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wj-CBYf8fORlmxekhIoTHejT1CM8rz39ToWIgV2Iylc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1497357703,
+          "mode": "list",
+          "cachedResultName": "Saas Competitive Intelligence v2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wj-CBYf8fORlmxekhIoTHejT1CM8rz39ToWIgV2Iylc/edit#gid=1497357703"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        32
+      ],
+      "id": "9fb0129a-9d73-4353-9f06-5496787a1bad",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -80
+      ],
+      "id": "dc395f84-8df9-4524-aa69-42538d6db235",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        240,
+        32
+      ],
+      "id": "c80b9c07-4b8d-45ba-8dcc-23b74b3cf153",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -208,
+        128
+      ],
+      "id": "3b2b7991-e739-4a51-b83a-d9fb50403646",
+      "name": "ChatInput",
+      "webhookId": "a83860cd-5abe-400d-a705-0dc4d9f0ee23"
+    },
+    {
+      "parameters": {
+        "jsCode": "function buildHierarchy(data) {\n    // Tạo map để truy cập nhanh các node theo row_number\n    const nodeMap = new Map();\n    \n    // Tạo root node\n    const root = { children: [] };\n    \n    // Bước 1: Tạo các node và lưu vào map\n    data.forEach(item => {\n        const node = {\n            row_number: item.row_number,\n            level: item.level,\n            agent_name: item.agent_name,\n            title: item.title,\n            prompt: item.prompt,\n            sys_prompt: item.sys_prompt,\n            children: []\n        };\n        nodeMap.set(item.row_number, node);\n    });\n    \n    // Bước 2: Xây dựng quan hệ cha-con\n    data.forEach(item => {\n        const currentNode = nodeMap.get(item.row_number);\n        const level = item.level.toString();\n        \n        if (level === \"0\") {\n            // Node gốc, thêm vào root\n            root.children.push(currentNode);\n        } else {\n            // Tìm parent node dựa trên Level\n            const parentLevel = findParentLevel(level);\n            const parentNode = findNodeByLevel(data, nodeMap, parentLevel);\n            \n            if (parentNode) {\n                parentNode.children.push(currentNode);\n            } else {\n                // Nếu không tìm thấy parent, thêm vào root\n                root.children.push(currentNode);\n            }\n        }\n    });\n    \n    return root.children.length === 1 ? root.children[0] : root;\n}\n\nfunction findParentLevel(currentLevel) {\n    const parts = currentLevel.toString().split('.');\n    \n    if (parts.length === 1) {\n        // Level số nguyên, parent là level 0\n        return \"0\";\n    } else {\n        // Level dạng \"1.1\", \"1.2\", parent là phần trước dấu chấm cuối\n        parts.pop();\n        return parts.join('.');\n    }\n}\n\nfunction findNodeByLevel(data, nodeMap, targetLevel) {\n    for (let item of data) {\n        if (item.level.toString() === targetLevel) {\n            return nodeMap.get(item.row_number);\n        }\n    }\n    return null;\n}\n\n// Sử dụng thuật toán với dữ liệu mới\nconst inputData = $json.data;\n\nconst promptTree = buildHierarchy(inputData);\n\nlet chatInput = $node[\"ChatInput\"].json[\"chatInput\"]; \n\n// add chatInput to first prompt\nif(promptTree.prompt.includes(\"{{ $json.chatInput }}\"))\n{\n  promptTree.prompt = promptTree.prompt.replace(\"{{ $json.chatInput }}\", chatInput);\n}\nelse{\n  promptTree.prompt += \"\\n\" + chatInput;\n}\n\nreturn [\n  {\n    json: promptTree\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        32
+      ],
+      "id": "2b19d28e-13d8-458c-8993-143943c02e9a",
+      "name": "AgentTree"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "rZ06nvSF5vIlnX0e",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/rZ06nvSF5vIlnX0e",
+          "cachedResultName": "[AI Agents] Recursive Agents"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        688,
+        32
+      ],
+      "id": "1fa7a826-6c44-4abb-ab23-3465f75a43ee",
+      "name": "Call '[AI Agents] Recursive Agents'"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "final_output",
+        "options": {
+          "fileName": "business plan - vi.md"
+        }
+      },
+      "id": "34f56b52-32c3-4eae-9121-e595d5551e7e",
+      "name": "Final result",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        2160,
+        176
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "sendDocument",
+        "chatId": "-5083259110",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "id": "3e43e478-b90f-4a4c-83c3-f6a744705927",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2384,
+        176
+      ],
+      "retryOnFail": true,
+      "webhookId": "1ae95e0c-f801-40c8-9796-59dc43e5309c",
+      "credentials": {
+        "telegramApi": {
+          "id": "0s3XJEX7B5UOE7rp",
+          "name": "Telegram @generalnotibot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.yoong.xyz/webhook/get-gemini-key?pick=random",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 2000
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1136,
+        176
+      ],
+      "id": "bdfa7ecc-e47e-473d-a3a7-66a0dc78e73d",
+      "name": "Get Gemini Key",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json.raw_output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        32
+      ],
+      "id": "0d23a4ac-a078-4850-9891-9fb30df96a76",
+      "name": "Translate raw_output"
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [];\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  results.push({\n    text: item.json.output\n  })\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        176
+      ],
+      "id": "907e6721-b7b6-401f-b44e-5527ea984e66",
+      "name": "Translate Result Organizer"
+    },
+    {
+      "parameters": {
+        "jsCode": "let  final_output = '';\n\nfor (const item of $input.all()) {\n  final_output += item.json.text + \"\\n\\n\\n\";\n}\n\nreturn {\n  final_output: final_output\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        176
+      ],
+      "id": "6a259676-b37d-4bac-b358-a64395a6a11d",
+      "name": "Result organizer"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Text to translate:\n{{ $('Translate raw_output').item.json.content }}",
+        "options": {
+          "systemMessage": "You are a professional translation expert. Translate the following English text into fluent, natural, and easily understandable Vietnamese while keeping the meaning accurate and faithful.|* Preserve all formatting, punctuation, markdown syntax, and line breaks exactly as in the original.* Do not add any extra commentary, explanation, or note—only output the translated text.* Maintain any markdown formatting such as headings, lists, bold, italics, blockquotes, or code blocks exactly as they appear.",
+          "batching": {
+            "batchSize": 1,
+            "delayBetweenBatches": 20000
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1360,
+        176
+      ],
+      "id": "5de321a9-ad68-4c90-a437-995cc8344f16",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "final_output",
+        "options": {
+          "fileName": "competitive-intelligence.md"
+        }
+      },
+      "id": "e121f9a2-6bfb-44c0-b853-77c5e101fac5",
+      "name": "Final result1",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        1424,
+        -128
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "sendDocument",
+        "chatId": "-5083259110",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "id": "495d35ab-1f20-46e3-b3fb-3e02e82fbc55",
+      "name": "Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1712,
+        -128
+      ],
+      "retryOnFail": true,
+      "webhookId": "1ae95e0c-f801-40c8-9796-59dc43e5309c",
+      "credentials": {
+        "telegramApi": {
+          "id": "0s3XJEX7B5UOE7rp",
+          "name": "Telegram @generalnotibot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let  final_output = '';\n\nfor (const item of $input.all()) {\n  final_output += fixNewLines(item.json.content) + \"\\n\\n\\n\";\n}\n\nreturn {\n  final_output: final_output\n}\n\nfunction decode(str) {\n  try {\n    return JSON.parse(`\"${str}\"`);\n  } catch (e) {\n    return str;\n  }\n}\n\nfunction fixNewLines(str) {\n  return decode(str).replace(/\\\\n/g, `\n  `);\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        -128
+      ],
+      "id": "268b7694-e79a-414d-933b-53a2424f5a82",
+      "name": "Result organizer1"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v3.1:671b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        400
+      ],
+      "id": "1b39401a-1e34-46a0-9ff7-3bf1bd17d111",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "t7LMuZYMFsVlgfYP",
+          "name": "Ollama - cloud - toivanlatoi.120689"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AgentTree",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ChatInput": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AgentTree": {
+      "main": [
+        [
+          {
+            "node": "Call '[AI Agents] Recursive Agents'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final result": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call '[AI Agents] Recursive Agents'": {
+      "main": [
+        [
+          {
+            "node": "Translate raw_output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Gemini Key": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate raw_output": {
+      "main": [
+        [
+          {
+            "node": "Result organizer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate Result Organizer": {
+      "main": [
+        [
+          {
+            "node": "Result organizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Result organizer": {
+      "main": [
+        [
+          {
+            "node": "Final result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Translate Result Organizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final result1": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Result organizer1": {
+      "main": [
+        [
+          {
+            "node": "Final result1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "41dc37a0-f952-482b-a7c6-65078f8178ca",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-11-20T10:31:25.371Z",
+      "createdAt": "2025-11-20T10:31:25.371Z",
+      "role": "workflow:owner",
+      "workflowId": "qagxehsGHlIeaQbm",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
