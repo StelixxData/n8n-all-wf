@@ -1,0 +1,580 @@
+{
+  "updatedAt": "2025-11-11T07:50:13.505Z",
+  "createdAt": "2025-10-24T09:41:13.726Z",
+  "id": "sU9Hc7F0pLb5ASIR",
+  "name": "(Robinson Pharma) ETA - Testing",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const newMailId = $(\"Oldest_Unhandle_Mail\").first().json.id;\nconst newMail = $(\"Oldest_Unhandle_Mail\").first(); //$input.all().find(x => x.json.id === newMailId);\nconst mailConversation = $input.first().json.value.filter(x => x.id != newMailId);\nif (!newMail) {\n return {\n isSuccess: false\n }\n}\n\nconst hasPrevMail = mailConversation.length > 0;\nlet prevMail = []\nfor (let i = 0; i < mailConversation.length; i ++){\n const object = {\n subject: mailConversation[i].subject,\n from: mailConversation[i].from.emailAddress.address,\n to: mailConversation[i].toRecipients.map(x=> x.emailAddress.address).join(';'),\n body: mailConversation[i].body.content,\n receiveTime: mailConversation[i].receivedDateTime\n }\n prevMail.push(object)\n}\n\n\nreturn {\n isSuccess: true,\n newMail: {\n id: newMail.json.id,\n subject: newMail.json.subject,\n from: newMail.json.from.emailAddress.address,\n to: newMail.json.toRecipients.map(x=> x.emailAddress.address).join(';'),\n body: newMail.json.body.content.split(\"________________________________\")[0],\n receiveTime: newMail.json.receivedDateTime\n },\n hasPrevMail: hasPrevMail,\n prevMail: prevMail\n}"
+      },
+      "id": "8bc35133-959d-4c39-9ce0-71bedcde98eb",
+      "name": "MailInfo_Extract",
+      "position": [
+        1344,
+        368
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.value[0]\nreturn data"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        144
+      ],
+      "id": "c97b0e3f-c716-413f-b982-eda866de29a8",
+      "name": "Oldest_Unhandle_Mail"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq '{{ $json.conversationId }}' and receivedDateTime lt {{ $json.receivedDateTime }}&$top=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "outlook.body-content-type=\"text\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1328,
+        144
+      ],
+      "id": "e017c505-9d37-438e-8cc8-1828787ff73a",
+      "name": "Get_MailConversation",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "QFu2YpmmoFgeALUr",
+          "name": "ndthang2802"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d4880266-bb12-486a-8e43-722f3559aa7e",
+              "leftValue": "={{ $json.value }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        160
+      ],
+      "id": "ad3dafab-502c-46dc-a47b-69663f1ef287",
+      "name": "If_HasNewEmail"
+    },
+    {
+      "parameters": {
+        "content": "### Testing: Vendor receive Email \n** Reply to Email sent from RBP System",
+        "height": 700,
+        "width": 1580,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a1f73e41-5ee2-4927-8d98-042c1512bded",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        160
+      ],
+      "id": "c19b9b04-c6bd-4216-8db7-841bff8ff060",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "get",
+        "folderId": {
+          "__rl": true,
+          "value": "AQMkADAwATMwMAExLTk5ADI4LTI5OGYtMDACLTAwCgAuAAAD79cMnjahxkyAFzyd_PtbkgEAfoEebWNwrk_gE1HBL3PjKAAAAgEMAAAA",
+          "mode": "list",
+          "cachedResultName": "Hộp thư",
+          "cachedResultUrl": "https://outlook.office365.com/mail/AQMkADAwATMwMAExLTk5ADI4LTI5OGYtMDACLTAwCgAuAAAD79cMnjahxkyAFzyd_PtbkgEAfoEebWNwrk_gE1HBL3PjKAAAAgEMAAAA"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        352,
+        160
+      ],
+      "id": "9be6fd19-1a03-4031-a394-96b6b00cba84",
+      "name": "Get a folder",
+      "webhookId": "e8e0d35a-581b-48df-a16a-8aa53eaf185b",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "1zUDBWHoqOeOVSOw",
+          "name": "ndthang2802"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n system_mail: '19522206@ms.uit.edu.vn'\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        160
+      ],
+      "id": "bfa2bf9b-4681-4c60-a2a2-85448171b34d",
+      "name": "SystemMail"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/me/mailFolders('{{$json.id}}')/messages?$filter=receivedDateTime ge 2000-01-01T00:00:00Z and sender/emailAddress/address eq '{{ $('SystemMail').first().json.system_mail }}' and not categories/any()&$orderby=receivedDateTime asc&$top=1",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOutlookOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "outlook.body-content-type=\"text\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        160
+      ],
+      "id": "c39f70c6-43a2-470e-88b0-275dd47a5f42",
+      "name": "Get_Oldest_EmailFromRBP",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "1zUDBWHoqOeOVSOw",
+          "name": "ndthang2802"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        528
+      ],
+      "id": "a4bd4c01-5557-45ec-8119-d56167c8569a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BWGByr1hd4kHbDEO",
+          "name": "victor account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "var mail = $input.all().find(function(x) { return x.json.newMail; });\nif(!mail) {\n return {\n isFail: true\n };\n}\nvar incoming_mail = mail.json.newMail;\nvar previous_mails = mail.json.prevMail;\n\nvar content = '\\n**Here is incoming email:-------------------\\nSubject: ' + incoming_mail.subject + ' \\nFrom: ' + incoming_mail.from + '\\nTo: ' + incoming_mail.to + '\\nBody: \\n' + incoming_mail.body + '\\n-------------------\\n';\n\nif (previous_mails && previous_mails.length) {\n content += '**Here is previous email conversation:\\n';\n var sortedList = previous_mails.sort(function(a, b) {\n return new Date(b.receiveTime).getTime() - new Date(a.receiveTime).getTime();\n }); \n for (var i = 0; i < sortedList.length; i++) {\n content += '--------Mail ' + (i+1) + ':-----------\\nSubject: ' + previous_mails[i].subject + ' \\nFrom: ' + previous_mails[i].from + '\\nTo: ' + previous_mails[i].to + '\\nBody: \\n' + previous_mails[i].body + '\\n-------------------\\n';\n }\n}\n\nreturn {\n content: content,\n isFail: false\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        368
+      ],
+      "id": "707ab805-f7d4-4423-827f-e3fa5c5b5846",
+      "name": "Content_process"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"send_reply\": {\n\t\t\t\"type\": \"boolean\"\n\t\t},\n\t\t\"mail_body\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2112,
+        512
+      ],
+      "id": "315f6d33-afbd-4a65-a0f3-c9c67f217b6c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $('Oldest_Unhandle_Mail').item.json.id }}",
+          "mode": "id"
+        },
+        "replyToSenderOnly": true,
+        "message": "={{ $json.output.mail_body }}",
+        "additionalFields": {
+          "bodyContentType": "html"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        224
+      ],
+      "id": "85927911-8c3b-4372-b964-3f11dcb82f2e",
+      "name": "Reply to a message",
+      "webhookId": "e4b5bb38-d83a-4c75-a266-09d62eec667f",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "1zUDBWHoqOeOVSOw",
+          "name": "ndthang2802"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "01821aaa-3028-44be-8b07-59a9238a9a40",
+              "leftValue": "={{ $json.output.send_reply }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2304,
+        368
+      ],
+      "id": "afee42b1-f769-4984-b967-ba9df6beb3d1",
+      "name": "Should_reply"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -496,
+        400
+      ],
+      "id": "1a7fcc1d-4ee7-4683-8f8f-0192f3b8aa2a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $('MailInfo_Extract').item.json.newMail.id }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "categories": [
+            "Green category"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        2864,
+        224
+      ],
+      "id": "bdcb750a-be81-466b-a75b-d92e812cc498",
+      "name": "Update a message",
+      "webhookId": "eed2f26c-72b5-4990-905e-cd4506e23165",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "1zUDBWHoqOeOVSOw",
+          "name": "ndthang2802"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// const _case = 'REPLY_FULL_ETA';\n// const _case = 'REPLY_PARTIAL_ETA';\n// const _case = 'REPLY_ETA_WITH_MISSING_YEAR_PART_OR_AMBIGOUS';\n// const _case = 'REPLY_NO_ETA_WITH_ISSUE';\n// const _case = 'REPLY_FULL_ETA_WITH_ISSUE';\n// const _case = 'REPLY_PARTIAL_ETA_WITH_ISSUE';\n// const _case = 'REPLY_INREVELVANT_ETA';\n// const _case = 'NO_REPLY';\nconst _case = 'REPLY_WITH_SPECIFIC_DELAY_TIME_TO_PROVIDE_ETA';\n// const _case = 'REPLY_WITH_AMBIGOUS_DEPLAY_TIME_TO_PROVIDE_ETA';\n// consr _case = 'RANDOM';\nreturn {\n _case\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        160
+      ],
+      "id": "9b4144e1-032a-4a73-9e95-efa1a59b509f",
+      "name": "Test_Case"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a **vendor of Robinson Pharma**, responsible for supplying components used in Robinson’s pharmaceutical production. \nYour mission is to generate realistic email replies to test an AI system that handles vendor communications.\n\nYou'll receive incoming emails and existing conversation threads, and based on those, you'll craft a reply.\n{{$json.content}}\n\n---\nYour reply must follow the behavior defined in this test case: \nTEST_CASE: {{ $('Test_Case').item.json._case }}\n\nToday’s date is {{ new Date(Date.now()).toISOString().split('T')[0] }}\n---\nReply Scenarios (mapped exactly to TEST_CASE):\n1. **REPLY_FULL_ETA** \n Provide a clear ETA for **all components** without mentioning any issue.\n _Example:_ \n `\"Component A will arrive by 08-15-2025, and Component B by 08-20-2025.\"`\n2. **REPLY_PARTIAL_ETA** \n Provide ETA for **some**, but **not all** components. If some of it already has eta, provide for another one, if just one remain not has eta, provide to it.\n _Example:_ \n `\"We expect Component C by 09-01-2025, but we're still confirming the ETA for Component D.\"`\n3. **REPLY_ETA_WITH_MISSING_YEAR_PART_OR_AMBIGOUS** \n Provide ETA for **all components**, but ensure that **some dates are missing the year part**, expressed in a natural way. This simulates cases where the year is implied or omitted. \n _Example:_ \n `\"Component A is expected by 08-15, and Component B by next Monday.\"`\n4. **REPLY_NO_ETA_WITH_ISSUE** \n Do **not** provide any ETA. Instead, explain a **realistic reason** for the delay. \n _Example:_ \n `\"Due to shipping delays from our supplier, we are currently unable to provide an ETA.\"`\n5. **REPLY_FULL_ETA_WITH_ISSUE** \n Provide ETA for **all components**, but **also mention** known issues, delays, or risks. \n _Example:_ \n `\"Component A is expected by 08-18-2025, and Component B by 08-21-2025, notice that price is change\"`\n6. **REPLY_PARTIAL_ETA_WITH_ISSUE** \n Provide ETA for **some components**, and explain **why others are delayed or pending**. \n _Example:_ \n `\"Component X will arrive by 08-20-2025. We're still waiting on a shipping confirmation for Component Y.\"`\n7. **REPLY_INREVELVANT_ETA** \n Provide a response that **mentions ETA**, but is **vague, off-topic, or not aligned** with the actual question. \n _Example:_ \n `\"Typically, deliveries take 1–2 weeks depending on your region.\"`\n8. **NO_REPLY** \n Do not reply. The system should remain silent. \n _Example:_ \n _No output generated._\n9. **REPLY_WITH_SPECIFIC_DELAY_TIME_TO_PROVIDE_ETA** \n Do **not** provide ETA now. Instead, promise a follow-up by a **specific future date**. \n _Example:_ \n `\"We are still collecting the ETA information and will follow up by 8-7-2025.\"` (example today is 8-3-2025 MM-DD-YYYY)\n `\"We are still collecting the ETA information and will follow up by tomorrow.\"` (example today is 8-3-2025 MM-DD-YYYY)\n10. **REPLY_WITH_AMBIGOUS_DEPLAY_TIME_TO_PROVIDE_ETA** \n Do **not** provide ETA now. Promise to follow up later using **vague timing**. \n _Example:_ \n `\"We're gathering the information and will provide an update as soon as possible.\"`\n---\nIf `TEST_CASE` is `RANDOM`, pick randomly from one of the 10 scenarios above.\n---\n\nOutput Format \nYour output must always follow this **exact JSON format**:\n{\n \"send_reply\": true or false,\n \"mail_body\": \"Your generated email reply content goes here.\"\n}\nFor _case values 1 through 9 except NO_REPLY, set send_reply to true and include a reply in mail_body.\nFor _case = 'NO_REPLY', set send_reply to false and leave mail_body as an empty string.\n\nNormally, the email that request ETA display data in HTML (table), so use HTML for email to display also (especially for table ).",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1952,
+        368
+      ],
+      "id": "00147402-f3be-4d25-9bc8-63043e2873d8",
+      "name": "QA"
+    }
+  ],
+  "connections": {
+    "Oldest_Unhandle_Mail": {
+      "main": [
+        [
+          {
+            "node": "Get_MailConversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get_MailConversation": {
+      "main": [
+        [
+          {
+            "node": "MailInfo_Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If_HasNewEmail": {
+      "main": [
+        [
+          {
+            "node": "Oldest_Unhandle_Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Test_Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a folder": {
+      "main": [
+        [
+          {
+            "node": "Get_Oldest_EmailFromRBP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SystemMail": {
+      "main": [
+        [
+          {
+            "node": "Get a folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get_Oldest_EmailFromRBP": {
+      "main": [
+        [
+          {
+            "node": "If_HasNewEmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MailInfo_Extract": {
+      "main": [
+        [
+          {
+            "node": "Content_process",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "QA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content_process": {
+      "main": [
+        [
+          {
+            "node": "QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "QA",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should_reply": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Update a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test_Case": {
+      "main": [
+        [
+          {
+            "node": "SystemMail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA": {
+      "main": [
+        [
+          {
+            "node": "Should_reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "24637d44-c63f-4ecd-bdba-6d90ecfe5112",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-10-24T09:41:13.726Z",
+      "createdAt": "2025-10-24T09:41:13.726Z",
+      "role": "workflow:owner",
+      "workflowId": "sU9Hc7F0pLb5ASIR",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
