@@ -1,0 +1,478 @@
+{
+  "updatedAt": "2024-12-27T03:30:34.845Z",
+  "createdAt": "2024-08-09T06:22:05.758Z",
+  "id": "1X7idDEg76rmTw4i",
+  "name": "ETF KIS Faker",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "0168784a-f13a-4da0-91d8-2aec97e00007",
+              "leftValue": "={{ $json.isNotSecenrio }}",
+              "rightValue": "Broker_Failed",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c8abb45f-d4e6-4564-a43c-022463bd7e4b",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        760,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://beta.kisvn.vn/kgw/consent/v1/check/aeId",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "proxy-authorization",
+              "value": "={{ $json.header.proxyAthorization }}"
+            },
+            {
+              "name": "=content-type",
+              "value": "={{ $json.headers['content-type'] }}"
+            },
+            {
+              "name": "x-date",
+              "value": "={{ $json.header.xDate }}"
+            },
+            {
+              "name": "host",
+              "value": "beta.kisvn.vn"
+            },
+            {
+              "name": "User-Agent",
+              "value": "PostmanRuntime/7.40.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "name": "idNumber",
+              "value": "={{ $json.idCard }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fffa6975-dc29-487f-ba77-4a11491e6716",
+      "name": "Kis request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "if ($input.item.json.dataTags.find(x=>x === 'Broker_Failed'))\n{\n  return {\n    \"able\": false\n  }\n}\nreturn {\n    \"able\": true\n}"
+      },
+      "id": "89e696ce-16b2-4761-b755-80262a8818d8",
+      "name": "Fake Broker",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "78d7503e-fc2c-409e-8ab2-0ca54c76a8d9",
+      "name": "Respond from Kis",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1420,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "kgw/consent/v1/check/aeId",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d9330d0d-11cb-490e-a21b-552477ca837e",
+      "name": "Check broker",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        20
+      ],
+      "webhookId": "bf07bb14-d7b7-48e0-a43f-3478d1799a96"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "0168784a-f13a-4da0-91d8-2aec97e00007",
+              "leftValue": "={{ $json.isNotSecenrio }}",
+              "rightValue": "Broker_Failed",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2a000a9f-6c8b-4ef5-88d7-312e29519177",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        760,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.yoong.xyz/webhook/secenrios",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.body.phone }}"
+            },
+            {
+              "name": "idCard",
+              "value": "={{ $json.body.cardId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=proxy-authorization",
+              "value": "={{ $json.headers['proxy-authorization']}}"
+            },
+            {
+              "name": "x-date",
+              "value": "={{ $json.headers['x-date'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "eec820b6-542d-492f-b8ac-383f0860fe6f",
+      "name": "Get Secenrios1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        440
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://beta.kisvn.vn/kgw/econtract/v1/phone/card/registrable",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "proxy-authorization",
+              "value": "={{ $json.header.proxyAthorization }}"
+            },
+            {
+              "name": "=content-type",
+              "value": "={{ $json.headers['content-type'] }}"
+            },
+            {
+              "name": "x-date",
+              "value": "={{ $json.header.xDate }}"
+            },
+            {
+              "name": "host",
+              "value": "beta.kisvn.vn"
+            },
+            {
+              "name": "User-Agent",
+              "value": "PostmanRuntime/7.40.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "cardId",
+              "value": "={{ $json.idCard }}"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $json.phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "091e6c4d-d064-4cc2-aa78-84bfc3518e30",
+      "name": "Kis Check phone card",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ab40a4a1-7b18-4fcd-b818-65cfd8dec27e",
+      "name": "Respond custom",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1400,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "kgw/econtract/v1/phone/card/registrable",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "4d2120c1-feab-449e-8ea2-0ab1fecc5a72",
+      "name": "Check phone/card",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        440
+      ],
+      "webhookId": "bf07bb14-d7b7-48e0-a43f-3478d1799a96"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "if ($input.item.json.dataTags.find(x => x === 'NewUser'))\n{\n  return {\n      \"code\": \"E100000\"\n  }\n}\nelse if ($input.item.json.dataTags.find(x => x === 'ExistUser'))\n{\n  return {\n      \"code\": \"E103000\"\n  }\n}\n\nreturn {\n    \"code\": \"E100000\"\n}"
+      },
+      "id": "da4db050-492c-438d-ba14-7517fb3c2f61",
+      "name": "Fake Result Check Phone/Card",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery"
+      },
+      "id": "cc3357cc-89be-43ff-99e6-730464e942c6",
+      "name": "Microsoft SQL",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        500,
+        40
+      ],
+      "credentials": {
+        "microsoftSql": {
+          "id": "xjdxj7AGDJyxUU2p",
+          "name": "EjiNguyen Uat Etf States"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Kis request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fake Broker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kis request": {
+      "main": [
+        [
+          {
+            "node": "Respond from Kis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fake Broker": {
+      "main": [
+        [
+          {
+            "node": "Respond custom",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check broker": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Kis Check phone card",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fake Result Check Phone/Card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Secenrios1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kis Check phone card": {
+      "main": [
+        [
+          {
+            "node": "Respond from Kis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check phone/card": {
+      "main": [
+        [
+          {
+            "node": "Get Secenrios1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fake Result Check Phone/Card": {
+      "main": [
+        [
+          {
+            "node": "Respond custom",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e0564c4c-4979-4a1a-990a-4342cf3b4144",
+  "activeVersionId": null,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2024-10-27T08:22:06.455Z",
+      "createdAt": "2024-10-27T08:22:06.455Z",
+      "role": "workflow:owner",
+      "workflowId": "1X7idDEg76rmTw4i",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
