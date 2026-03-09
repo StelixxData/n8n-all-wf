@@ -1,0 +1,1463 @@
+{
+  "updatedAt": "2026-01-15T09:54:09.363Z",
+  "createdAt": "2025-12-10T04:51:45.539Z",
+  "id": "LH1FHG490IRCDJvl",
+  "name": "[Stelixx Community][Insider] Content Crawler",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://www.opensourceprojects.dev/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        64
+      ],
+      "id": "bc392eb7-761c-41cf-9eae-972a10539c6e",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "content": "https://github.com/EvanLi/Github-Ranking/blob/master/Top100/Top-100-forks.md"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -208
+      ],
+      "id": "ebeac823-3d22-4d3d-8272-f3ac3e697fce",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "let posts = [];\n\nfor (const item of $input.all()) {\n  posts.push({\n    id: item.json.guid,\n    content: item.json.content.replace(/GitHub Repository:\\s*https?:\\/\\/[^\\s\\n]+/gi, ''),\n    medias: JSON.stringify([item.json.enclosure.url]),\n    sources: JSON.stringify(item.json.content.match(/(https?:\\/\\/[^\\s]+)/g)),\n    created_date: $now.toString(),\n    updated_date: $now.toString(),\n  })\n}\n\nreturn posts;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        64
+      ],
+      "id": "0a412d35-6651-435e-8da7-ef6fd11dbe6e",
+      "name": "Data"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+          "mode": "list",
+          "cachedResultName": "[Stelixx] Social Channels",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1005748558,
+          "mode": "list",
+          "cachedResultName": "Insider Auto Crawl",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=1005748558"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "medias",
+              "displayName": "medias",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sources",
+              "displayName": "sources",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_date",
+              "displayName": "created_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_date",
+              "displayName": "updated_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        64
+      ],
+      "id": "8a242aa5-f5f6-4777-bc20-9b6a2795d463",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 3,
+              "triggerAtHour": 5,
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        64
+      ],
+      "id": "7e0212e1-954d-4ae7-96de-c7051ed53bad",
+      "name": "https://www.opensourceprojects.dev/rss"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 2,
+              "triggerAtHour": 6,
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        -160
+      ],
+      "id": "efb3822a-a09c-4089-8c11-9009c72bf905",
+      "name": "Auto Sync to Original Sheet"
+    },
+    {
+      "parameters": {
+        "jsCode": "let posts = [];\n\nfor (const item of $input.all()) {\n  posts.push({\n    Id: item.json.id,\n    Content: item.json.content,\n    MediaUrl: JSON.parse(item.json.medias).join(\"\\n\"),\n    Sources: JSON.parse(item.json.sources).join(\"\\n\"),\n    CreatedDate: $now.toString(),\n    UpdatedDate: $now.toString(),\n    ChannelIds: $node[\"Get Insider Channels\"].json[\"Value\"]\n  })\n}\n\nreturn posts;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -160
+      ],
+      "id": "e14f92ef-34f5-4612-b341-8c9f715633ab",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+          "mode": "list",
+          "cachedResultName": "[Stelixx] Social Channels",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1875403296,
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=1875403296"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Key",
+              "lookupValue": "Insider Channels"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        112,
+        -160
+      ],
+      "id": "708ccc67-b087-41bd-8ed0-2fcc65a55789",
+      "name": "Get Insider Channels",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+          "mode": "list",
+          "cachedResultName": "[Stelixx] Social Channels",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1005748558,
+          "mode": "list",
+          "cachedResultName": "Insider Auto Crawl",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=1005748558"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        320,
+        -160
+      ],
+      "id": "6df105b5-6abe-412c-8f9f-068332816d60",
+      "name": "Get AutoCrawl Posts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+          "mode": "list",
+          "cachedResultName": "[Stelixx] Social Channels",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2064113875,
+          "mode": "list",
+          "cachedResultName": "Insider Original",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=2064113875"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Id"
+          ],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "MediaUrl",
+              "displayName": "MediaUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sources",
+              "displayName": "Sources",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ChannelIds",
+              "displayName": "ChannelIds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CreatedDate",
+              "displayName": "CreatedDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "UpdatedDate",
+              "displayName": "UpdatedDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PostizContentSheetId",
+              "displayName": "PostizContentSheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PharaphaseStatus",
+              "displayName": "PharaphaseStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PostizMediaUrls",
+              "displayName": "PostizMediaUrls",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        -160
+      ],
+      "id": "5e702538-26e3-4f78-9b9d-a235bf9c7210",
+      "name": "Append to Original Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let posts = [];\n\nfor (const item of $input.all()) {\n  posts.push({\n    id: item.json.Id,\n    updated_date: $now.toString(),\n    status: \"Completed\"\n  })\n}\n\nreturn posts;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        -160
+      ],
+      "id": "efea7977-557b-45d6-913d-dd60e16138e2",
+      "name": "Update AutoCrawl Status"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+          "mode": "list",
+          "cachedResultName": "[Stelixx] Social Channels",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1005748558,
+          "mode": "list",
+          "cachedResultName": "Insider Auto Crawl",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=1005748558"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "medias",
+              "displayName": "medias",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sources",
+              "displayName": "sources",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_date",
+              "displayName": "created_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_date",
+              "displayName": "updated_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1168,
+        -160
+      ],
+      "id": "9a0f1ade-248d-4520-b008-282c7cb4e6dc",
+      "name": "Update Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 3,
+              "triggerAtMinute": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        288
+      ],
+      "id": "4c811650-b908-4dcc-aa91-31333d91a297",
+      "name": "https://github.com/trending?since=daily"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (Run Once for All Items)\n// Lấy trending repos + description + Open Graph image (avatar dự án)\nconst html = await this.helpers.httpRequest({\n\tmethod: 'GET',\n\turl: 'https://github.com/trending?since=daily',\n\theaders: {\n\t\t'User-Agent': 'Mozilla/5.0 (compatible; n8n-bot; +https://n8n.io)',\n\t\t'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',\n\t\t'Accept-Language': 'en-US,en;q=0.5',\n\t\t'Accept-Encoding': 'gzip, deflate',\n\t\t'Connection': 'keep-alive',\n\t},\n\tjson: false,\n});\n\nconst stripTags = (s) => s.replace(/<[^>]+>/g, ' ');\nconst decodeEntities = (s) =>\n\ts\n\t\t.replace(/&amp;/g, '&')\n\t\t.replace(/&quot;/g, '\"')\n\t\t.replace(/&#39;/g, \"'\")\n\t\t.replace(/&lt;/g, '<')\n\t\t.replace(/&gt;/g, '>')\n\t\t.replace(/&nbsp;/g, ' ');\n\nconst cleanText = (s) =>\n\tdecodeEntities(stripTags(String(s || '')))\n\t\t.replace(/\\s+/g, ' ')\n\t\t.trim();\n\n// Bước 1: Parse trending HTML để lấy danh sách repos\nconst results = [];\nconst articleRe = /<article\\b[\\s\\S]*?class=\"[^\"]*\\bBox-row\\b[^\"]*\"[\\s\\S]*?<\\/article>/g;\nlet a;\nwhile ((a = articleRe.exec(html)) !== null) {\n\tconst block = a[0];\n\n\t// Link repo: /owner/repo\n\tconst linkMatch = block.match(/<h2[^>]*>\\s*<a[^>]*href=\"([^\"]+)\"/);\n\tif (!linkMatch) continue;\n\tlet href = linkMatch[1];\n\thref = href.replace(/\\/$/, ''); // remove trailing /\n\tconst link = href.startsWith('http') ? href : `https://github.com${href}`;\n\n\t// Owner/repo từ link\n\tconst parts = link.match(/github\\.com\\/([^\\/]+)\\/([^\\/]+)/);\n\tif (!parts) continue;\n\tconst owner = parts[1];\n\tconst repoName = parts[2];\n\n\t// Description\n\tconst descMatch = block.match(/<p\\b[^>]*class=\"[^\"]*\\bcol-9\\b[^\"]*\"[^>]*>([\\s\\S]*?)<\\/p>/i);\n\tconst description = descMatch ? cleanText(descMatch[1]) : '';\n\n\tresults.push({ link, owner, repoName, description });\n}\n\n// Bước 2: Parallel fetch từng repo page để lấy og:image\n// (GitHub tự generate og:image dạng https://opengraph.githubassets.com/{hash}/{owner}/{repo})\nconst fetchRepoOgImage = async (owner, repoName) => {\n\ttry {\n\t\tconst repoUrl = `https://github.com/${owner}/${repoName}`;\n\t\tconst repoHtml = await this.helpers.httpRequest({\n\t\t\tmethod: 'GET',\n\t\t\turl: repoUrl,\n\t\t\theaders: {\n\t\t\t\t'User-Agent': 'Mozilla/5.0 (compatible; n8n-bot; +https://n8n.io)',\n\t\t\t\t'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',\n\t\t\t\t'Accept-Language': 'en-US,en;q=0.5',\n\t\t\t},\n\t\t\tjson: false,\n\t\t});\n\n\t\t// Extract <meta property=\"og:image\" content=\"https://opengraph.githubassets.com/...\">\n\t\tconst ogMatch = repoHtml.match(/<meta[^>]*property=[\"']og:image[\"'][^>]*content=[\"']([^\"']+)[\"']/i);\n\t\treturn ogMatch ? ogMatch[1] : '';\n\t} catch (error) {\n\t\tconsole.error(`Error fetching ${owner}/${repoName}:`, error.message);\n\t\treturn '';\n\t}\n};\n\nconst finalResults = await Promise.all(\n\tresults.map(async (r) => {\n\t\tconst image = await fetchRepoOgImage(r.owner, r.repoName);\n\t\treturn { ...r, image };\n\t})\n);\n\nreturn finalResults.map((r) => ({ json: {\n    id: r.link,\n    content: r.description,\n    medias: JSON.stringify([r.image]),\n    sources: JSON.stringify([r.link]),\n    created_date: $now.toString(),\n    updated_date: $now.toString(),\n} }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        288
+      ],
+      "id": "c48a9877-f0eb-4399-a219-7a2bcfc9bc5b",
+      "name": "Repo Data"
+    }
+  ],
+  "connections": {
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "https://www.opensourceprojects.dev/rss": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto Sync to Original Sheet": {
+      "main": [
+        [
+          {
+            "node": "Get Insider Channels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append to Original Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Insider Channels": {
+      "main": [
+        [
+          {
+            "node": "Get AutoCrawl Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get AutoCrawl Posts": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Original Sheet": {
+      "main": [
+        [
+          {
+            "node": "Update AutoCrawl Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update AutoCrawl Status": {
+      "main": [
+        [
+          {
+            "node": "Update Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "https://github.com/trending?since=daily": {
+      "main": [
+        [
+          {
+            "node": "Repo Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Repo Data": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:https://www.opensourceprojects.dev/rss": {
+      "recurrenceRules": [
+        55
+      ]
+    },
+    "node:Auto Sync to Original Sheet": {
+      "recurrenceRules": [
+        56
+      ]
+    },
+    "node:https://github.com/trending?since=daily": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "da49e63e-8835-4a5f-88ed-3ba3a60757ed",
+  "activeVersionId": "da49e63e-8835-4a5f-88ed-3ba3a60757ed",
+  "triggerCount": 3,
+  "shared": [
+    {
+      "updatedAt": "2025-12-10T04:51:45.539Z",
+      "createdAt": "2025-12-10T04:51:45.539Z",
+      "role": "workflow:owner",
+      "workflowId": "LH1FHG490IRCDJvl",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-26T08:31:17.177Z",
+    "createdAt": "2026-02-26T08:31:17.177Z",
+    "versionId": "da49e63e-8835-4a5f-88ed-3ba3a60757ed",
+    "workflowId": "LH1FHG490IRCDJvl",
+    "nodes": [
+      {
+        "parameters": {
+          "url": "https://www.opensourceprojects.dev/rss",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.rssFeedRead",
+        "typeVersion": 1.2,
+        "position": [
+          128,
+          64
+        ],
+        "id": "bc392eb7-761c-41cf-9eae-972a10539c6e",
+        "name": "RSS Read"
+      },
+      {
+        "parameters": {
+          "content": "https://github.com/EvanLi/Github-Ranking/blob/master/Top100/Top-100-forks.md"
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -480,
+          -208
+        ],
+        "id": "ebeac823-3d22-4d3d-8272-f3ac3e697fce",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "jsCode": "let posts = [];\n\nfor (const item of $input.all()) {\n  posts.push({\n    id: item.json.guid,\n    content: item.json.content.replace(/GitHub Repository:\\s*https?:\\/\\/[^\\s\\n]+/gi, ''),\n    medias: JSON.stringify([item.json.enclosure.url]),\n    sources: JSON.stringify(item.json.content.match(/(https?:\\/\\/[^\\s]+)/g)),\n    created_date: $now.toString(),\n    updated_date: $now.toString(),\n  })\n}\n\nreturn posts;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          352,
+          64
+        ],
+        "id": "0a412d35-6651-435e-8da7-ef6fd11dbe6e",
+        "name": "Data"
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+            "mode": "list",
+            "cachedResultName": "[Stelixx] Social Channels",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1005748558,
+            "mode": "list",
+            "cachedResultName": "Insider Auto Crawl",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=1005748558"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "id"
+            ],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "content",
+                "displayName": "content",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "medias",
+                "displayName": "medias",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "sources",
+                "displayName": "sources",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "created_date",
+                "displayName": "created_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "updated_date",
+                "displayName": "updated_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          576,
+          64
+        ],
+        "id": "8a242aa5-f5f6-4777-bc20-9b6a2795d463",
+        "name": "Append or update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "daysInterval": 3,
+                "triggerAtHour": 5,
+                "triggerAtMinute": 10
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -96,
+          64
+        ],
+        "id": "7e0212e1-954d-4ae7-96de-c7051ed53bad",
+        "name": "https://www.opensourceprojects.dev/rss"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "daysInterval": 2,
+                "triggerAtHour": 6,
+                "triggerAtMinute": 10
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -96,
+          -160
+        ],
+        "id": "efb3822a-a09c-4089-8c11-9009c72bf905",
+        "name": "Auto Sync to Original Sheet"
+      },
+      {
+        "parameters": {
+          "jsCode": "let posts = [];\n\nfor (const item of $input.all()) {\n  posts.push({\n    Id: item.json.id,\n    Content: item.json.content,\n    MediaUrl: JSON.parse(item.json.medias).join(\"\\n\"),\n    Sources: JSON.parse(item.json.sources).join(\"\\n\"),\n    CreatedDate: $now.toString(),\n    UpdatedDate: $now.toString(),\n    ChannelIds: $node[\"Get Insider Channels\"].json[\"Value\"]\n  })\n}\n\nreturn posts;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          528,
+          -160
+        ],
+        "id": "e14f92ef-34f5-4612-b341-8c9f715633ab",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+            "mode": "list",
+            "cachedResultName": "[Stelixx] Social Channels",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1875403296,
+            "mode": "list",
+            "cachedResultName": "Settings",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=1875403296"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Key",
+                "lookupValue": "Insider Channels"
+              }
+            ]
+          },
+          "options": {
+            "returnFirstMatch": true
+          }
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          112,
+          -160
+        ],
+        "id": "708ccc67-b087-41bd-8ed0-2fcc65a55789",
+        "name": "Get Insider Channels",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+            "mode": "list",
+            "cachedResultName": "[Stelixx] Social Channels",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1005748558,
+            "mode": "list",
+            "cachedResultName": "Insider Auto Crawl",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=1005748558"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "status"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          320,
+          -160
+        ],
+        "id": "6df105b5-6abe-412c-8f9f-068332816d60",
+        "name": "Get AutoCrawl Posts",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+            "mode": "list",
+            "cachedResultName": "[Stelixx] Social Channels",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 2064113875,
+            "mode": "list",
+            "cachedResultName": "Insider Original",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=2064113875"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "Id"
+            ],
+            "schema": [
+              {
+                "id": "Id",
+                "displayName": "Id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Content",
+                "displayName": "Content",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "MediaUrl",
+                "displayName": "MediaUrl",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Sources",
+                "displayName": "Sources",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "ChannelIds",
+                "displayName": "ChannelIds",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "CreatedDate",
+                "displayName": "CreatedDate",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "UpdatedDate",
+                "displayName": "UpdatedDate",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "PostizContentSheetId",
+                "displayName": "PostizContentSheetId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "PharaphaseStatus",
+                "displayName": "PharaphaseStatus",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "PostizMediaUrls",
+                "displayName": "PostizMediaUrls",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          736,
+          -160
+        ],
+        "id": "5e702538-26e3-4f78-9b9d-a235bf9c7210",
+        "name": "Append to Original Sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "let posts = [];\n\nfor (const item of $input.all()) {\n  posts.push({\n    id: item.json.Id,\n    updated_date: $now.toString(),\n    status: \"Completed\"\n  })\n}\n\nreturn posts;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          944,
+          -160
+        ],
+        "id": "efea7977-557b-45d6-913d-dd60e16138e2",
+        "name": "Update AutoCrawl Status"
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+            "mode": "list",
+            "cachedResultName": "[Stelixx] Social Channels",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1005748558,
+            "mode": "list",
+            "cachedResultName": "Insider Auto Crawl",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=1005748558"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "id"
+            ],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "content",
+                "displayName": "content",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "medias",
+                "displayName": "medias",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "sources",
+                "displayName": "sources",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "created_date",
+                "displayName": "created_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "updated_date",
+                "displayName": "updated_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1168,
+          -160
+        ],
+        "id": "9a0f1ade-248d-4520-b008-282c7cb4e6dc",
+        "name": "Update Status",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 3,
+                "triggerAtMinute": 20
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -96,
+          288
+        ],
+        "id": "4c811650-b908-4dcc-aa91-31333d91a297",
+        "name": "https://github.com/trending?since=daily"
+      },
+      {
+        "parameters": {
+          "jsCode": "// n8n Code node (Run Once for All Items)\n// Lấy trending repos + description + Open Graph image (avatar dự án)\nconst html = await this.helpers.httpRequest({\n\tmethod: 'GET',\n\turl: 'https://github.com/trending?since=daily',\n\theaders: {\n\t\t'User-Agent': 'Mozilla/5.0 (compatible; n8n-bot; +https://n8n.io)',\n\t\t'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',\n\t\t'Accept-Language': 'en-US,en;q=0.5',\n\t\t'Accept-Encoding': 'gzip, deflate',\n\t\t'Connection': 'keep-alive',\n\t},\n\tjson: false,\n});\n\nconst stripTags = (s) => s.replace(/<[^>]+>/g, ' ');\nconst decodeEntities = (s) =>\n\ts\n\t\t.replace(/&amp;/g, '&')\n\t\t.replace(/&quot;/g, '\"')\n\t\t.replace(/&#39;/g, \"'\")\n\t\t.replace(/&lt;/g, '<')\n\t\t.replace(/&gt;/g, '>')\n\t\t.replace(/&nbsp;/g, ' ');\n\nconst cleanText = (s) =>\n\tdecodeEntities(stripTags(String(s || '')))\n\t\t.replace(/\\s+/g, ' ')\n\t\t.trim();\n\n// Bước 1: Parse trending HTML để lấy danh sách repos\nconst results = [];\nconst articleRe = /<article\\b[\\s\\S]*?class=\"[^\"]*\\bBox-row\\b[^\"]*\"[\\s\\S]*?<\\/article>/g;\nlet a;\nwhile ((a = articleRe.exec(html)) !== null) {\n\tconst block = a[0];\n\n\t// Link repo: /owner/repo\n\tconst linkMatch = block.match(/<h2[^>]*>\\s*<a[^>]*href=\"([^\"]+)\"/);\n\tif (!linkMatch) continue;\n\tlet href = linkMatch[1];\n\thref = href.replace(/\\/$/, ''); // remove trailing /\n\tconst link = href.startsWith('http') ? href : `https://github.com${href}`;\n\n\t// Owner/repo từ link\n\tconst parts = link.match(/github\\.com\\/([^\\/]+)\\/([^\\/]+)/);\n\tif (!parts) continue;\n\tconst owner = parts[1];\n\tconst repoName = parts[2];\n\n\t// Description\n\tconst descMatch = block.match(/<p\\b[^>]*class=\"[^\"]*\\bcol-9\\b[^\"]*\"[^>]*>([\\s\\S]*?)<\\/p>/i);\n\tconst description = descMatch ? cleanText(descMatch[1]) : '';\n\n\tresults.push({ link, owner, repoName, description });\n}\n\n// Bước 2: Parallel fetch từng repo page để lấy og:image\n// (GitHub tự generate og:image dạng https://opengraph.githubassets.com/{hash}/{owner}/{repo})\nconst fetchRepoOgImage = async (owner, repoName) => {\n\ttry {\n\t\tconst repoUrl = `https://github.com/${owner}/${repoName}`;\n\t\tconst repoHtml = await this.helpers.httpRequest({\n\t\t\tmethod: 'GET',\n\t\t\turl: repoUrl,\n\t\t\theaders: {\n\t\t\t\t'User-Agent': 'Mozilla/5.0 (compatible; n8n-bot; +https://n8n.io)',\n\t\t\t\t'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',\n\t\t\t\t'Accept-Language': 'en-US,en;q=0.5',\n\t\t\t},\n\t\t\tjson: false,\n\t\t});\n\n\t\t// Extract <meta property=\"og:image\" content=\"https://opengraph.githubassets.com/...\">\n\t\tconst ogMatch = repoHtml.match(/<meta[^>]*property=[\"']og:image[\"'][^>]*content=[\"']([^\"']+)[\"']/i);\n\t\treturn ogMatch ? ogMatch[1] : '';\n\t} catch (error) {\n\t\tconsole.error(`Error fetching ${owner}/${repoName}:`, error.message);\n\t\treturn '';\n\t}\n};\n\nconst finalResults = await Promise.all(\n\tresults.map(async (r) => {\n\t\tconst image = await fetchRepoOgImage(r.owner, r.repoName);\n\t\treturn { ...r, image };\n\t})\n);\n\nreturn finalResults.map((r) => ({ json: {\n    id: r.link,\n    content: r.description,\n    medias: JSON.stringify([r.image]),\n    sources: JSON.stringify([r.link]),\n    created_date: $now.toString(),\n    updated_date: $now.toString(),\n} }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          144,
+          288
+        ],
+        "id": "c48a9877-f0eb-4399-a219-7a2bcfc9bc5b",
+        "name": "Repo Data"
+      }
+    ],
+    "connections": {
+      "RSS Read": {
+        "main": [
+          [
+            {
+              "node": "Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Data": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "https://www.opensourceprojects.dev/rss": {
+        "main": [
+          [
+            {
+              "node": "RSS Read",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Auto Sync to Original Sheet": {
+        "main": [
+          [
+            {
+              "node": "Get Insider Channels",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Append to Original Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Insider Channels": {
+        "main": [
+          [
+            {
+              "node": "Get AutoCrawl Posts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get AutoCrawl Posts": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append to Original Sheet": {
+        "main": [
+          [
+            {
+              "node": "Update AutoCrawl Status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update AutoCrawl Status": {
+        "main": [
+          [
+            {
+              "node": "Update Status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "https://github.com/trending?since=daily": {
+        "main": [
+          [
+            {
+              "node": "Repo Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Repo Data": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
