@@ -1,0 +1,1064 @@
+{
+  "updatedAt": "2025-11-19T04:07:47.956Z",
+  "createdAt": "2025-10-31T11:18:14.802Z",
+  "id": "Q3LJliExfPrBxSM5",
+  "name": "[Stelixx Community] Content Approval",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+          "mode": "list",
+          "cachedResultName": "[Stelixx] Social Channels",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Postiz Contents",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Id"
+          ],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ChannelIds",
+              "displayName": "ChannelIds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ChannelCategory",
+              "displayName": "ChannelCategory",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ContentApproveStatus",
+              "displayName": "ContentApproveStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SendPostizStatus",
+              "displayName": "SendPostizStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PublishStatus",
+              "displayName": "PublishStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PostizType",
+              "displayName": "PostizType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PostizScheduleDate",
+              "displayName": "PostizScheduleDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PostizPostIds",
+              "displayName": "PostizPostIds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Links",
+              "displayName": "Links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "JsonData",
+              "displayName": "JsonData",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "JsonData1",
+              "displayName": "JsonData1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JsonData2",
+              "displayName": "JsonData2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "JsonData3",
+              "displayName": "JsonData3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CreatedDate",
+              "displayName": "CreatedDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "UpdatedDate",
+              "displayName": "UpdatedDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -80,
+        -256
+      ],
+      "id": "00b3dd55-38cd-42d3-8b7d-f7c6b6c9ccfa",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  //\"postData\": JSON.stringify(json),\n  \"Id\": $node[\"Approve-Reject Content\"].json[\"query\"][\"id\"],\n  \"UpdatedDate\": $now.toLocaleString(),\n  \"ContentApproveStatus\": $node[\"Approve-Reject Content\"].json[\"query\"][\"status\"]\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        -256
+      ],
+      "id": "7b985466-edbc-46e6-ab3b-0a6fb8e0a248",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "path": "ste-community-approval-request",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -528,
+        -256
+      ],
+      "id": "e0967121-776e-4608-8e55-d1d0712534f1",
+      "name": "Approve-Reject Content",
+      "webhookId": "a48ea5b0-e8f6-43df-a97c-3b7cb30b02d6"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        144,
+        -256
+      ],
+      "id": "3bcf2d76-d4f6-453c-bbc4-cab3218919ca",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 50
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        -480
+      ],
+      "id": "97d158af-a895-4801-ad58-1f927d467c5e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+          "mode": "list",
+          "cachedResultName": "[Stelixx] Social Channels",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Postiz Contents",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ContentApproveStatus",
+              "lookupValue": "WaitingForApproval"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -80,
+        -576
+      ],
+      "id": "3c5ded70-4208-4a69-a34e-369410370c01",
+      "name": "Get1PostForApproval",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let sheetData = $node[\"Get1PostForApproval\"].json;\nlet jsonData = sheetData.JsonData;\n\nlet messages = [];\n\nif(jsonData == null || jsonData == '' || jsonData == undefined)\n{\n  jsonData = sheetData.JsonData1 + sheetData.JsonData2 + sheetData.JsonData3;\n}\n\njsonData = JSON.parse(jsonData);\n\nlet json = \n{\n    \"chat_id\": $node[\"evn\"].json[\"telegramGroupId\"],\n    \"media\": Array.isArray(jsonData.postiz_medias)\n      ? jsonData.postiz_medias.map((item) => {\n          return {\n            \"type\": \"photo\",\n            \"media\": item.path\n          };\n        })\n      : JSON.parse(jsonData.postiz_medias).map((item) => {\n          return {\n            \"type\": \"photo\",\n            \"media\": item.path\n          };\n        })\n}\n\nmessages.push({\n  postData: json,\n  telegramBotUrl: 'https://api.telegram.org/bot'+$node[\"evn\"].json[\"telegramBotToken\"]+'/sendMediaGroup'\n});\n\n// không cần duyệt tiếng Anh.\n// let followUpJson = \n// {\n//     \"chat_id\": $node[\"evn\"].json[\"telegramGroupId\"],\n//     \"text\": jsonData.master_content.english,\n// }\n// messages.push({\n//   postData: followUpJson,\n//   telegramBotUrl: 'https://api.telegram.org/bot'+$node[\"evn\"].json[\"telegramBotToken\"]+'/sendMessage'\n// });\n\n\nlet followUpJson2 = \n{\n    \"chat_id\": $node[\"evn\"].json[\"telegramGroupId\"],\n    \"text\": jsonData.master_content.vietnamese.substring(0, 4095),\n    \"reply_markup\":{\n            \"inline_keyboard\": [[\n                \n                    {\n                        \"text\": \"Reject\",\n                        \"url\": \"https://n8n.yoong.xyz/webhook/ste-community-approval-request?id=\" + sheetData.Id + \"&status=Rejected\"\n                    },\n                    {\n                        \"text\": \"Approve\",\n                        \"url\": \"https://n8n.yoong.xyz/webhook/ste-community-approval-request?id=\" + sheetData.Id + \"&status=Approved\"\n                    }\n                \n            ]]\n        }\n}\nmessages.push({\n  postData: followUpJson2,\n  telegramBotUrl: 'https://api.telegram.org/bot'+$node[\"evn\"].json[\"telegramBotToken\"]+'/sendMessage'\n});\n\nreturn messages;\n\n// return {\n//   \"postData\": JSON.stringify(json),\n//   \"followUpData\": JSON.stringify(followUpJson)\n// }\n"
+      },
+      "id": "bd9c6d55-4ae6-4ff1-a766-76fcda6b69c1",
+      "name": "TelegramContentData",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -576
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.telegramBotUrl }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.postData }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchInterval": 3000
+            }
+          }
+        }
+      },
+      "id": "5b0394c3-a7bf-4e78-bb49-9ff40a9b0455",
+      "name": "sendMediaGroup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        -576
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"telegramGroupId\": \"-4992404459\",\n  \"telegramGroupName\": \"[Stelixx Community] Content Approval\",\n  \"telegramBotToken\": \"7621159924:AAEYJT1OJZe7DBoL-d0fqGjx4ImEU4oAjJ8\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        -576
+      ],
+      "id": "49fa3b73-abd2-4e13-bf3f-51a23f8aa24b",
+      "name": "evn"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/bot{{ $node[\"evn\"].json[\"telegramBotToken\"] }}/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $node[\"TelegramContentData\"].json.followUpData }}",
+        "options": {}
+      },
+      "id": "a7762ac2-efca-4464-ae8f-c596c70d705d",
+      "name": "sendMediaGroup1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -528,
+        -896
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "path": "01e275bd-d17e-4386-89a2-91cf19cc2bce",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -528,
+        -672
+      ],
+      "id": "8ee96e7c-600e-4287-9fcc-ce06a1f36bb6",
+      "name": "Webhook",
+      "webhookId": "01e275bd-d17e-4386-89a2-91cf19cc2bce"
+    }
+  ],
+  "connections": {
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approve-Reject Content": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "evn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get1PostForApproval": {
+      "main": [
+        [
+          {
+            "node": "TelegramContentData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TelegramContentData": {
+      "main": [
+        [
+          {
+            "node": "sendMediaGroup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evn": {
+      "main": [
+        [
+          {
+            "node": "Get1PostForApproval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sendMediaGroup": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "evn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "KG3wK34JqO8YiJsO"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    },
+    "node:Schedule Trigger1": {
+      "recurrenceRules": []
+    },
+    "node:Auto Add Post to Postiz": {
+      "recurrenceRules": []
+    },
+    "node:Daily Stelixx Insights": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "61f1fa79-01e6-4d8d-b6c3-5c471ff2dc2d",
+  "activeVersionId": "61f1fa79-01e6-4d8d-b6c3-5c471ff2dc2d",
+  "triggerCount": 3,
+  "shared": [
+    {
+      "updatedAt": "2025-10-31T11:18:14.802Z",
+      "createdAt": "2025-10-31T11:18:14.802Z",
+      "role": "workflow:owner",
+      "workflowId": "Q3LJliExfPrBxSM5",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-26T08:31:17.177Z",
+    "createdAt": "2026-02-26T08:31:17.177Z",
+    "versionId": "61f1fa79-01e6-4d8d-b6c3-5c471ff2dc2d",
+    "workflowId": "Q3LJliExfPrBxSM5",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+            "mode": "list",
+            "cachedResultName": "[Stelixx] Social Channels",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Postiz Contents",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "Id"
+            ],
+            "schema": [
+              {
+                "id": "Id",
+                "displayName": "Id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Content",
+                "displayName": "Content",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "ChannelIds",
+                "displayName": "ChannelIds",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "ChannelCategory",
+                "displayName": "ChannelCategory",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "ContentApproveStatus",
+                "displayName": "ContentApproveStatus",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "SendPostizStatus",
+                "displayName": "SendPostizStatus",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "PublishStatus",
+                "displayName": "PublishStatus",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "PostizType",
+                "displayName": "PostizType",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "PostizScheduleDate",
+                "displayName": "PostizScheduleDate",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "PostizPostIds",
+                "displayName": "PostizPostIds",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Links",
+                "displayName": "Links",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "JsonData",
+                "displayName": "JsonData",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "JsonData1",
+                "displayName": "JsonData1",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "JsonData2",
+                "displayName": "JsonData2",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "JsonData3",
+                "displayName": "JsonData3",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "CreatedDate",
+                "displayName": "CreatedDate",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "UpdatedDate",
+                "displayName": "UpdatedDate",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -80,
+          -256
+        ],
+        "id": "00b3dd55-38cd-42d3-8b7d-f7c6b6c9ccfa",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "return {\n  //\"postData\": JSON.stringify(json),\n  \"Id\": $node[\"Approve-Reject Content\"].json[\"query\"][\"id\"],\n  \"UpdatedDate\": $now.toLocaleString(),\n  \"ContentApproveStatus\": $node[\"Approve-Reject Content\"].json[\"query\"][\"status\"]\n}\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -304,
+          -256
+        ],
+        "id": "7b985466-edbc-46e6-ab3b-0a6fb8e0a248",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "path": "ste-community-approval-request",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -528,
+          -256
+        ],
+        "id": "e0967121-776e-4608-8e55-d1d0712534f1",
+        "name": "Approve-Reject Content",
+        "webhookId": "a48ea5b0-e8f6-43df-a97c-3b7cb30b02d6"
+      },
+      {
+        "parameters": {
+          "respondWith": "allIncomingItems",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.4,
+        "position": [
+          144,
+          -256
+        ],
+        "id": "3bcf2d76-d4f6-453c-bbc4-cab3218919ca",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 50
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -528,
+          -480
+        ],
+        "id": "97d158af-a895-4801-ad58-1f927d467c5e",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ",
+            "mode": "list",
+            "cachedResultName": "[Stelixx] Social Channels",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Postiz Contents",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YyzZtkNln7oGe7J8Y_Q5DPXNpEcRSFTXH4D-XzkxcfQ/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "ContentApproveStatus",
+                "lookupValue": "WaitingForApproval"
+              }
+            ]
+          },
+          "options": {
+            "returnFirstMatch": true
+          }
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -80,
+          -576
+        ],
+        "id": "3c5ded70-4208-4a69-a34e-369410370c01",
+        "name": "Get1PostForApproval",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "let sheetData = $node[\"Get1PostForApproval\"].json;\nlet jsonData = sheetData.JsonData;\n\nlet messages = [];\n\nif(jsonData == null || jsonData == '' || jsonData == undefined)\n{\n  jsonData = sheetData.JsonData1 + sheetData.JsonData2 + sheetData.JsonData3;\n}\n\njsonData = JSON.parse(jsonData);\n\nlet json = \n{\n    \"chat_id\": $node[\"evn\"].json[\"telegramGroupId\"],\n    \"media\": Array.isArray(jsonData.postiz_medias)\n      ? jsonData.postiz_medias.map((item) => {\n          return {\n            \"type\": \"photo\",\n            \"media\": item.path\n          };\n        })\n      : JSON.parse(jsonData.postiz_medias).map((item) => {\n          return {\n            \"type\": \"photo\",\n            \"media\": item.path\n          };\n        })\n}\n\nmessages.push({\n  postData: json,\n  telegramBotUrl: 'https://api.telegram.org/bot'+$node[\"evn\"].json[\"telegramBotToken\"]+'/sendMediaGroup'\n});\n\n// không cần duyệt tiếng Anh.\n// let followUpJson = \n// {\n//     \"chat_id\": $node[\"evn\"].json[\"telegramGroupId\"],\n//     \"text\": jsonData.master_content.english,\n// }\n// messages.push({\n//   postData: followUpJson,\n//   telegramBotUrl: 'https://api.telegram.org/bot'+$node[\"evn\"].json[\"telegramBotToken\"]+'/sendMessage'\n// });\n\n\nlet followUpJson2 = \n{\n    \"chat_id\": $node[\"evn\"].json[\"telegramGroupId\"],\n    \"text\": jsonData.master_content.vietnamese.substring(0, 4095),\n    \"reply_markup\":{\n            \"inline_keyboard\": [[\n                \n                    {\n                        \"text\": \"Reject\",\n                        \"url\": \"https://n8n.yoong.xyz/webhook/ste-community-approval-request?id=\" + sheetData.Id + \"&status=Rejected\"\n                    },\n                    {\n                        \"text\": \"Approve\",\n                        \"url\": \"https://n8n.yoong.xyz/webhook/ste-community-approval-request?id=\" + sheetData.Id + \"&status=Approved\"\n                    }\n                \n            ]]\n        }\n}\nmessages.push({\n  postData: followUpJson2,\n  telegramBotUrl: 'https://api.telegram.org/bot'+$node[\"evn\"].json[\"telegramBotToken\"]+'/sendMessage'\n});\n\nreturn messages;\n\n// return {\n//   \"postData\": JSON.stringify(json),\n//   \"followUpData\": JSON.stringify(followUpJson)\n// }\n"
+        },
+        "id": "bd9c6d55-4ae6-4ff1-a766-76fcda6b69c1",
+        "name": "TelegramContentData",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          144,
+          -576
+        ]
+      },
+      {
+        "parameters": {
+          "url": "={{ $json.telegramBotUrl }}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.postData }}",
+          "options": {
+            "batching": {
+              "batch": {
+                "batchInterval": 3000
+              }
+            }
+          }
+        },
+        "id": "5b0394c3-a7bf-4e78-bb49-9ff40a9b0455",
+        "name": "sendMediaGroup",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          368,
+          -576
+        ],
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "{\n  \"telegramGroupId\": \"-4992404459\",\n  \"telegramGroupName\": \"[Stelixx Community] Content Approval\",\n  \"telegramBotToken\": \"7621159924:AAEYJT1OJZe7DBoL-d0fqGjx4ImEU4oAjJ8\"\n}\n",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -304,
+          -576
+        ],
+        "id": "49fa3b73-abd2-4e13-bf3f-51a23f8aa24b",
+        "name": "evn"
+      },
+      {
+        "parameters": {
+          "url": "=https://api.telegram.org/bot{{ $node[\"evn\"].json[\"telegramBotToken\"] }}/sendMessage",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $node[\"TelegramContentData\"].json.followUpData }}",
+          "options": {}
+        },
+        "id": "a7762ac2-efca-4464-ae8f-c596c70d705d",
+        "name": "sendMediaGroup1",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -528,
+          -896
+        ],
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "path": "01e275bd-d17e-4386-89a2-91cf19cc2bce",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -528,
+          -672
+        ],
+        "id": "8ee96e7c-600e-4287-9fcc-ce06a1f36bb6",
+        "name": "Webhook",
+        "webhookId": "01e275bd-d17e-4386-89a2-91cf19cc2bce"
+      }
+    ],
+    "connections": {
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Approve-Reject Content": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "evn",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get1PostForApproval": {
+        "main": [
+          [
+            {
+              "node": "TelegramContentData",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "TelegramContentData": {
+        "main": [
+          [
+            {
+              "node": "sendMediaGroup",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "evn": {
+        "main": [
+          [
+            {
+              "node": "Get1PostForApproval",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "sendMediaGroup": {
+        "main": [
+          []
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "evn",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
