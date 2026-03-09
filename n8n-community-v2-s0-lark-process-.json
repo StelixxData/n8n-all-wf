@@ -1,0 +1,1675 @@
+{
+  "updatedAt": "2025-02-06T16:28:38.218Z",
+  "createdAt": "2024-12-26T09:25:24.509Z",
+  "id": "ogmJgoLqdW6PB9NO",
+  "name": "Community - V2 - S0 - Lark Process",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1660,
+        40
+      ],
+      "id": "17ec487a-106e-4117-bfd8-53fa96697e1f",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "UPLOAD",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "570f06aa-6f2d-44d9-bcb5-2767513839ab",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "DOWNLOAD",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "78118f34-18b1-4398-a3b4-d3d99cab41b8",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "CREATE_FOLDER",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "28fa99be-8543-492d-addc-07d162252eec",
+                    "leftValue": "={{  $json.action }}",
+                    "rightValue": "MOVE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3e477194-36d4-4222-b343-2bc0f0c0eb8e",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "PUBLIC_FILE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8e9a574f-328e-41d4-8cb7-e50cab02b360",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "NON_PUBLIC_FILE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4d5772e6-f7b3-4f6a-8848-29d20004a4f9",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "IGNORE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -660,
+        -140
+      ],
+      "id": "9f4b700f-3a71-49b2-8b63-ffd980a6eabd",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "=https://open.larksuite.com/open-apis/drive/v1/files/{{ $json.file_token }}/download",
+        "sendHeaders": true,
+        "specifyHeaders": "=keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.app_access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        -500
+      ],
+      "id": "3c721afe-475f-4489-aab5-b515f16dee4b",
+      "name": "DownLoadFromLarkDrive",
+      "alwaysOutputData": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/drive/v1/files/create_folder",
+        "sendHeaders": true,
+        "specifyHeaders": "=keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.app_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "folder_token",
+              "value": "={{ $json.folder_token }}"
+            },
+            {
+              "name": "=name",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        -260
+      ],
+      "id": "cc0b6cd9-1f24-4e2a-8ad5-84e867114dad",
+      "name": "CreateFolderInLarkDrive",
+      "alwaysOutputData": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/drive/v1/files/upload_all",
+        "sendHeaders": true,
+        "specifyHeaders": "=keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.app_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "file_name",
+              "value": "={{ $json.fileName }}"
+            },
+            {
+              "name": "parent_node",
+              "value": "={{ $json.folderToken }}"
+            },
+            {
+              "name": "parent_type",
+              "value": "explorer"
+            },
+            {
+              "name": "size",
+              "value": "={{ $json.size }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -120,
+        -760
+      ],
+      "id": "ef699324-548d-4408-bbbf-1eca62fba01b",
+      "name": "SaveToLarkDrive",
+      "alwaysOutputData": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2640,
+        -220
+      ],
+      "id": "0b74eca9-3f44-449f-b426-300dfcb067ff",
+      "name": "When clicking ‘Test workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\nconst fileType = require('file-type');\n\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\n\nconst medias = $input.all().map(x => x.json)\nconst maxSizeMB = 10; // Max size in MB\nconst maxSizeBytes = maxSizeMB * 1024 * 1024;\n\n\nfunction getVideoSize(media) {\n  return Number(media.document.size)\n}\n\nfunction isVideo(media) {\n    return media.video && 1;\n}\n\nfunction isHandleVideo(medias){\n    return medias.some(media => media[\"Type\"] == 'FileType.VIDEO')\n}\n\nasync function connectWithTimeout(client, timeout = 20000) {\n    const timeoutPromise = new Promise((resolve) =>\n        setTimeout(() => resolve(false), timeout)\n    );\n\n    try {\n        const connectResult = await Promise.race([\n            client.connect().then(() => true),\n            timeoutPromise,\n        ]);\n        return connectResult;\n    } catch {\n        return false;\n    }\n}\n\nconst username = medias[0][\"Username\"];\nconst msgIds = medias.map(x => Number(x[\"MessageId\"]))\n\nasync function handleMedia() {\n  const f_result = []\n  const client = new TelegramClient(\n        new StringSession(stringSession),\n        apiId,\n        apiHash,\n        { connectionRetries: 5 }\n      );\n  try {\n    await client.connect();\n    const result = await client.invoke(\n      new Api.channels.GetMessages({\n        channel: username,\n        id: msgIds\n      })\n    );\n    const teleMsgs = result.messages;\n    for(let i = 0; i < medias.length; i++) {\n      const media = medias[i];\n      const teleMsg = teleMsgs.find(x => x[\"id\"].toString() == media[\"MessageId\"].toString())\n      if(!teleMsg) {\n          continue;\n      }\n      const id = media[\"Id\"];\n      const syncTime = media[\"MediaSyncTime\"];\n      const isMediaVideo = isVideo(teleMsg.media);\n      if (isMediaVideo) {\n          const videoSize = getVideoSize(teleMsg.media);\n          if (videoSize > maxSizeBytes){\n            f_result.push({\n                json : {\n                      id,\n                      size: videoSize,\n                      isLarge: true\n                  }\n            });\n            continue;\n          }\n      }\n      let buffer = await client.downloadMedia(teleMsg, {\n        worker: 1\n      });\n      const mimeType = await fileType.fromBuffer(buffer);\n      const size = buffer.length;\n      const isLarge = size > maxSizeBytes;\n      if (isLarge){\n        f_result.push({\n            json : {\n                  id,\n                  size,\n                  isLarge,\n                  action: 'IGNORE',\n                  credential: media[\"Credentials\"],\n              }\n        });\n      }\n      else {\n        f_result.push({\n          json : {\n            id,\n            isLarge: false,\n            syncTime,\n            mimeType,\n            action: 'UPLOAD',\n            credential: media[\"Credentials\"],\n            folderToken: 'MwlqfQO8VlRvuzdhGr7lIlgSgah', //media[\"Folder_token\"],\n            size,\n            fileName: `${media[\"Id\"]}_${media[\"ChatId\"]}_${media[\"MessageId\"]}.${mimeType?.ext}`\n          },\n          binary: {\n              data: {\n                data: buffer,\n                mimeType: mimeType?.mime,\n                fileName: `${media[\"Id\"]}_${media[\"ChatId\"]}_${media[\"MessageId\"]}.${mimeType?.ext}`\n              }\n          }\n        })\n      }\n      buffer = null;\n    }\n  } finally {\n    await client.disconnect();\n  }\n  return f_result;\n};\n\nconst returnData = await handleMedia();\nreturnData.push({\n              json : {\n                  id: 'fake',\n                  size: 100000,\n                  isLarge: true,\n                  action: 'IGNORE',\n                  credential: `{\"app_id\": \"cli_a7dfe8681738502f\", \"app_secret\": \"7rTLWYqFx3RHLHGnEpWLYgIQjGtvV4Kc\"}`,\n              }\n})\nreturn returnData"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2020,
+        -220
+      ],
+      "id": "ff87521b-539d-41a0-a7f5-ec7fb0d7bd43",
+      "name": "GetTelegramMedia",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "BEGIN TRANSACTION;\n\nBEGIN TRY\n\n  SELECT TOP 2 \n    A.Id, A.\"Type\", MediaSyncTime, Username,  MessageId, A.ChatId \n    INTO #TempSelectedRecords\n  FROM XinhTelegramMedia A \n  JOIN TelegramGroupSource B ON A.ChatId = B.ChatId \n  WHERE \n    MediaLink IS NULL \n    AND MediaSyncTime < 3 \n    AND A.\"Type\" in ('FileType.PHOTO') \n    AND \"Status\" <> 'MEDIASYNC-FAIL'\n  ORDER BY A.ChatId;\n  \n  UPDATE XinhTelegramMedia\n  SET \"Status\" = 'MEDIASYNC-PROCESSING'\n  WHERE Id IN (SELECT Id FROM #TempSelectedRecords);\n\n  SELECT * FROM #TempSelectedRecords \n  CROSS JOIN\n  (\n    SELECT TOP 1 \"Credentials\" FROM CommunityAccount\n    WHERE AccountType = 'LARK' \n    AND \"Status\" = 'ACTIVE'\n  ) AS Account\n   CROSS JOIN (\n    SELECT TOP 1 Folder_token FROM CommunityStorageResource\n    WHERE ResourceType = 'LARK'\n    AND \"Status\" = 'ACTIVE'\n  ) AS Storage;\n\n  DROP TABLE #TempSelectedRecords;\n\nCOMMIT TRANSACTION;\nEND TRY\nBEGIN CATCH\n    ROLLBACK TRANSACTION;\nEND CATCH;"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        -2320,
+        -220
+      ],
+      "id": "2348a000-8b96-41ed-991c-2e278b309c42",
+      "name": "UnsyncMediaMsg1",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/auth/v3/app_access_token/internal",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"app_id\" : \"{{ $json.credential.parseJson().app_id }}\",\n  \"app_secret\" : \"{{ $json.credential.parseJson().app_secret }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1180,
+        80
+      ],
+      "id": "a658afdf-7173-491f-bd7a-ba1a99b7df74",
+      "name": "GetLarkAccessToken",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -920,
+        -140
+      ],
+      "id": "a0f8435a-f280-4d6a-afe3-3bd8e5880302",
+      "name": "MergeDataWithAccessToken"
+    },
+    {
+      "parameters": {
+        "jsCode": "// JSON example to Download Upload file\nreturn {\n          json : {\n            id,\n            isLarge: false,\n            syncTime,\n            mimeType,\n            action: 'UPLOAD',\n            size,\n            fileName: `${media[\"ChatId\"]}_${teleMsg[\"id\"]}.${mimeType?.ext}`\n          },\n          binary: {\n              data: {\n                data: buffer,\n                mimeType: mimeType?.mime,\n                fileName: `${media[\"ChatId\"]}_${media[\"MessageId\"]}.${mimeType?.ext}`\n              }\n          }\n        }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2020,
+        400
+      ],
+      "id": "c6250f05-7870-4a6a-ac15-63d3367ecad5",
+      "name": "Example of JSON to call UPLOAD",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  file_token: 'LvEkbUYqcoDzOdxTGeIlutRuglg',\n  action: 'DOWNLOAD'\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2020,
+        -20
+      ],
+      "id": "f6713533-5194-45ae-9506-f5753769d7cd",
+      "name": "ExampleRequestToDownload"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  folder_token: 'nodlgBHpInpdXz7KtdG1uiGyfYz',\n  action: 'CREATE_FOLDER',\n  name: 'TestCreateFolder-DeleteIfWant'\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2020,
+        -580
+      ],
+      "id": "b05af8cf-8347-4c3f-b8c2-c7fd3d984757",
+      "name": "ExampleRequestToCreateFolder"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://open.larksuite.com/open-apis/drive/v1/files/{{ $json.file_token }}/move",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=Authorization",
+              "value": "=Bearer {{ $json.app_access_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=folder_token",
+              "value": "={{ $json.target_folder }}"
+            },
+            {
+              "name": "type",
+              "value": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        20
+      ],
+      "id": "780e5891-6c1b-4605-8382-6413b2891f19",
+      "name": "MoveFileInLarkDrive"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  file_token: 'LvEkbUYqcoDzOdxTGeIlutRuglg',\n  action: 'MOVE',\n  target_folder: 'R6GFfMrZUltO9gdeVVQlkGhVgVf'\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2020,
+        200
+      ],
+      "id": "a28bf9b3-1df3-4275-92a0-dd8771bdff73",
+      "name": "ExampleJsonToMoveFile"
+    },
+    {
+      "parameters": {
+        "jsCode": "// JSON example to Download Upload file\n// return {\n//       file_token: 'S9lEbwsooopldcxsBA3l97fEgKF',\n//       action: 'PUBLIC_FILE'\n// }\n\nreturn {\n      file_token: 'S9lEbwsooopldcxsBA3l97fEgKF',\n      action: 'NON_PUBLIC_FILE'\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2020,
+        -400
+      ],
+      "id": "7152b72c-7b1b-4898-b390-3442f52af618",
+      "name": "ExampleRequestMakeFilePublic"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  link: `https://api16-sgsaas1-drive-sg.larksuite.com/space/api/box/stream/download/all/${$('MergeDataWithAccessToken').first().json.file_token}`\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        120,
+        240
+      ],
+      "id": "97fe59c0-f051-4720-a738-c1754ed0e38e",
+      "name": "GetDownloadLink"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://open.larksuite.com/open-apis/drive/v1/permissions/{{$json.file_token}}/public?type=file",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=Authorization",
+              "value": "=Bearer {{ $json.app_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "external_access",
+              "value": "false"
+            },
+            {
+              "name": "security_entity",
+              "value": "anyone_can_view"
+            },
+            {
+              "name": "share_entity",
+              "value": "same_tenant"
+            },
+            {
+              "name": "link_share_entity",
+              "value": "tenant_editable"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        500
+      ],
+      "id": "950b0c5d-f481-447b-a403-db9f9998447e",
+      "name": "MakeFileNonPublic"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://open.larksuite.com/open-apis/drive/v1/permissions/{{$json.file_token}}/public?type=file",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=Authorization",
+              "value": "=Bearer {{ $json.app_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "external_access",
+              "value": "true"
+            },
+            {
+              "name": "security_entity",
+              "value": "anyone_can_view"
+            },
+            {
+              "name": "share_entity",
+              "value": "anyone"
+            },
+            {
+              "name": "link_share_entity",
+              "value": "anyone_readable"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        260
+      ],
+      "id": "ca43d39f-578f-4b7d-9b8c-0e1841c8706d",
+      "name": "MakeFilePublic"
+    },
+    {
+      "parameters": {
+        "content": "Consider to  add if node to check if already have app_access_token then no need to call to http request to get this"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1560,
+        100
+      ],
+      "id": "59082792-d59a-4be6-a1c3-ea9e7eb97102",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## For test (don't delete)\n",
+        "height": 1300,
+        "width": 940,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2700,
+        -700
+      ],
+      "id": "dcc1ab19-39e8-4095-9a8c-5efeb4272200",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all()"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        720
+      ],
+      "id": "92b77fba-e098-493e-8c2f-33d45f2aa2a8",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const uploadResponses = $input.all();\nconst inputDatas = $('Switch').all().map(x => x[\"json\"])\nconst result = [];\n\nfor (let i = 0; i < uploadResponses.length; i ++) {\n  const paired = uploadResponses[i][\"pairedItem\"][\"item\"];\n  // delete uploadResponses[i][\"pairedItem\"];\n  let r = {json : {\n    ...inputDatas[paired],\n    ...uploadResponses[i][\"json\"],\n  }}\n  result.push(r)\n}\nreturn result;\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        -760
+      ],
+      "id": "16449047-a346-4c7f-9390-55925ce40514",
+      "name": "Response"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "MergeDataWithAccessToken",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GetLarkAccessToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "SaveToLarkDrive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DownLoadFromLarkDrive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CreateFolderInLarkDrive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MoveFileInLarkDrive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MakeFilePublic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MakeFileNonPublic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SaveToLarkDrive": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "UnsyncMediaMsg1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetTelegramMedia": {
+      "main": [
+        []
+      ]
+    },
+    "UnsyncMediaMsg1": {
+      "main": [
+        [
+          {
+            "node": "GetTelegramMedia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetLarkAccessToken": {
+      "main": [
+        [
+          {
+            "node": "MergeDataWithAccessToken",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MergeDataWithAccessToken": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ExampleRequestToDownload": {
+      "main": [
+        []
+      ]
+    },
+    "ExampleRequestToCreateFolder": {
+      "main": [
+        []
+      ]
+    },
+    "ExampleJsonToMoveFile": {
+      "main": [
+        []
+      ]
+    },
+    "ExampleRequestMakeFilePublic": {
+      "main": [
+        []
+      ]
+    },
+    "MakeFilePublic": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "KG3wK34JqO8YiJsO"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "b8a33cb5-05f8-4f78-98f3-d64d991c9182",
+  "activeVersionId": "b8a33cb5-05f8-4f78-98f3-d64d991c9182",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2024-12-26T09:25:24.509Z",
+      "createdAt": "2024-12-26T09:25:24.509Z",
+      "role": "workflow:owner",
+      "workflowId": "ogmJgoLqdW6PB9NO",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-26T08:31:17.421Z",
+    "createdAt": "2026-02-26T08:31:17.421Z",
+    "versionId": "b8a33cb5-05f8-4f78-98f3-d64d991c9182",
+    "workflowId": "ogmJgoLqdW6PB9NO",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          -1660,
+          40
+        ],
+        "id": "17ec487a-106e-4117-bfd8-53fa96697e1f",
+        "name": "Execute Workflow Trigger"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "UPLOAD",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "570f06aa-6f2d-44d9-bcb5-2767513839ab",
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "DOWNLOAD",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "78118f34-18b1-4398-a3b4-d3d99cab41b8",
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "CREATE_FOLDER",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "28fa99be-8543-492d-addc-07d162252eec",
+                      "leftValue": "={{  $json.action }}",
+                      "rightValue": "MOVE",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "3e477194-36d4-4222-b343-2bc0f0c0eb8e",
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "PUBLIC_FILE",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "8e9a574f-328e-41d4-8cb7-e50cab02b360",
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "NON_PUBLIC_FILE",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "4d5772e6-f7b3-4f6a-8848-29d20004a4f9",
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "IGNORE",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.2,
+        "position": [
+          -660,
+          -140
+        ],
+        "id": "9f4b700f-3a71-49b2-8b63-ffd980a6eabd",
+        "name": "Switch"
+      },
+      {
+        "parameters": {
+          "url": "=https://open.larksuite.com/open-apis/drive/v1/files/{{ $json.file_token }}/download",
+          "sendHeaders": true,
+          "specifyHeaders": "=keypair",
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.app_access_token }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -140,
+          -500
+        ],
+        "id": "3c721afe-475f-4489-aab5-b515f16dee4b",
+        "name": "DownLoadFromLarkDrive",
+        "alwaysOutputData": false,
+        "retryOnFail": false
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://open.larksuite.com/open-apis/drive/v1/files/create_folder",
+          "sendHeaders": true,
+          "specifyHeaders": "=keypair",
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.app_access_token }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "folder_token",
+                "value": "={{ $json.folder_token }}"
+              },
+              {
+                "name": "=name",
+                "value": "={{ $json.name }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -140,
+          -260
+        ],
+        "id": "cc0b6cd9-1f24-4e2a-8ad5-84e867114dad",
+        "name": "CreateFolderInLarkDrive",
+        "alwaysOutputData": false,
+        "retryOnFail": false
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://open.larksuite.com/open-apis/drive/v1/files/upload_all",
+          "sendHeaders": true,
+          "specifyHeaders": "=keypair",
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.app_access_token }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "multipart-form-data",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "parameterType": "formBinaryData",
+                "name": "file",
+                "inputDataFieldName": "data"
+              },
+              {
+                "name": "file_name",
+                "value": "={{ $json.fileName }}"
+              },
+              {
+                "name": "parent_node",
+                "value": "={{ $json.folderToken }}"
+              },
+              {
+                "name": "parent_type",
+                "value": "explorer"
+              },
+              {
+                "name": "size",
+                "value": "={{ $json.size }}"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -120,
+          -760
+        ],
+        "id": "ef699324-548d-4408-bbbf-1eca62fba01b",
+        "name": "SaveToLarkDrive",
+        "alwaysOutputData": false,
+        "retryOnFail": false
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -2640,
+          -220
+        ],
+        "id": "0b74eca9-3f44-449f-b426-300dfcb067ff",
+        "name": "When clicking ‘Test workflow’",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "jsCode": "const { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\nconst fileType = require('file-type');\n\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\n\nconst medias = $input.all().map(x => x.json)\nconst maxSizeMB = 10; // Max size in MB\nconst maxSizeBytes = maxSizeMB * 1024 * 1024;\n\n\nfunction getVideoSize(media) {\n  return Number(media.document.size)\n}\n\nfunction isVideo(media) {\n    return media.video && 1;\n}\n\nfunction isHandleVideo(medias){\n    return medias.some(media => media[\"Type\"] == 'FileType.VIDEO')\n}\n\nasync function connectWithTimeout(client, timeout = 20000) {\n    const timeoutPromise = new Promise((resolve) =>\n        setTimeout(() => resolve(false), timeout)\n    );\n\n    try {\n        const connectResult = await Promise.race([\n            client.connect().then(() => true),\n            timeoutPromise,\n        ]);\n        return connectResult;\n    } catch {\n        return false;\n    }\n}\n\nconst username = medias[0][\"Username\"];\nconst msgIds = medias.map(x => Number(x[\"MessageId\"]))\n\nasync function handleMedia() {\n  const f_result = []\n  const client = new TelegramClient(\n        new StringSession(stringSession),\n        apiId,\n        apiHash,\n        { connectionRetries: 5 }\n      );\n  try {\n    await client.connect();\n    const result = await client.invoke(\n      new Api.channels.GetMessages({\n        channel: username,\n        id: msgIds\n      })\n    );\n    const teleMsgs = result.messages;\n    for(let i = 0; i < medias.length; i++) {\n      const media = medias[i];\n      const teleMsg = teleMsgs.find(x => x[\"id\"].toString() == media[\"MessageId\"].toString())\n      if(!teleMsg) {\n          continue;\n      }\n      const id = media[\"Id\"];\n      const syncTime = media[\"MediaSyncTime\"];\n      const isMediaVideo = isVideo(teleMsg.media);\n      if (isMediaVideo) {\n          const videoSize = getVideoSize(teleMsg.media);\n          if (videoSize > maxSizeBytes){\n            f_result.push({\n                json : {\n                      id,\n                      size: videoSize,\n                      isLarge: true\n                  }\n            });\n            continue;\n          }\n      }\n      let buffer = await client.downloadMedia(teleMsg, {\n        worker: 1\n      });\n      const mimeType = await fileType.fromBuffer(buffer);\n      const size = buffer.length;\n      const isLarge = size > maxSizeBytes;\n      if (isLarge){\n        f_result.push({\n            json : {\n                  id,\n                  size,\n                  isLarge,\n                  action: 'IGNORE',\n                  credential: media[\"Credentials\"],\n              }\n        });\n      }\n      else {\n        f_result.push({\n          json : {\n            id,\n            isLarge: false,\n            syncTime,\n            mimeType,\n            action: 'UPLOAD',\n            credential: media[\"Credentials\"],\n            folderToken: 'MwlqfQO8VlRvuzdhGr7lIlgSgah', //media[\"Folder_token\"],\n            size,\n            fileName: `${media[\"Id\"]}_${media[\"ChatId\"]}_${media[\"MessageId\"]}.${mimeType?.ext}`\n          },\n          binary: {\n              data: {\n                data: buffer,\n                mimeType: mimeType?.mime,\n                fileName: `${media[\"Id\"]}_${media[\"ChatId\"]}_${media[\"MessageId\"]}.${mimeType?.ext}`\n              }\n          }\n        })\n      }\n      buffer = null;\n    }\n  } finally {\n    await client.disconnect();\n  }\n  return f_result;\n};\n\nconst returnData = await handleMedia();\nreturnData.push({\n              json : {\n                  id: 'fake',\n                  size: 100000,\n                  isLarge: true,\n                  action: 'IGNORE',\n                  credential: `{\"app_id\": \"cli_a7dfe8681738502f\", \"app_secret\": \"7rTLWYqFx3RHLHGnEpWLYgIQjGtvV4Kc\"}`,\n              }\n})\nreturn returnData"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2020,
+          -220
+        ],
+        "id": "ff87521b-539d-41a0-a7f5-ec7fb0d7bd43",
+        "name": "GetTelegramMedia",
+        "alwaysOutputData": false
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "BEGIN TRANSACTION;\n\nBEGIN TRY\n\n  SELECT TOP 2 \n    A.Id, A.\"Type\", MediaSyncTime, Username,  MessageId, A.ChatId \n    INTO #TempSelectedRecords\n  FROM XinhTelegramMedia A \n  JOIN TelegramGroupSource B ON A.ChatId = B.ChatId \n  WHERE \n    MediaLink IS NULL \n    AND MediaSyncTime < 3 \n    AND A.\"Type\" in ('FileType.PHOTO') \n    AND \"Status\" <> 'MEDIASYNC-FAIL'\n  ORDER BY A.ChatId;\n  \n  UPDATE XinhTelegramMedia\n  SET \"Status\" = 'MEDIASYNC-PROCESSING'\n  WHERE Id IN (SELECT Id FROM #TempSelectedRecords);\n\n  SELECT * FROM #TempSelectedRecords \n  CROSS JOIN\n  (\n    SELECT TOP 1 \"Credentials\" FROM CommunityAccount\n    WHERE AccountType = 'LARK' \n    AND \"Status\" = 'ACTIVE'\n  ) AS Account\n   CROSS JOIN (\n    SELECT TOP 1 Folder_token FROM CommunityStorageResource\n    WHERE ResourceType = 'LARK'\n    AND \"Status\" = 'ACTIVE'\n  ) AS Storage;\n\n  DROP TABLE #TempSelectedRecords;\n\nCOMMIT TRANSACTION;\nEND TRY\nBEGIN CATCH\n    ROLLBACK TRANSACTION;\nEND CATCH;"
+        },
+        "type": "n8n-nodes-base.microsoftSql",
+        "typeVersion": 1.1,
+        "position": [
+          -2320,
+          -220
+        ],
+        "id": "2348a000-8b96-41ed-991c-2e278b309c42",
+        "name": "UnsyncMediaMsg1",
+        "credentials": {
+          "microsoftSql": {
+            "id": "sBluV7uBt8ahdNUT",
+            "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://open.larksuite.com/open-apis/auth/v3/app_access_token/internal",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"app_id\" : \"{{ $json.credential.parseJson().app_id }}\",\n  \"app_secret\" : \"{{ $json.credential.parseJson().app_secret }}\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -1180,
+          80
+        ],
+        "id": "a658afdf-7173-491f-bd7a-ba1a99b7df74",
+        "name": "GetLarkAccessToken",
+        "executeOnce": true,
+        "retryOnFail": true,
+        "maxTries": 2
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "combineBy": "combineAll",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          -920,
+          -140
+        ],
+        "id": "a0f8435a-f280-4d6a-afe3-3bd8e5880302",
+        "name": "MergeDataWithAccessToken"
+      },
+      {
+        "parameters": {
+          "jsCode": "// JSON example to Download Upload file\nreturn {\n          json : {\n            id,\n            isLarge: false,\n            syncTime,\n            mimeType,\n            action: 'UPLOAD',\n            size,\n            fileName: `${media[\"ChatId\"]}_${teleMsg[\"id\"]}.${mimeType?.ext}`\n          },\n          binary: {\n              data: {\n                data: buffer,\n                mimeType: mimeType?.mime,\n                fileName: `${media[\"ChatId\"]}_${media[\"MessageId\"]}.${mimeType?.ext}`\n              }\n          }\n        }\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2020,
+          400
+        ],
+        "id": "c6250f05-7870-4a6a-ac15-63d3367ecad5",
+        "name": "Example of JSON to call UPLOAD",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "jsCode": "return {\n  file_token: 'LvEkbUYqcoDzOdxTGeIlutRuglg',\n  action: 'DOWNLOAD'\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2020,
+          -20
+        ],
+        "id": "f6713533-5194-45ae-9506-f5753769d7cd",
+        "name": "ExampleRequestToDownload"
+      },
+      {
+        "parameters": {
+          "jsCode": "return {\n  folder_token: 'nodlgBHpInpdXz7KtdG1uiGyfYz',\n  action: 'CREATE_FOLDER',\n  name: 'TestCreateFolder-DeleteIfWant'\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2020,
+          -580
+        ],
+        "id": "b05af8cf-8347-4c3f-b8c2-c7fd3d984757",
+        "name": "ExampleRequestToCreateFolder"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://open.larksuite.com/open-apis/drive/v1/files/{{ $json.file_token }}/move",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "=Authorization",
+                "value": "=Bearer {{ $json.app_access_token }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json; charset=utf-8"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "=folder_token",
+                "value": "={{ $json.target_folder }}"
+              },
+              {
+                "name": "type",
+                "value": "file"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -140,
+          20
+        ],
+        "id": "780e5891-6c1b-4605-8382-6413b2891f19",
+        "name": "MoveFileInLarkDrive"
+      },
+      {
+        "parameters": {
+          "jsCode": "return {\n  file_token: 'LvEkbUYqcoDzOdxTGeIlutRuglg',\n  action: 'MOVE',\n  target_folder: 'R6GFfMrZUltO9gdeVVQlkGhVgVf'\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2020,
+          200
+        ],
+        "id": "a28bf9b3-1df3-4275-92a0-dd8771bdff73",
+        "name": "ExampleJsonToMoveFile"
+      },
+      {
+        "parameters": {
+          "jsCode": "// JSON example to Download Upload file\n// return {\n//       file_token: 'S9lEbwsooopldcxsBA3l97fEgKF',\n//       action: 'PUBLIC_FILE'\n// }\n\nreturn {\n      file_token: 'S9lEbwsooopldcxsBA3l97fEgKF',\n      action: 'NON_PUBLIC_FILE'\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2020,
+          -400
+        ],
+        "id": "7152b72c-7b1b-4898-b390-3442f52af618",
+        "name": "ExampleRequestMakeFilePublic"
+      },
+      {
+        "parameters": {
+          "jsCode": "return {\n  link: `https://api16-sgsaas1-drive-sg.larksuite.com/space/api/box/stream/download/all/${$('MergeDataWithAccessToken').first().json.file_token}`\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          120,
+          240
+        ],
+        "id": "97fe59c0-f051-4720-a738-c1754ed0e38e",
+        "name": "GetDownloadLink"
+      },
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "=https://open.larksuite.com/open-apis/drive/v1/permissions/{{$json.file_token}}/public?type=file",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "=Authorization",
+                "value": "=Bearer {{ $json.app_access_token }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "external_access",
+                "value": "false"
+              },
+              {
+                "name": "security_entity",
+                "value": "anyone_can_view"
+              },
+              {
+                "name": "share_entity",
+                "value": "same_tenant"
+              },
+              {
+                "name": "link_share_entity",
+                "value": "tenant_editable"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -140,
+          500
+        ],
+        "id": "950b0c5d-f481-447b-a403-db9f9998447e",
+        "name": "MakeFileNonPublic"
+      },
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "=https://open.larksuite.com/open-apis/drive/v1/permissions/{{$json.file_token}}/public?type=file",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "=Authorization",
+                "value": "=Bearer {{ $json.app_access_token }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "external_access",
+                "value": "true"
+              },
+              {
+                "name": "security_entity",
+                "value": "anyone_can_view"
+              },
+              {
+                "name": "share_entity",
+                "value": "anyone"
+              },
+              {
+                "name": "link_share_entity",
+                "value": "anyone_readable"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -140,
+          260
+        ],
+        "id": "ca43d39f-578f-4b7d-9b8c-0e1841c8706d",
+        "name": "MakeFilePublic"
+      },
+      {
+        "parameters": {
+          "content": "Consider to  add if node to check if already have app_access_token then no need to call to http request to get this"
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -1560,
+          100
+        ],
+        "id": "59082792-d59a-4be6-a1c3-ea9e7eb97102",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "content": "## For test (don't delete)\n",
+          "height": 1300,
+          "width": 940,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -2700,
+          -700
+        ],
+        "id": "dcc1ab19-39e8-4095-9a8c-5efeb4272200",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "jsCode": "return $input.all()"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -140,
+          720
+        ],
+        "id": "92b77fba-e098-493e-8c2f-33d45f2aa2a8",
+        "name": "Code"
+      },
+      {
+        "parameters": {
+          "jsCode": "const uploadResponses = $input.all();\nconst inputDatas = $('Switch').all().map(x => x[\"json\"])\nconst result = [];\n\nfor (let i = 0; i < uploadResponses.length; i ++) {\n  const paired = uploadResponses[i][\"pairedItem\"][\"item\"];\n  // delete uploadResponses[i][\"pairedItem\"];\n  let r = {json : {\n    ...inputDatas[paired],\n    ...uploadResponses[i][\"json\"],\n  }}\n  result.push(r)\n}\nreturn result;\n\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          100,
+          -760
+        ],
+        "id": "16449047-a346-4c7f-9390-55925ce40514",
+        "name": "Response"
+      }
+    ],
+    "connections": {
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "MergeDataWithAccessToken",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "GetLarkAccessToken",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch": {
+        "main": [
+          [
+            {
+              "node": "SaveToLarkDrive",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "DownLoadFromLarkDrive",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "CreateFolderInLarkDrive",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "MoveFileInLarkDrive",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "MakeFilePublic",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "MakeFileNonPublic",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SaveToLarkDrive": {
+        "main": [
+          [
+            {
+              "node": "Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Test workflow’": {
+        "main": [
+          [
+            {
+              "node": "UnsyncMediaMsg1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GetTelegramMedia": {
+        "main": [
+          []
+        ]
+      },
+      "UnsyncMediaMsg1": {
+        "main": [
+          [
+            {
+              "node": "GetTelegramMedia",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GetLarkAccessToken": {
+        "main": [
+          [
+            {
+              "node": "MergeDataWithAccessToken",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "MergeDataWithAccessToken": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "ExampleRequestToDownload": {
+        "main": [
+          []
+        ]
+      },
+      "ExampleRequestToCreateFolder": {
+        "main": [
+          []
+        ]
+      },
+      "ExampleJsonToMoveFile": {
+        "main": [
+          []
+        ]
+      },
+      "ExampleRequestMakeFilePublic": {
+        "main": [
+          []
+        ]
+      },
+      "MakeFilePublic": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
