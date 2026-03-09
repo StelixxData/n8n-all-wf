@@ -1,0 +1,500 @@
+{
+  "updatedAt": "2025-01-07T17:53:29.434Z",
+  "createdAt": "2025-01-05T11:47:21.692Z",
+  "id": "10mu1JlTG6j2uGKp",
+  "name": "Community - Media Distribute (from Lark Drive)",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        560
+      ],
+      "id": "3b7daea0-06d5-42ce-bcef-d369615d4320",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH TopRecord AS\n(\n    SELECT TOP 1 x.Id, x.\"Type\", \"Text\", MediaLink , MessageGroupedId, x.ChatId\n    FROM XinhTelegramMedia x\n    JOIN TelegramGroupSource tg ON x.ChatId = tg.ChatId\n    WHERE \n    NOT EXISTS (\n        SELECT 1\n        FROM XinhDistributionLog xl\n        WHERE x.Id = xl.SourceId AND DistributionTarget <> '{{ $json.Link }}'\n    )\n    --AND \"Status\"  = 'APPROVED'\n    AND MediaLink NOT LIKE 'https://drive.google.com%'\n    AND MessageGroupedId IS NULL -- REMOVE THIS LINE LATER\n    AND tg.GroupType = '{{ $json.GroupType }}'\n    AND x.\"Type\" = 'FileType.PHOTO' -- REMOVE THIS LINE LATER\n)\nSELECT x.Id, x.\"Type\", x.\"Text\", x.MediaLink, x.MessageGroupedId, ChatId, ca.Credentials\nFROM XinhTelegramMedia x\nJOIN CommunityAccount ca ON x.DriveAccount = ca.\"User\"\nWHERE \n    (SELECT MessageGroupedId FROM TopRecord) IS NULL \n    AND x.Id = (SELECT Id FROM TopRecord)\n    OR \n    ( x.MessageGroupedId = (SELECT MessageGroupedId FROM TopRecord) AND x.ChatId = (SELECT ChatId from TopRecord)  )"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        -340,
+        320
+      ],
+      "id": "d4bb054a-99d4-41a7-b970-d806c288b10e",
+      "name": "GetMediaToDeliver",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all().map(i => i[\"json\"]);\n\nreturn input.map(i => {\n  return {\n    file_token: i[\"MediaLink\"],\n    action: 'DOWNLOAD',\n    credential: i[\"Credentials\"],\n    type: i[\"Type\"],\n    text: i[\"Text\"],\n  }\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -60,
+        320
+      ],
+      "id": "70eedef1-958b-4f79-80e8-424ee528e84f",
+      "name": "DownloadRequest"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ogmJgoLqdW6PB9NO",
+          "mode": "list",
+          "cachedResultName": "Lark Process"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        320
+      ],
+      "id": "03d5efe8-c92a-422c-9b27-577877eeb66c",
+      "name": "DownloadMedia"
+    },
+    {
+      "parameters": {
+        "content": "TELEGRAM DISTRIBUTION\n",
+        "height": 300,
+        "width": 1260,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        -460
+      ],
+      "id": "1787229e-4d66-4c35-9d7f-c8360d113c2b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\nconst { CustomFile } = require(\"telegram/client/uploads\");\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\n\nlet client = new TelegramClient(\n        new StringSession(stringSession),\n        apiId,\n        apiHash,\n        { connectionRetries: 5 }\n);\nconst distributedGroup = $('GetGroupToDistribute').first().json;\nasync function run() {\n  try {\n    await client.connect();\n    let medias = $input.all();\n    let fileSend = [];\n    let message = '';\n    for (let i = 0; i < medias.length; i ++) {\n      let buffer = await this.helpers.getBinaryDataBuffer(i, 'data');\n      let fileName = medias[i][\"binary\"][\"data\"][\"fileName\"];\n      \n      let fileSize = buffer.length;\n      let file = new CustomFile(fileName, fileSize, \"\", buffer);\n      let uploadedFile = await client.uploadFile({\n        file: file,\n        workers: 1\n      });\n      \n      fileSend.push(uploadedFile);\n      let text = medias[i][\"json\"][\"text\"]\n      if (text && text.length && text.trim() != '') {\n        message = text;\n      }\n    }\n    let result = await client.sendMessage(\"victor_nd2802\", {\n        message: message,\n        file: fileSend,\n    });\n    return {\n      mediasDistributed: true,\n      id: result[0][\"id\"]\n    };\n  } catch {\n    return {\n      mediasDistributed: false\n    };\n  } finally {\n    await client.disconnect();\n  }\n};\nconst result = await run();\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        40
+      ],
+      "id": "af3f199e-8be5-4f70-a76f-fff0cc613353",
+      "name": "DistributeToTeleGroup"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT TOP 1 g.Id, g.ChatId, 'https://t.me/' + g.Username as Link, g.Username, b.Token, g.GroupType\nFROM TelegramGroups g\nJOIN TelegramUserBots b ON g.DistributeBot = b.Username\nWHERE g.GroupType = '{{ `XINH` }}'\n    AND g.SyncStatus = 'SYNCED'\n    AND g.[Type] = 'channel'\n    AND (DATEPART(hour, GETDATE()) * 60 + DATEPART(minute, GETDATE())) % g.DistributeIntervalMinute <= {{ 1000 }};"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        -620,
+        -100
+      ],
+      "id": "700b3837-affc-4eda-a0e9-b16b4b4e259a",
+      "name": "GetGroupToDistribute",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const distributedMedias = $('GetMediaToDeliver').all().map(x => x[\"json\"]);\nconst distributedGroup = $('GetGroupToDistribute').first().json;\nconst sentMsgId = $input.first().json.id\nconst values = distributedMedias.map(item => {\n  const { Id } = item;\n  return `(${Id}, '${distributedGroup[\"Link\"]}', '${distributedGroup[\"Link\"]}/${sentMsgId}' )`; // DISTRIBUTION LINK MUST BE COMBINED WITH THE ID OF Sent Msg\n}).join(',\\n');\nconst insertSQL = `\nBEGIN TRANSACTION;\n\nBEGIN TRY\n\n  INSERT INTO XinhDistributionLog \n    (SourceId, DistributionTarget, DistributionLink) \n  VALUES ${values};\n\nCOMMIT TRANSACTION;\nEND TRY\nBEGIN CATCH\n    ROLLBACK TRANSACTION;\nEND CATCH;\n`\nreturn {\n  query: insertSQL.replace(/\\s+/g, ' ').trim()\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        -80
+      ],
+      "id": "669d2122-135b-4f7e-b0b6-73db6726b1c9",
+      "name": "PrepareLogData"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b5ec9701-1e95-4c7b-9ce0-a35fd26939da",
+              "leftValue": "={{ $json.mediasDistributed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1220,
+        40
+      ],
+      "id": "23054181-d62d-4a4b-9658-b80e272759e4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "DOWNLOAD FILE AND STORAGE AS BUFFER",
+        "height": 280,
+        "width": 940,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        240
+      ],
+      "id": "fd3c8fae-a247-4261-81db-322ffb904a8d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "X DISTRIBUTION",
+        "height": 300,
+        "width": 1260,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        880,
+        940
+      ],
+      "id": "a6fb6434-16c6-4cac-b763-767951ebcc76",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        -600,
+        940
+      ],
+      "id": "7f13076c-3a41-4455-8ad3-26a2a4f5be69",
+      "name": "GetXGroupToDistribute",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const distributedMedias = $('GetMediaToDeliver1').all().map(x => x[\"json\"]);\nconst distributedXaccount = `thangnd_2802`;\nconst input = $input.first()[\"json\"];\nconst tweet = input[\"data\"][\"data\"][\"text\"];\nconst regex = /(http[s]?:\\/\\/\\S+)/g; // Regular expression to match URLs\nconst tweetLink = tweet.match(regex);\n// should take the mediaIds to create extraData\n\nconst values = distributedMedias.map(item => {\n  const { Id } = item;\n  return `(${Id}, '${distributedXaccount}', '${tweetLink}' )`;\n}).join(',\\n');\nconst insertSQL = `\nBEGIN TRANSACTION;\n\nBEGIN TRY\n\n  INSERT INTO XinhDistributionLog \n    (SourceId, DistributionTarget, DistributionLink) \n  VALUES ${values};\n\nCOMMIT TRANSACTION;\nEND TRY\nBEGIN CATCH\n    ROLLBACK TRANSACTION;\nEND CATCH;\n`\nreturn {\n  query: insertSQL.replace(/\\s+/g, ' ').trim()\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1880,
+        980
+      ],
+      "id": "1f4ef6b0-9d32-4530-9cc3-752d4906e33c",
+      "name": "PrepareXDistributionLog"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fetch = require('node-fetch');\nconst { URLSearchParams } = require('url');\nconst qs = require('querystring');\nconst crypto = require('crypto');\nconst FormData = require('form-data');\n// this is Thang's tokens. Account just like a bot. Please don't hack me \nconst BEARER_TOKEN = 'AAAAAAAAAAAAAAAAAAAAAC7uxwEAAAAAvS2hVfEGUAZ9fMmHl90N3aw75%2Fo%3DSJUarz9HmeNva2DUbi1Ln4zsALoioAdxqRkcWzsyYrCYWiJ3do';\nconst API_KEY = 'TEHE13PjM0m4F04tpREn8iWNZ';\nconst ACCESS_TOKEN = '1766431905514463232-DtrVZhd9jscqulLDTdWOlP5surwIHo';\nconst API_SECRET_KEY = 'T4nhkYlfmkHFakX5uiGdYXZB6nLY4R8VO5wIMDpZMUMY7Tv6YR';\nconst ACCESS_TOKEN_SECRET = 'NiPsudHXhrXXqPDo9BHjtOSS1klM5OUy7dnlwY6Jh2AZw';\nfunction generateOAuthParams(url, method) {\n  const oauthParams = {\n    oauth_consumer_key: API_KEY,\n    oauth_nonce: crypto.randomBytes(16).toString('hex'),\n    oauth_signature_method: 'HMAC-SHA1',\n    oauth_timestamp: Math.floor(Date.now() / 1000).toString(),\n    oauth_token: ACCESS_TOKEN,\n    oauth_version: '1.0',\n  };\n\n  const baseString = [\n    method.toUpperCase(),\n    encodeURIComponent(url),\n    encodeURIComponent(new URLSearchParams(oauthParams).toString()),\n  ].join('&');\n\n  const signingKey = `${API_SECRET_KEY}&${ACCESS_TOKEN_SECRET}`;\n  oauthParams.oauth_signature = crypto.createHmac('sha1', signingKey).update(baseString).digest('base64');\n\n  return oauthParams;\n}\n\nfunction buildOAuthHeader(oauthParams) {\n  let header = 'OAuth ' + Object.keys(oauthParams)\n    .map(key => `${encodeURIComponent(key)}=\"${encodeURIComponent(oauthParams[key])}\"`)\n    .join(', ');\n  return header;\n}\n\nasync function uploadMedia(i, fN, mT) {\n  let url = 'https://upload.twitter.com/1.1/media/upload.json';\n  let method = 'POST';\n  let oauth = generateOAuthParams(url, method);\n  let buffer = await this.helpers.getBinaryDataBuffer(i, 'data')\n  let formData = new FormData();\n  formData.append('media', buffer, { filename: fN, contentType: mT });\n  let response = await fetch(url, {\n    method: method,\n    headers: {\n      ...formData.getHeaders(),\n      'Authorization': buildOAuthHeader(oauth),\n    },\n    body: formData,\n  });\n  console.log(response)\n  if (!response.ok) {\n    console.error('Failed to upload media:', await response.text());\n    return null;\n  }\n  const data = await response.json();\n  console.log(\"x media upload result: \", data)\n  return data.media_id_string;\n}\n\nasync function postTweet(text, mediaIds) {\n  let url = 'https://api.twitter.com/2/tweets';\n  let method = 'POST';\n  let oauth = generateOAuthParams(url, method);\n  const response = await fetch(url, {\n    method: 'POST',\n    headers: {\n      // 'Authorization': `Bearer ${BEARER_TOKEN}`,\n      'Authorization': buildOAuthHeader(oauth),\n      'Content-Type': 'application/json',\n    },\n    body: JSON.stringify({\n      text: text,\n      media: { media_ids: mediaIds }\n    })\n  });\n  console.log('post tweet: ',response)\n  if (!response.ok) {\n    return null;\n  }\n  let res = await response.json()\n  console.log('Tweet posted successfully:', res);\n  return res;\n}\n\nasync function handle() {\n  let inputs = $input.all()\n  let mediaIds = ['1876552771157291008'];\n  // for (let i = 0; i < inputs.length; i ++) {\n  //   let fileName = inputs[i][\"binary\"][\"data\"][\"fileName\"];\n  //   let mimeType = inputs[i][\"binary\"][\"data\"][\"mimeType\"];\n  //   let mediaId = await uploadMedia(i, fileName, mimeType);\n  //   mediaIds.push(mediaId);\n  // }\n  if (mediaIds.length) {\n    const postTweetResult = await postTweet('Hi', mediaIds );\n    return {\n      tweet: postTweetResult,\n      media: mediaIds\n    };\n  }\n  return null;\n  \n}\n\nconst res = await handle();\nif (res == null ){\n  return {\n    distributed: false\n  }\n} else {\n  return {\n    distributed: true,\n    data: res\n  }\n}\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        1020
+      ],
+      "id": "02ffc9d6-e1cd-4d64-bcb6-3afa8d350df9",
+      "name": "DistributeToXAccount"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH TopRecord AS\n(\n    SELECT TOP 1 x.Id, x.\"Type\", \"Text\", MediaLink , MessageGroupedId, x.ChatId\n    FROM XinhTelegramMedia x\n    JOIN TelegramGroupSource tg ON x.ChatId = tg.ChatId\n    WHERE \n    NOT EXISTS (\n        SELECT 1\n        FROM XinhDistributionLog xl\n        WHERE x.Id = xl.SourceId AND DistributionTarget <> '{{ `` }}'\n    )\n    --AND \"Status\"  = 'APPROVED'\n    AND MediaLink NOT LIKE 'https://drive.google.com%'\n    AND MessageGroupedId IS NULL -- REMOVE THIS LINE LATER\n    AND tg.GroupType = '{{ `XINH` }}'\n    AND x.\"Type\" = 'FileType.PHOTO' AND x.Id > 42775 -- REMOVE THIS LINE LATER\n)\nSELECT x.Id, x.\"Type\", x.\"Text\", x.MediaLink, x.MessageGroupedId, ChatId, ca.Credentials\nFROM XinhTelegramMedia x\nJOIN CommunityAccount ca ON x.DriveAccount = ca.\"User\"\nWHERE \n    (SELECT MessageGroupedId FROM TopRecord) IS NULL \n    AND x.Id = (SELECT Id FROM TopRecord)\n    OR \n    ( x.MessageGroupedId = (SELECT MessageGroupedId FROM TopRecord) AND x.ChatId = (SELECT ChatId from TopRecord)  )"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        20,
+        1400
+      ],
+      "id": "2b2af22f-dff6-490b-b3b9-d84d3932f27d",
+      "name": "GetMediaToDeliver1",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all().map(i => i[\"json\"]);\n\nreturn input.map(i => {\n  return {\n    file_token: i[\"MediaLink\"],\n    action: 'DOWNLOAD',\n    credential: i[\"Credentials\"],\n    type: i[\"Type\"],\n    text: i[\"Text\"],\n  }\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1400
+      ],
+      "id": "88b07461-e400-4165-9624-f0b972d2c23a",
+      "name": "DownloadRequest1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ogmJgoLqdW6PB9NO",
+          "mode": "list",
+          "cachedResultName": "Lark Process"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        460,
+        1400
+      ],
+      "id": "ff42227f-3706-4435-939a-2d33a819e7fb",
+      "name": "DownloadMedia1"
+    },
+    {
+      "parameters": {
+        "content": "DOWNLOAD FILE AND STORAGE AS BUFFER",
+        "height": 280,
+        "width": 940,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        1080
+      ],
+      "id": "cfc7c2bb-af00-4b96-b2f1-ef554bf2bca4",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e88ad698-289d-42b8-bbac-014a2c5392c8",
+              "leftValue": "={{ $json.distributed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1540,
+        1020
+      ],
+      "id": "275bd0c9-1e2f-4580-800e-cd75a00d9bb0",
+      "name": "If1"
+    }
+  ],
+  "connections": {
+    "GetMediaToDeliver": {
+      "main": [
+        [
+          {
+            "node": "DownloadRequest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DownloadRequest": {
+      "main": [
+        [
+          {
+            "node": "DownloadMedia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DownloadMedia": {
+      "main": [
+        [
+          {
+            "node": "DistributeToTeleGroup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetGroupToDistribute": {
+      "main": [
+        [
+          {
+            "node": "GetMediaToDeliver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DistributeToTeleGroup": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "PrepareLogData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetXGroupToDistribute": {
+      "main": [
+        []
+      ]
+    },
+    "DistributeToXAccount": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetMediaToDeliver1": {
+      "main": [
+        [
+          {
+            "node": "DownloadRequest1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DownloadRequest1": {
+      "main": [
+        [
+          {
+            "node": "DownloadMedia1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DownloadMedia1": {
+      "main": [
+        [
+          {
+            "node": "DistributeToXAccount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "PrepareXDistributionLog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "87619cc3-ebe4-416f-9861-e68a4594d56f",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-01-05T11:47:21.692Z",
+      "createdAt": "2025-01-05T11:47:21.692Z",
+      "role": "workflow:owner",
+      "workflowId": "10mu1JlTG6j2uGKp",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
