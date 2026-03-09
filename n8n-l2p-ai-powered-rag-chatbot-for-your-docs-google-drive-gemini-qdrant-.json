@@ -1,0 +1,1493 @@
+{
+  "updatedAt": "2025-05-07T15:45:02.710Z",
+  "createdAt": "2025-05-07T12:14:06.302Z",
+  "id": "GGKchY8VztL0SbUx",
+  "name": "[L2P] 🤖 AI Powered RAG Chatbot for Your Docs + Google Drive + Gemini + Qdrant",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "dataType": "binary",
+        "binaryMode": "specificField",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_id",
+                "value": "={{ $json.id }}"
+              },
+              {
+                "name": "pubkey",
+                "value": "={{ $json.name }}"
+              },
+              {
+                "name": "=overarching_theme",
+                "value": "={{ $('Extract Meta Data').item.json.output.overarching_theme }}"
+              },
+              {
+                "name": "recurring_topics",
+                "value": "={{ $('Extract Meta Data').item.json.output.recurring_topics }}"
+              },
+              {
+                "name": "pain_points",
+                "value": "={{ $('Extract Meta Data').item.json.output.pain_points }}"
+              },
+              {
+                "name": "analytical_insights",
+                "value": "={{ $('Extract Meta Data').item.json.output.analytical_insights }}"
+              },
+              {
+                "name": "conclusion",
+                "value": "={{ $('Extract Meta Data').item.json.output.conclusion }}"
+              },
+              {
+                "name": "keywords",
+                "value": "={{ $('Extract Meta Data').item.json.output.keywords }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "5cbd49e7-024a-44b4-b7a4-71f02a192ff7",
+      "name": "Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        1520,
+        1980
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkSize": 3000
+      },
+      "id": "05497590-7fa9-4325-8456-2df04c86c529",
+      "name": "Token Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "position": [
+        1620,
+        2120
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "id",
+          "value": "=nostr-damus-user-profiles"
+        },
+        "options": {}
+      },
+      "id": "d2b307b0-83d2-4678-9875-3f1d317fbe7f",
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        1440,
+        1780
+      ],
+      "executeOnce": false,
+      "retryOnFail": true,
+      "typeVersion": 1,
+      "credentials": {
+        "qdrantApi": {
+          "id": "r2MEJgOtdd0as4JC",
+          "name": "QdrantApi - toivanlatoi.120689"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "28c54069-3759-4fb7-a1ee-52b9dbd04d90",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        1080,
+        1120
+      ],
+      "typeVersion": 3,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "54236646-6b70-4cb0-a613-673a8a114b80",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1920,
+        2100
+      ],
+      "webhookId": "237d7f8a-aead-479a-b813-f407d1f37fa5",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {},
+      "id": "6c31c04a-b535-455e-a95b-c79b9ae8aa77",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -260,
+        980
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro-exp-03-25",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "id": "ecd6f5ac-2f0b-44cd-958b-8dfb1598cb27",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        2020,
+        1240
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BWGByr1hd4kHbDEO",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "9b9d9285-ecc7-47b3-8f1c-935cb9f2d0b7",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1720,
+        1460
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.data }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "overarching_theme",
+              "description": "Summarize the main theme(s) discussed in the \"Overarching Theme\" section."
+            },
+            {
+              "name": "recurring_topics",
+              "description": "List the recurring topics mentioned in the \"Common Threads\" section as an array of strings."
+            },
+            {
+              "name": "pain_points",
+              "description": "Summarize the user's frustrations or challenges mentioned in the \"Pain Points\" section as an array of strings."
+            },
+            {
+              "name": "analytical_insights",
+              "description": "Extract a list of key analytical observations from the \"Analytical Insights\" section, including shifts in tone or behavior."
+            },
+            {
+              "name": "conclusion",
+              "description": "Summarize the conclusions drawn about the user’s threads and their overall focus."
+            },
+            {
+              "name": "keywords",
+              "description": "Generate a list of 10 keywords that capture the essence of the document (e.g., \"askNostr,\" \"decentralization,\" \"spam filtering\")."
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an expert extraction algorithm.\nOnly extract relevant information from the text.\nIf you do not know the value of an attribute asked to extract, you may omit the attribute's value."
+        }
+      },
+      "id": "cc5a5100-bbed-461f-84ba-bb26b7d1be87",
+      "name": "Extract Meta Data",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        1920,
+        1080
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "id": "53f36f56-0baf-459c-86ea-e6f081e77511",
+      "name": "Get File Contents",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        1720,
+        1080
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {}
+      },
+      "id": "840049d3-e29c-4690-b111-3e9a8c1a1463",
+      "name": "Download File From Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        1400,
+        1080
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "puDhIoph2fEiW30P",
+          "name": "Google Drive - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "mode": "list",
+            "value": "My Drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $json.folder_id }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "d84bf76b-2f2f-4c40-b5df-397d654f43de",
+      "name": "Find File Ids in Google Drive Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        280,
+        1100
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "puDhIoph2fEiW30P",
+          "name": "Google Drive - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "id": "1f2cd254-3ecd-4286-9bb1-2aa185e38e1b",
+      "name": "text-embeddings-3-large",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        1240,
+        1940
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "ug4Zw35WHAKHXpRE",
+          "name": "OpenAi - toivanlatoi.120689"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e6f6188f-c895-4c8c-b39a-0ef55b490fd6",
+              "name": "folder_id",
+              "type": "string",
+              "value": "1i06veTWxv_n6iVipNKB_iuVDfPX71xNk"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3f5408ac-8daa-4098-9c38-e61c5749e345",
+      "name": "Google Folder ID",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        80,
+        1100
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f9561f29-dfbc-410d-9d23-a477b6b8b30c",
+      "name": "gpt-4o-mini1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        600,
+        2220
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "ug4Zw35WHAKHXpRE",
+          "name": "OpenAi - toivanlatoi.120689"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "code": {
+          "execute": {
+            "code": "const { QdrantVectorStore } = require(\"@langchain/qdrant\");\nconst { OpenAIEmbeddings } = require(\"@langchain/openai\");\n\n// Qdrant connection details\nconst url = \"http://localhost:6333/\";\nconst apiKey = \"\";\n\n// OpenAI API configuration\nconst openAIApiKey = \"[Your-OpenAI-API-Key]\";\n\n// Get input data\nconst items = this.getInputData()[0];\n// console.log(items)\n\nconst collectionName =  items.json.qdrant_collection_name;\n// console.log(collectionName)\n\nasync function deleteDocumentsFromQdrant() {\n  try {\n    // Initialize OpenAI embeddings\n    const embeddings = new OpenAIEmbeddings({\n      model: \"text-embedding-3-large\",\n      openAIApiKey: openAIApiKey\n    });\n\n    // Connect to existing Qdrant collection\n    const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {\n      url: url,\n      apiKey: apiKey,\n      collectionName: collectionName,\n    });\n\n    const fileIds = items.json.appended_id.map(item => item);\n\n    console.log(fileIds)\n\n    // Delete points by fileId\n    const deletionResults = await Promise.all(fileIds.map(async (file_id) => {\n      const filter = {\n        must: [\n          {\n            key: \"metadata.file_id\",\n            match: { value: file_id }\n          }\n        ]\n      };\n\n      try {\n        // Access the underlying Qdrant client to perform the deletion\n        await vectorStore.client.delete(collectionName, { filter });\n        return { file_id, status: \"deleted\" };\n      } catch (error) {\n        console.error(`Error deleting documents for fileId ${file_id}:`, error);\n        return { file_id, status: \"error\", message: error.message };\n      }\n    }));\n\n    return deletionResults;\n  } catch (error) {\n    console.error(\"An error occurred during the deletion process:\", error);\n    return error.message;\n  }\n}\n\n// Execute the deletion process\ntry {\n  const result = await deleteDocumentsFromQdrant();\n  console.log(\"Deletion process completed:\", result);\n  return [];\n} catch (error) {\n  console.error(\"Failed to execute deletion process:\", error);\n  return [{ json: { error } }];\n}\n\n"
+          }
+        },
+        "inputs": {
+          "input": [
+            {
+              "type": "main",
+              "maxConnections": 1,
+              "required": true
+            },
+            {
+              "type": "ai_languageModel",
+              "maxConnections": 1,
+              "required": true
+            }
+          ]
+        },
+        "outputs": {
+          "output": [
+            {
+              "type": "main"
+            }
+          ]
+        }
+      },
+      "id": "8ce320f5-0cb3-4411-8b2d-d8f9494592e3",
+      "name": "Delete Qdrant Points by File ID",
+      "type": "@n8n/n8n-nodes-langchain.code",
+      "position": [
+        400,
+        2060
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "11fa71e9-6cbc-4183-9439-e3379b2b970e",
+              "name": "qdrant_collection_name",
+              "type": "string",
+              "value": "nostr-damus-user-profiles"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "695569e4-df3e-408c-9e8c-af5770be4702",
+      "name": "Qdrant Collection Name",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        200,
+        1360
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "append",
+              "field": "id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a3589e28-052d-4e04-9ae0-b2ace1b94cff",
+      "name": "File Id List",
+      "type": "n8n-nodes-base.summarize",
+      "position": [
+        200,
+        1540
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "89a32157-029f-4912-9e47-5dd7a76634bd",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        560,
+        1600
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {},
+      "id": "990ed1fe-af9f-48d9-aff8-f607ab099556",
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        820,
+        1120
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "content": "## Prepare Qdrant Vector Store",
+        "height": 760,
+        "width": 1180,
+        "color": 3
+      },
+      "id": "814e31f2-347e-4650-9c0f-7b81aae36699",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -380,
+        1820
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "-4759044689",
+        "message": "=WARNING - {{ $json.appended_id.length }} Records in the Qdrant vector store collection \"{{ $json.qdrant_collection_name }}\" will be deleted.  Are you sure you want to continue?  This action cannot be undone!",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeAmount": 15,
+              "resumeUnit": "minutes"
+            }
+          }
+        }
+      },
+      "id": "591e9796-5658-448b-96d8-21b23e15a895",
+      "name": "Confirm Qdrant Delete Points",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        -160,
+        2020
+      ],
+      "webhookId": "29aac1ac-9345-4e44-babf-ebcfae701d88",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "0s3XJEX7B5UOE7rp",
+          "name": "Telegram @generalnotibot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "20f530d6-fd55-420d-b8a9-70e5303f688e",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5f55f2b-0f23-4b31-81f0-ae047aab80a5",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -160,
+        2260
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "content": "## Perform Qdrant Vector Store Operations",
+        "height": 640,
+        "width": 920,
+        "color": 7
+      },
+      "id": "c6bdc38b-f168-4e56-b346-27427f6b6c1e",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1220,
+        1680
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chatId": "=-4759044689",
+        "text": "Qdrant vector store upsert declined",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "e4885690-2b21-4b03-9671-4839c231074e",
+      "name": "Send Declined Message",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        160,
+        2380
+      ],
+      "webhookId": "382a3b43-b83f-47b1-a276-67c6b98a441a",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "0s3XJEX7B5UOE7rp",
+          "name": "Telegram @generalnotibot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🌟Workflow Config\n\n- Google Drive Folder Id\n- Qdrant Collection Name\n- List of Google Drive File Id's",
+        "height": 840,
+        "width": 480
+      },
+      "id": "9a2fdc33-d754-4f5f-abe5-a801812146bc",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        880
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Extract Metadata for Qdrant Hybrid Search",
+        "height": 420,
+        "width": 640,
+        "color": 6
+      },
+      "id": "53713197-6506-4933-9796-a255b1442339",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1640,
+        980
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Google Drive",
+        "height": 320,
+        "width": 300,
+        "color": 2
+      },
+      "id": "e5be8a27-0c43-4d09-8150-0b4ef182fe8d",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1300,
+        980
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ✨ Save Documents to Qdrant Vector Store",
+        "height": 1480,
+        "width": 1360,
+        "color": 5
+      },
+      "id": "0f7c0edc-f9d2-4314-a2f7-1eeb037ed360",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        980,
+        900
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Delete From Qdrant Vector Store\nThis operation can not be undone!!!",
+        "height": 400,
+        "width": 420,
+        "color": 5
+      },
+      "id": "0ccfd31f-f419-41dc-9570-caa9a7b1473a",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        320,
+        1940
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Human In The Loop\nUser must verify deletion of points from Qdrant vector store",
+        "height": 520,
+        "width": 380,
+        "color": 4
+      },
+      "id": "55667064-9614-4515-aa54-46014a3b27ee",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -300,
+        1900
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 👍Start Here!",
+        "height": 460,
+        "width": 340,
+        "color": 4
+      },
+      "id": "e6258fe1-9d6a-4b39-b995-79c618c60866",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -380,
+        880
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "upsert",
+        "options": {}
+      },
+      "id": "d3e9fef1-cf1b-4dce-b88b-d5e759b3f827",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -260,
+        1160
+      ],
+      "webhookId": "3a30557f-9264-4bc8-a253-a9356677c791",
+      "typeVersion": 2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=You are an intelligent assistant specialized in answering user questions using Nostr user profiles. Your primary goal is to provide precise, contextually relevant, and concise answers based on the tools and resources available.\n\n### TOOL\nUse the \"nostr_damus_user_profiles\" tool to:\n- perform semantic similarity searches and retrieve information from Nostr user profiles relevant to the user's query.\n- access detailed information about Nostr and/or Damus users when additional context or specifics are required.\n\n### Key Instructions\n1. **Response Guidelines**:\n   - Clearly explain how the retrieved information addresses the user's query, if applicable.\n   - If no relevant information is found, respond with: \"I cannot find the answer in the available resources.\"\n   - If user allow to search from internet, do it and return with exactly data \n\n2. **Focus and Relevance**:\n   - Ensure all responses are directly aligned with the user's question.\n   - Avoid including extraneous details or relying solely on internal knowledge.\n"
+        }
+      },
+      "id": "8226c68e-8e53-4fa3-807c-24a9abed71d9",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        300,
+        60
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 40
+      },
+      "id": "05f0d989-1e4b-42e8-a571-f4aa1ef8a9a9",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        320,
+        260
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "05fbe155-4a20-4eb8-a93f-18a3f190c54f",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        -260,
+        60
+      ],
+      "webhookId": "5f1c0c82-0ff9-40c7-9e2e-b1a96ffe24cd",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro-exp-03-25",
+        "options": {
+          "maxOutputTokens": 8192
+        }
+      },
+      "id": "ab191e93-37af-49d4-9419-b534c884a397",
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        140,
+        260
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BWGByr1hd4kHbDEO",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "id": "c3777868-79e3-4ea4-9902-21b1f36e96b3",
+      "name": "text-embeddings-3-large1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        720,
+        360
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "ug4Zw35WHAKHXpRE",
+          "name": "OpenAi - toivanlatoi.120689"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## 🤖Retrieve Content from Qdrant Vector Store",
+        "height": 680,
+        "width": 860,
+        "color": 5
+      },
+      "id": "8e71a890-c0e2-42ec-8405-1b316d9e5f37",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        -40
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🗣️ Chat with Your Documents",
+        "height": 320,
+        "width": 340,
+        "color": 4
+      },
+      "id": "375a62c3-3234-4834-89a0-48ed2244bc3f",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -380,
+        -40
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# Step 1 - Save Documents to Qdrant Vector Store",
+        "height": 1880,
+        "width": 2880,
+        "color": 7
+      },
+      "id": "32e13609-2c7a-4902-8bf8-a3e1e1275e1b",
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -460,
+        780
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# Step 2 - Chat with Your Documents from Qdrant Vector Store",
+        "height": 880,
+        "width": 1780,
+        "color": 7
+      },
+      "id": "3cd86b1f-6ba4-4c96-b037-b5c526586b8a",
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -460,
+        -160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ $json.output }}",
+        "name": "=Nostr Chatbot - Avatar - {{ $now }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "d213026b-b4f5-47e5-ad07-20ea8ae2478a",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        1020,
+        480
+      ],
+      "typeVersion": 3,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cd8f88e1-19c0-4b9e-914d-e2e7ba21d9fa",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3e336634-b41c-48c8-9690-16afec079f51",
+      "name": "Respond to User",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1020,
+        300
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "## Save Chat History",
+        "height": 300,
+        "width": 340,
+        "color": 4
+      },
+      "id": "202b752a-d754-4a0a-900d-4e185e9a1654",
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        900,
+        -40
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentURL": "1ej_qLolUFp1h4eZkrb99T3DWQ3JOwXVEMS3VUjWyVf0",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "=\n-------------------------------\n\n{{ $now }}\n\n{{ $('When chat message received').item.json.chatInput  }}\n\n{{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "id": "ff76abe4-42c8-4701-be5b-3d53ce7a1351",
+      "name": "Update Chat History",
+      "type": "n8n-nodes-base.googleDocs",
+      "position": [
+        1020,
+        60
+      ],
+      "typeVersion": 2,
+      "credentials": {
+        "googleApi": {
+          "id": "xKP7IcBqbHBHea0W",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "nostr_damus_user_profiles",
+        "toolDescription": "Retrieve information about Nostr or Damus users",
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "list",
+          "value": "nostr-damus-user-profiles",
+          "cachedResultName": "nostr-damus-user-profiles"
+        },
+        "topK": 20,
+        "options": {}
+      },
+      "id": "cd788666-9b86-44b3-8fe4-993df10acf69",
+      "name": "Qdrant Vector Store Tool",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        480,
+        260
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "qdrantApi": {
+          "id": "r2MEJgOtdd0as4JC",
+          "name": "QdrantApi - toivanlatoi.120689"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "810ce2c3-2e8d-4ca9-ba4f-363c988a00ee",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        140,
+        460
+      ],
+      "typeVersion": 1.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "-4759044689",
+        "text": "Qdrant vector store upsert completed",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "4908909d-60e2-4ed2-8d52-2db0b13e1349",
+      "name": "Send Completed Message",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1400,
+        1460
+      ],
+      "webhookId": "382a3b43-b83f-47b1-a276-67c6b98a441a",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "0s3XJEX7B5UOE7rp",
+          "name": "Telegram @generalnotibot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 🤖 AI-Powered RAG Chatbot with Google Drive Integration\n\nThis workflow creates a powerful RAG (Retrieval-Augmented Generation) chatbot that can process, store, and interact with documents from Google Drive using Qdrant vector storage and Google's Gemini AI.\n\n## How It Works\n\n### Document Processing & Storage 📚\n- Retrieves documents from a specified Google Drive folder\n- Processes and splits documents into manageable chunks\n- Extracts metadata using AI for enhanced search capabilities\n- Stores document vectors in Qdrant for efficient retrieval\n\n### Intelligent Chat Interface 💬\n- Provides a conversational interface powered by Google Gemini\n- Uses RAG to retrieve relevant context from stored documents\n- Maintains chat history in Google Docs for reference\n- Delivers accurate, context-aware responses\n\n### Vector Store Management 🗄️\n- Features secure delete operations with human verification\n- Includes Telegram notifications for important operations\n- Maintains data integrity with proper version control\n- Supports batch processing of documents\n\n## Setup Steps\n\n1. Configure API Credentials:\n   - Set up Google Drive & Docs access\n   - Configure Gemini AI API\n   - Set up Qdrant vector store connection\n   - Add Telegram bot for notifications\n\n2. Configure Document Sources:\n   - Set Google Drive folder ID\n   - Define Qdrant collection name\n   - Set up document processing parameters\n\n3. Test and Deploy:\n   - Verify document processing\n   - Test chat functionality\n   - Confirm vector store operations\n   - Check notification system\n\n\nThis workflow is ideal for organizations needing to create intelligent chatbots that can access and understand large document repositories while maintaining context and providing accurate responses through RAG technology.\n",
+        "height": 1240,
+        "width": 700
+      },
+      "id": "765b623a-9c4a-4c89-8e98-037f933db4e7",
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1220,
+        780
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-exp-03-07"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        580,
+        480
+      ],
+      "id": "1ded25ba-8d7f-43f3-b16e-a64961d389d4",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BWGByr1hd4kHbDEO",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro-exp-03-25",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        400,
+        2220
+      ],
+      "id": "d241cbac-9a39-4639-9501-0e543a01be84",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BWGByr1hd4kHbDEO",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-exp-03-07"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        2000
+      ],
+      "id": "dd355aa0-43c1-4250-89f1-3fbe78e3e793",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BWGByr1hd4kHbDEO",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Delete Qdrant Points by File ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Declined Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Confirm Qdrant Delete Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Google Folder ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Id List": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "gpt-4o-mini1": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Token Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send Completed Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download File From Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Folder ID": {
+      "main": [
+        [
+          {
+            "node": "Find File Ids in Google Drive Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Meta Data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get File Contents": {
+      "main": [
+        [
+          {
+            "node": "Extract Meta Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Collection Name": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text-embeddings-3-large": {
+      "ai_embedding": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract Meta Data",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text-embeddings-3-large1": {
+      "ai_embedding": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Qdrant Delete Points": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Qdrant Points by File ID": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Download File From Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Get File Contents",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Folder ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find File Ids in Google Drive Folder": {
+      "main": [
+        [
+          {
+            "node": "File Id List",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Qdrant Collection Name",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store Tool",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Delete Qdrant Points by File ID",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "087704c9-058e-4853-9dce-9af6f3c47e85",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-05-07T12:14:06.302Z",
+      "createdAt": "2025-05-07T12:14:06.302Z",
+      "role": "workflow:owner",
+      "workflowId": "GGKchY8VztL0SbUx",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
