@@ -1,0 +1,248 @@
+{
+  "updatedAt": "2024-03-30T12:44:59.632Z",
+  "createdAt": "2024-03-30T11:58:38.797Z",
+  "id": "Epm0em7KkLdMLQRD",
+  "name": "Maix - Auto UnSub All Lead Trader",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "-4196634068",
+        "text": "=/unsub {{ $node[\"Loop Over Items\"].json[\"NickName\"] }}",
+        "replyMarkup": "inlineKeyboard",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "48b30dfb-250f-46f7-a5d1-0a717c293c50",
+      "name": "Send Telegram Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1520,
+        400
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wpMgkt8EZ5TveO30",
+          "name": "Telegram - @blackblock_trade_bot"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "7e47c439-3fd1-4bf7-8cea-437340bf1585",
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "72b12700-a020-4a40-9af1-170b3d34a71c",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1200,
+        280
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3502fe0a-2c82-43f0-8680-b35f161bc17b",
+      "name": "Replace Me",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2460,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "amount": "={{ $node[\"Get Random Second\"].json[\"random\"] }}",
+        "unit": "seconds"
+      },
+      "id": "343faafe-02d6-488f-9b0a-d48821071fca",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        2260,
+        400
+      ],
+      "webhookId": "3bd73684-036f-4582-91ef-c8d7291a62ff"
+    },
+    {
+      "parameters": {
+        "jsCode": "function randomIntFromInterval(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n\nvar rndInt = randomIntFromInterval(10, 15)\n\nreturn {\n  random: rndInt\n}"
+      },
+      "id": "85f7a654-2dd2-4fe3-ac35-5588a4462197",
+      "name": "Get Random Second",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1860,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var query = \n`SELECT DISTINCT NickName FROM LeadCopyTrader WHERE GroupSubscribed IS NOT NULL;`\n\nreturn {\n  query: query\n}"
+      },
+      "id": "f19f0518-3e13-47d1-b254-14e00ac6fe2e",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code1\"].json[\"query\"] }}"
+      },
+      "id": "2fb89535-74b2-4023-a31d-15722e7d0c8e",
+      "name": "Microsoft SQL",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        980,
+        280
+      ],
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 103.57.210.11 - sa2 - T_MaixSignal"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking \"Test workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Random Second": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Get Random Second",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Time Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "8a9ee187-fb3c-4437-b900-17ef2d5886dd",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-03-30T11:58:38.797Z",
+      "createdAt": "2024-03-30T11:58:38.797Z",
+      "role": "workflow:owner",
+      "workflowId": "Epm0em7KkLdMLQRD",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
