@@ -1,0 +1,201 @@
+{
+  "updatedAt": "2024-12-15T11:01:46.255Z",
+  "createdAt": "2024-12-12T09:53:30.912Z",
+  "id": "Pgjjq1bhaurrZBuc",
+  "name": "Yoong Admin - Auto Increase Page View",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 4
+            }
+          ]
+        }
+      },
+      "id": "00e6d12f-b7c9-4305-adce-6ce7dc78e4c2",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -780,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return[\n    {link: 'https://itviec.com/'},    \n    // {link: 'https://itviec.com/companies/yoong'},\n    // {link: 'https://itviec.com/companies/yoong/review'}\n  ]"
+      },
+      "id": "f0d4a7a4-c15e-4242-b813-ce279a4e0da1",
+      "name": "Links",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -340,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function randomIntFromInterval(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n\nvar rndInt = randomIntFromInterval(10, 100) // seconds\n\nreturn {\n  random: rndInt\n}"
+      },
+      "id": "72ad49f1-0dcd-4457-9301-d2dcd6ad6f3e",
+      "name": "Random",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "amount": "={{ $node[\"Random\"].json[\"random\"] }}",
+        "unit": "seconds"
+      },
+      "id": "e5d319e2-408f-4e41-8e59-9383f1af0134",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        340,
+        60
+      ],
+      "webhookId": "f582fbd5-30e5-45d3-bd56-9f22045373b1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const {execSync} = require('child_process')\nconst link = $node[\"Link\"].json[\"link\"];\n\nconst cmd = `curl --location --request GET '${ link }' \\\n--header 'Cookie: _ITViec_session=' \\\n--header 'User-Agent: Apidog/1.0.0 (https://apidog.com)'`\n\nconst html = execSync(cmd).toString()\n\nreturn{\n  html: html\n}"
+      },
+      "id": "dd47c72c-2b7c-4ca1-b38e-04efab0a216d",
+      "name": "curl",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "b6b3ac64-26a9-41ef-97c9-68a04497b48c",
+      "name": "Link",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -120,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://itviec.com/companies/yoong",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -100,
+        -360
+      ],
+      "id": "cae3151e-b0a8-4c99-a568-f2a853081190",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Links": {
+      "main": [
+        [
+          {
+            "node": "Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Random": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "curl",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "curl": {
+      "main": [
+        [
+          {
+            "node": "Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Link": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Random",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "2dd8cc03-8e75-4c36-af41-721d22b5293f",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2024-12-12T09:53:30.912Z",
+      "createdAt": "2024-12-12T09:53:30.912Z",
+      "role": "workflow:owner",
+      "workflowId": "Pgjjq1bhaurrZBuc",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
