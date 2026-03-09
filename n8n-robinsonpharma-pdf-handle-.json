@@ -1,0 +1,30 @@
+{
+  "updatedAt": "2025-11-05T03:09:04.448Z",
+  "createdAt": "2025-11-05T03:09:04.448Z",
+  "id": "MsFGLC7zbzKj1xyn",
+  "name": "(RobinsonPharma)- PDF handle",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "fb934014-fae6-4734-858f-7993be14b728",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-05T03:09:04.448Z",
+      "createdAt": "2025-11-05T03:09:04.448Z",
+      "role": "workflow:owner",
+      "workflowId": "MsFGLC7zbzKj1xyn",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
