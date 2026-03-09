@@ -1,0 +1,336 @@
+{
+  "updatedAt": "2024-12-28T12:54:34.030Z",
+  "createdAt": "2024-10-23T15:47:59.680Z",
+  "id": "hDf7SXAPNrBSFLDB",
+  "name": "Community - 3 - Reaction",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/bot{{ $node[\"Emoji\"].json[\"access_token\"] }}/setMessageReaction",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chat_id\": \"{{ $node[\"Emoji\"].json[\"chatId\"] }}\",\n    \"message_id\": {{ $node[\"Emoji\"].json[\"messageId\"] }},\n    \"reaction\": [\n        {\n            \"type\": \"emoji\",\n            \"emoji\": \"{{ $node[\"Emoji\"].json[\"emoji\"] }}\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "id": "4371af29-c89f-4be0-9cfc-e4ea329f1ace",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        440
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "amount": "={{$json.second }}"
+      },
+      "id": "afa311da-3ec7-4ec1-a333-ed06c04e0b52",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2420,
+        440
+      ],
+      "webhookId": "796f813c-e60a-4c07-8a6f-6b8336e15e2e"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $node[\"env\"].json[\"bots\"];"
+      },
+      "id": "ad6c3d80-28d8-4cd3-af3d-cfa35a46e3ba",
+      "name": "Bot",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ff5c8c75-7670-43b9-8c74-b3e166007425",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1480,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "function randomIntFromInterval(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n// Tối đa 11 emoji - Quy định của tele và của group admin\n// The message already has exactly `reactions_uniq_max` reaction emojis, you can't react with a new emoji, see [the docs for more info](/api/config#client-configuration)\nconst emojis = $node[\"env\"].json[\"emojis\"];\nconst rndInt = randomIntFromInterval(0, emojis.length - 1);\n\nreturn{\n  \"emoji\": emojis[rndInt],\n  \"access_token\": $json.access_token,\n  \"chatId\": $node[\"env\"].json[\"chatId\"],\n  \"messageId\": $node[\"env\"].json[\"messageId\"]\n}"
+      },
+      "id": "53acd046-b24a-4c8e-b24f-6cadf2332a50",
+      "name": "Emoji",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "amount": "={{$json.second }}"
+      },
+      "id": "3a7bb1d0-9a61-473b-8310-b7c1f3bd9001",
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1060,
+        320
+      ],
+      "webhookId": "43931f76-3a0d-43df-902c-481f03a52585"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reaction8-c59fe239-b27e-4b6e-a86e-24c9e9b2439e",
+        "options": {}
+      },
+      "id": "1f4bb0ca-181e-4c03-9394-b7ba326e2c3f",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        620,
+        320
+      ],
+      "webhookId": "c59fe239-b27e-4b6e-a86e-24c9e9b2439e"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getRandomElements(array, numElements) {\n  const result = [];\n  const usedIndices = new Set(); // Keep track of used indices\n\n  while (result.length < numElements) {\n    const randomIndex = Math.floor(Math.random() * array.length); \n    if (!usedIndices.has(randomIndex)) { // Check if index has been used\n      result.push(array[randomIndex]);\n      usedIndices.add(randomIndex);\n    }\n  }\n\n  return result;\n}\n\nfunction randomInt(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n\n////////\nvar emojis = [\"👍\", \"👎\", \"❤\", \"🔥\", \"🥰\", \"👏\", \"😁\", \"🤔\", \"🤯\", \"😱\", \"🤬\", \"😢\", \"🎉\", \"🤩\", \"🤮\", \"💩\", \"🙏\", \"👌\", \"🕊\", \"🤡\", \"🥱\", \"🥴\", \"😍\", \"🐳\", \"❤‍🔥\", \"🌚\", \"🌭\", \"💯\", \"🤣\", \"⚡\", \"🍌\", \"🏆\", \"💔\", \"🤨\", \"😐\", \"🍓\", \"🍾\", \"💋\", \"🖕\", \"😈\", \"😴\", \"😭\", \"🤓\", \"👻\", \"👨‍💻\", \"👀\", \"🎃\", \"🙈\", \"😇\", \"😨\", \"🤝\", \"✍\", \"🤗\", \"🫡\", \"🎅\", \"🎄\", \"☃\", \"💅\", \"🤪\", \"🗿\", \"🆒\", \"💘\", \"🙉\", \"🦄\", \"😘\", \"💊\", \"🙊\", \"😎\", \"👾\", \"🤷‍♂\", \"🤷\", \"🤷‍♀\", \"😡\"];\n\nconst randomEmojis = getRandomElements(emojis, randomInt(6, 11)); \n\n////////\nconst bots = [\n    {\n        \"username\": \"@aidanaaronbot\",\n        \"access_token\": \"7980504225:AAEx9tfgDyvb8ZH4a1vievu7fe0jVi0fT50\"\n    },\n    {\n        \"username\": \"@girlxinhbbot\",\n        \"access_token\": \"7201097064:AAENCN44PHdInuti4CsNgzjPql8wInS13Kg\"\n    },\n    {\n        \"username\": \"@girlxinhbot\",\n        \"access_token\": \"7726671499:AAEa8tOLlUJFeaA22tAnh1yFs_HLFWE-Klk\"\n    },\n    {\n        \"username\": \"@CryptoQuantTrading_bot\",\n        \"access_token\": \"7511615476:AAFARA1lpUVA-_J3itDuteENurrclU-hSoI\"\n    },\n    {\n        \"username\": \"@girlgirlbabybot\",\n        \"access_token\": \"7848793416:AAGNrY1C4KHTAkc9Jf8keifqET2RBFo6qVc\"\n    },\n    {\n        \"username\": \"@girlxinhbabybot\",\n        \"access_token\": \"7702452030:AAHpYvewa91KHuTPuUlEMLaZyg8PFk7uQHQ\"\n    },\n    {\n        \"username\": \"@masrbotbot\",\n        \"access_token\": \"7846341469:AAEIJ-gZrZYVKdhHJQIM7hP44sB8LWlqkyM\"\n    },\n    {\n        \"username\": \"@dasschwarzebot\",\n        \"access_token\": \"7853485045:AAF7cRUv0uauLH8CYsTZ3MUy7xESUyc4Wig\"\n    },\n    {\n        \"username\": \"@microsoftexxcelbot\",\n        \"access_token\": \"7612483818:AAGdyylvdBXxnZuK8vOj4223XO9eTsiML1s\"\n    },\n    {\n        \"username\": \"@catlovvvebot\",\n        \"access_token\": \"7839025967:AAGTlUC6W7QZ_MWXVj6Nq_jN9CumLd_Brbc\"\n    },\n    {\n        \"username\": \"@posidonboostbot\",\n        \"access_token\": \"7894432704:AAH8W56xyRgTjk3r0L6uzOyGtR5X9IjFUhA\"\n    },\n    {\n        \"username\": \"@rosebibot\",\n        \"access_token\": \"7519120919:AAEffyAkzUwU6IEFWi-Kzjk7B9iw--LIvj4\"\n    },\n    {\n        \"username\": \"@ironaladinbot\",\n        \"access_token\": \"7869904438:AAHZ27vAwolwHrsEpH1AxlFpjPMfvEY0Kyc\"\n    },\n    {\n        \"username\": \"@temugoshbot\",\n        \"access_token\": \"7958533901:AAH7-e1wKkDiqBq9vdpYnpcyQRBYNdqd0c0\"\n    },\n    {\n        \"username\": \"@jomijanbot\",\n        \"access_token\": \"7907951992:AAERhPlNfJBrrU_7Mia4xV-a-RAzorBBihk\"\n    }\n];\n\nconst randomBots = getRandomElements(bots, randomInt(1, bots.length)); \n\n//\nconst firstMessage = $node[\"Webhook\"].json[\"body\"][\"result\"][0];\nconst chatId = firstMessage[\"chat\"][\"id\"];\nconst messageId = firstMessage[\"message_id\"];\nconst second = randomInt(60, 300);\n\nreturn {\n  \"second\": second,\n  \"chatId\": chatId,\n  \"messageId\": messageId,\n  \"emojis\": randomEmojis,\n  \"bots\": randomBots,\n  \"allData\": {\n    \"body\": $node[\"Webhook\"].json[\"body\"],\n    \"emojis\": randomEmojis\n  }\n}"
+      },
+      "id": "77d78a64-d447-47bf-a743-bf542e8a8863",
+      "name": "env",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function randomIntFromInterval(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n\nconst second = randomIntFromInterval(5, 20);\nreturn {\n  second: second\n}"
+      },
+      "id": "a54e8288-0b67-43c7-9045-d97eec6480b7",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    \"username\": \"@godallabot\",\n    \"access_token\": \"7730828661:AAF_7aroyh5z_8_sADzFiiV-COQdfKzdl5o\"\n  },\n  {\n    \"username\": \"@SolarFlareAzureBot\",\n    \"access_token\": \"7522123294:AAG6gFFQus5ls2ufAdzAzXMO1AFx1WatKGE\"\n  },\n  {\n    \"username\": \"@DalbitSonyeobot\",\n    \"access_token\": \"7848970269:AAEZIKL2d0ONHUnc5faVRfpVwrlDCFZkreQ\"\n  },\n  {\n    \"username\": \"@cationormbot\",\n    \"access_token\": \"8015642481:AAG97UvjV5yVQXAJ3lLFx7Opu7awWiO3mk8\"\n  },\n  {\n    \"username\": \"@santennormbot\",\n    \"access_token\": \"7664559776:AAEIb7WlFwnh_cyQo22am2CYolMQie4BiSY\"\n  },\n  {\n    \"username\": \"@crimsonabsidianbot\",\n    \"access_token\": \"7181510335:AAF2oS0mqNev45iz5a1nTCE46PhZKW8TH24\"\n  },\n  {\n    \"username\": \"@GeurimijaJeongwonBot\",\n    \"access_token\": \"7208218148:AAHlihZw5JakwH_i5BV_b9bG2sUuDtIFtYM\"\n  },\n  {\n    \"username\": \"@AkaiHonoBot\",\n    \"access_token\": \"7720853129:AAFzQXvkxvX_PzhqXDIjrnypIzKGuLD0ywg\"\n  },\n  {\n    \"username\": \"@samsamcaterbot\",\n    \"access_token\": \"7445807253:AAF87kDm82pOD4SOIzO3_M8lvQCQrPCLgz0\"\n  },\n  {\n    \"username\": \"@emeraldgalebot\",\n    \"access_token\": \"7205323964:AAHo30ZTs7d7vHvhduRo_YXPwybQ2UaT2DY\"\n  },\n  {\n    \"username\": \"@stormsolarbot\",\n    \"access_token\": \"8042607124:AAF6sIjyMyTsxInNVlCw54CM0NMQxpjjnWo\"\n  },\n  {\n    \"username\": \"@HaneulSaebyukBot\",\n    \"access_token\": \"7895805524:AAGqFCIKoK8gNIM4y4DHybb1x0DtChkRsdY\"\n  },\n  {\n    \"username\": \"@brisadoradabot\",\n    \"access_token\": \"7704640860:AAHyhHDT4b39lqN3fXDWORaqO09SKb2gd_M\"\n  },\n  {\n    \"username\": \"@YoruNoTsukiBot\",\n    \"access_token\": \"7931760297:AAFJAV_b3zogrTco0xz4lJv0vdTyrczR-0I\"\n  },\n  {\n    \"username\": \"@YumeNoMaiBot\",\n    \"access_token\": \"7583624538:AAHpvYsSa0S8RgaBJnqachld10zyBk-K9gI\"\n  }\n]"
+      },
+      "id": "a13dc094-14fb-4f71-a0ca-bb4949175f29",
+      "name": "Bot1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function getRandomElements(array, numElements) {\n  const result = [];\n  const usedIndices = new Set(); // Keep track of used indices\n\n  while (result.length < numElements) {\n    const randomIndex = Math.floor(Math.random() * array.length); \n    if (!usedIndices.has(randomIndex)) { // Check if index has been used\n      result.push(array[randomIndex]);\n      usedIndices.add(randomIndex);\n    }\n  }\n\n  return result;\n}\n\nfunction randomInt(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n\n////////\nvar emojis = [\"👍\", \"👎\", \"❤\", \"🔥\", \"🥰\", \"👏\", \"😁\", \"🤔\", \"🤯\", \"😱\", \"🤬\", \"😢\", \"🎉\", \"🤩\", \"🤮\", \"💩\", \"🙏\", \"👌\", \"🕊\", \"🤡\", \"🥱\", \"🥴\", \"😍\", \"🐳\", \"❤‍🔥\", \"🌚\", \"🌭\", \"💯\", \"🤣\", \"⚡\", \"🍌\", \"🏆\", \"💔\", \"🤨\", \"😐\", \"🍓\", \"🍾\", \"💋\", \"🖕\", \"😈\", \"😴\", \"😭\", \"🤓\", \"👻\", \"👨‍💻\", \"👀\", \"🎃\", \"🙈\", \"😇\", \"😨\", \"🤝\", \"✍\", \"🤗\", \"🫡\", \"🎅\", \"🎄\", \"☃\", \"💅\", \"🤪\", \"🗿\", \"🆒\", \"💘\", \"🙉\", \"🦄\", \"😘\", \"💊\", \"🙊\", \"😎\", \"👾\", \"🤷‍♂\", \"🤷\", \"🤷‍♀\", \"😡\"];\n\nconst randomEmojis = getRandomElements(emojis, 11); \n\n////////\nvar bots = [\n    {\n        \"username\": \"@aidanaaronbot\",\n        \"access_token\": \"7980504225:AAEx9tfgDyvb8ZH4a1vievu7fe0jVi0fT50\"\n    },\n    {\n        \"username\": \"@girlxinhbbot\",\n        \"access_token\": \"7201097064:AAENCN44PHdInuti4CsNgzjPql8wInS13Kg\"\n    },\n    {\n        \"username\": \"@girlxinhbot\",\n        \"access_token\": \"7726671499:AAEa8tOLlUJFeaA22tAnh1yFs_HLFWE-Klk\"\n    },\n    {\n        \"username\": \"@CryptoQuantTrading_bot\",\n        \"access_token\": \"7511615476:AAFARA1lpUVA-_J3itDuteENurrclU-hSoI\"\n    },\n    {\n        \"username\": \"@girlgirlbabybot\",\n        \"access_token\": \"7848793416:AAGNrY1C4KHTAkc9Jf8keifqET2RBFo6qVc\"\n    },\n    {\n        \"username\": \"@girlxinhbabybot\",\n        \"access_token\": \"7702452030:AAHpYvewa91KHuTPuUlEMLaZyg8PFk7uQHQ\"\n    },\n    {\n        \"username\": \"@masrbotbot\",\n        \"access_token\": \"7846341469:AAEIJ-gZrZYVKdhHJQIM7hP44sB8LWlqkyM\"\n    },\n    {\n        \"username\": \"@dasschwarzebot\",\n        \"access_token\": \"7853485045:AAF7cRUv0uauLH8CYsTZ3MUy7xESUyc4Wig\"\n    },\n    {\n        \"username\": \"@microsoftexxcelbot\",\n        \"access_token\": \"7612483818:AAGdyylvdBXxnZuK8vOj4223XO9eTsiML1s\"\n    },\n    {\n        \"username\": \"@catlovvvebot\",\n        \"access_token\": \"7839025967:AAGTlUC6W7QZ_MWXVj6Nq_jN9CumLd_Brbc\"\n    },\n    {\n        \"username\": \"@posidonboostbot\",\n        \"access_token\": \"7894432704:AAH8W56xyRgTjk3r0L6uzOyGtR5X9IjFUhA\"\n    },\n    {\n        \"username\": \"@rosebibot\",\n        \"access_token\": \"7519120919:AAEffyAkzUwU6IEFWi-Kzjk7B9iw--LIvj4\"\n    },\n    {\n        \"username\": \"@ironaladinbot\",\n        \"access_token\": \"7869904438:AAHZ27vAwolwHrsEpH1AxlFpjPMfvEY0Kyc\"\n    },\n    {\n        \"username\": \"@temugoshbot\",\n        \"access_token\": \"7958533901:AAH7-e1wKkDiqBq9vdpYnpcyQRBYNdqd0c0\"\n    },\n    {\n        \"username\": \"@jomijanbot\",\n        \"access_token\": \"7907951992:AAERhPlNfJBrrU_7Mia4xV-a-RAzorBBihk\"\n    }\n];\n\nconst randomBots = getRandomElements(bots, randomInt(bots.length * 0.7, bots.length)); \n\nreturn {\n  \"emojis\": randomEmojis,\n  \"bots\": randomBots\n};"
+      },
+      "id": "f2a2513e-5905-4d52-b98b-4a95b328ece2",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n9n.yoong.xyz/webhook/reaction9-c59fe239-b27e-4b6e-a86e-24c9e9b3339e",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $item(\"0\").$node[\"env\"].json[\"allData\"] }}",
+        "options": {}
+      },
+      "id": "394de180-e874-411f-8ef0-b9af7afe69ae",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        220
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "content": "add comment to topic channel\nhttps://github.com/php-telegram-bot/core/issues/1171",
+        "width": 312
+      },
+      "id": "9b1a4cba-33a9-4f5e-a5df-fbb03aa6d650",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        40
+      ]
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bot": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Emoji",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Emoji": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "env",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "env": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "KG3wK34JqO8YiJsO"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        14
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ea0731e0-5b52-4012-b6dd-fbdecd88a535",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-10-23T15:47:59.680Z",
+      "createdAt": "2024-10-23T15:47:59.680Z",
+      "role": "workflow:owner",
+      "workflowId": "hDf7SXAPNrBSFLDB",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
