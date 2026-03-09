@@ -1,0 +1,404 @@
+{
+  "updatedAt": "2024-12-19T03:25:41.067Z",
+  "createdAt": "2024-04-19T07:17:23.374Z",
+  "id": "sQBVRKvQWiUSowJr",
+  "name": "MaixPremium - Open Position Alert - v2",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "var signal_postion = $node[\"Aggregate\"].json[\"data\"];\nvar signal;\nvar position;\nvar insertQuery;\nvar telegramPushMessage;\n\n// Vì kết quả SQL trả về 2 bảng chung 1 lần, nên cần tách ra\nif(signal_postion)\n{\n   if(signal_postion.length == 2)\n   {\n     signal = signal_postion[0];\n     position = signal_postion[1];\n   }else if(signal_postion.length == 1)\n   {\n     if(signal_postion[0].SIGNAL)\n       signal = signal_postion[0];\n     else if (signal_postion[0].POSITION)\n       position = signal_postion[0];\n   }\n}\n\nif(position == null && signal) // Không tồn lại Position đang Open và có Signal\n{\ninsertQuery = \n`\nINSERT INTO [dbo].[TradeSignalSignature] ( \n  [Direction], \n  [TradingPair], \n  [Leverage],\n  [EntryPrice], \n  [OpenedDate],\n  [Status],\n  [TradeSignalJson]\n)\nVALUES (\n  N'${signal['Direction']}', \n  N'${signal['TradingPair']}',\n   ${signal['Leverage']}, \n   ${signal['EntryPrice']},  \n   GETUTCDATE(),\n   0,\n   N'${signal[\"TraderName\"]}'\n)`\n  \n  // 2. Alert to Telegram\ntelegramPushMessage = \n`\n<b>#${signal['TradingPair']}</b>\n\n${ signal['Direction'] == \"LONG\" ? \"🟢\" : \"🔴\"} <b>${signal['Direction']}</b>\n\n✦ Entry Price:  <b>${signal['EntryPrice'].toFixed(4)}</b>\n✦ Recommended Leverage:  <b>${signal['Leverage']}x</b>\n✦ Action: <b>Opened Position</b>\n✦ Direction: <b>${ signal['Direction'] }</b>\n\n<i>Disclaimer: Not Financial Advice, Do Your Own Research</i>`\n\n}\n  \nreturn {\n  insertQuery: insertQuery,\n  telegramPushMessage: telegramPushMessage\n};"
+      },
+      "id": "f1ed51fa-8217-4509-973b-bf3b80ed5e51",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$node[\"evn\"].json[\"telegramGroupId\"]}}",
+        "text": "={{ $node[\"Code\"].json[\"telegramPushMessage\"] }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Trade on Binance Now",
+                    "additionalFields": {
+                      "url": "https://accounts.binance.com/register?ref=66065403"
+                    }
+                  },
+                  {
+                    "text": "View More",
+                    "additionalFields": {
+                      "url": "https://maix8.com"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "0e45c041-e4f4-4db0-bced-bb0d66711627",
+      "name": "Send Telegram Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1980,
+        480
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "wgY9dLz5D0eEhJic",
+          "name": "Telegram @MaixCryptoTradingbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "adc594d8-5f31-48c0-abeb-f7d7e9ee1e34",
+              "leftValue": "={{$node[\"Code\"].json[\"insertQuery\"]}}",
+              "rightValue": 1,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "67c74fea-af27-4821-948d-fcdbceb74a3f",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var setting = {\n  windowTimeInMinutes: 10,\n  minNumberSignalWithInWindowTime: 3,\n//  telegramGroupId: -4136053740, // MAIX - Signature Signals (a Vinh)\n    telegramGroupId: -1002386555138, // Future Premium Signals\n  telegramGroupId2: -4146123805 // MAIX - Signature Signals (a Sơn, a Lâm)\n}\n\nreturn setting;"
+      },
+      "id": "13ba2101-8be6-49d7-a56d-656ac7d5bd15",
+      "name": "evn",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d0abe1c3-1682-40ed-a361-791660e7b072",
+        "options": {}
+      },
+      "id": "77fad285-591a-477d-88e8-5c2b72f2ec70",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        560
+      ],
+      "webhookId": "d0abe1c3-1682-40ed-a361-791660e7b072"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "cf7ffe08-9a40-4771-ab1f-a52537939c7b",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"QUERY: Get Open ing Signals & Position\"].json[\"query\"] }}"
+      },
+      "id": "709d3b43-9fb3-4000-bbc0-3d64ea2f8e84",
+      "name": "MSSQL: Get Open ing Signals & Position",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        820,
+        560
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code\"].json[\"insertQuery\"] }}"
+      },
+      "id": "df030e8a-bf52-4f58-bb28-f714d2d1d80d",
+      "name": "MSSQL: Insert Position",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        480
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$node[\"evn\"].json[\"telegramGroupId2\"]}}",
+        "text": "={{ $node[\"Code\"].json[\"telegramPushMessage\"] }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Trade on Binance Now",
+                    "additionalFields": {
+                      "url": "https://accounts.binance.com/register?ref=66065403"
+                    }
+                  },
+                  {
+                    "text": "View More",
+                    "additionalFields": {
+                      "url": "https://maix8.com"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "3fd4860f-8320-4cec-a20c-964e1f781df7",
+      "name": "Send Telegram Message1",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        480
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "wgY9dLz5D0eEhJic",
+          "name": "Telegram @MaixCryptoTradingbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "var settings = $node[\"evn\"].json;\nvar windowTimeInMinutes = settings.windowTimeInMinutes;\nvar minNumberSignalWithInWindowTime = settings.minNumberSignalWithInWindowTime;\nvar trade = $node[\"Webhook\"].json[\"body\"][\"trade\"];\n\nvar getOpenPositionQuery = \n`\nDECLARE @MinSignal INT;\n\nDECLARE @WindowTime INT;\n\n\nSELECT @MinSignal = MinSignal,\n       @WindowTime = WindowTime\nFROM TradeSignalSetting\nWHERE Id = 2; -- Signature\n\nWITH FilteredSignals AS\n  (SELECT TOP (@MinSignal * 10) [Id],\n          [TraderName],\n          [Direction],\n          [TradingPair],\n          [Leverage],\n          [EntryPrice],\n          [ClosingPrice],\n          [PositionSize],\n          [AverageCost],\n          [PNL],\n          [PNLPercentage],\n          [OpenedDate],\n          [ClosedDate],\n          [CreatedDate],\n          [TradeDurationInSecond],\n          [PositionMode],\n          [Status],\n          'Signal' AS SIGNAL,\n          ROW_NUMBER() OVER (PARTITION BY TraderName,\n                                          TradingPair,\n                                          Direction\n                             ORDER BY OpenedDate DESC) AS RowNum\n   FROM [dbo].[FutureSignal]\n   WHERE OpenedDate BETWEEN DATEADD(MINUTE, -(@WindowTime), GETUTCDATE()) AND GETUTCDATE()\n     AND Direction = '${trade[\"actionDirection\"]}'\n     AND TradingPair = '${trade[\"tradingPair\"]}'\n     AND Status = 0\n   ORDER BY OpenedDate DESC),\n\n\nDistinctSignals AS\n  (SELECT TOP (@MinSignal * 10) *\n   FROM FilteredSignals\n   WHERE RowNum = 1\n   ORDER BY OpenedDate DESC)\n\n   \nSELECT TOP 1 *\nFROM DistinctSignals\nWHERE\n    (SELECT COUNT(*)\n     FROM DistinctSignals) >= @MinSignal;\n\n\nSELECT *,\n       'Position' AS POSITION\nFROM TradeSignalSignature\nWHERE TradingPair = '${trade[\"tradingPair\"]}'\n  AND Status = 0\n`\n\nreturn {\n  query: getOpenPositionQuery\n}\n"
+      },
+      "id": "05acfc77-a69e-4dd8-ab7c-e5a97d892cf4",
+      "name": "QUERY: Get Open ing Signals & Position",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "-4197813745",
+        "text": "={{$node[\"Aggregate\"].json[\"data\"]}}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "1b95f43e-bc84-4f4f-b02c-38961296dea7",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1380,
+        880
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wpMgkt8EZ5TveO30",
+          "name": "Telegram - @blackblock_trade_bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "evn": {
+      "main": [
+        [
+          {
+            "node": "QUERY: Get Open ing Signals & Position",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "evn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MSSQL: Get Open ing Signals & Position": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "MSSQL: Insert Position",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MSSQL: Insert Position": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QUERY: Get Open ing Signals & Position": {
+      "main": [
+        [
+          {
+            "node": "MSSQL: Get Open ing Signals & Position",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "tVa1fbkE9BESGesN"
+  },
+  "staticData": {
+    "node:Time Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b1ea0ba7-68e5-4610-becc-7ff2e4fe4632",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-04-19T07:17:23.374Z",
+      "createdAt": "2024-04-19T07:17:23.374Z",
+      "role": "workflow:owner",
+      "workflowId": "sQBVRKvQWiUSowJr",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
