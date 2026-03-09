@@ -1,0 +1,179 @@
+{
+  "updatedAt": "2025-09-18T03:05:26.075Z",
+  "createdAt": "2025-09-05T08:38:13.064Z",
+  "id": "kAMdhJVV8SXz2O5v",
+  "name": "Lynk2pay-webhook-testing",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c2465fd1-e3f5-438d-bd63-8168939c01d9",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -740,
+        -260
+      ],
+      "id": "30b12ca0-9d9b-456a-849f-dbe20aea118b",
+      "name": "Webhook",
+      "webhookId": "c2465fd1-e3f5-438d-bd63-8168939c01d9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nfunction generateRequestHash(obj, secretKey) {\n  // Sort object keys to ensure consistency\n  const sortedKeys = Object.keys(obj).sort();\n\n  // Convert object to a consistent string format\n  const dataString = sortedKeys\n    .map((key) => `${key}:${JSON.stringify(obj[key])}`)\n    .join('|');\n\n  // Create HMAC hash using the secret key\n  return crypto\n    .createHmac('sha256', secretKey)\n    .update(dataString)\n    .digest('hex');\n}\nconst body = $input.first().json.body\nconst secretKey = \"XYjoOy277shY1z6Xex580QBwgDPgVqlovWkTmclThbjtPjpdkSOQszhHxx0RUg-PNqRWf3y8vNtSPdr9k0tXzg\";\nconst { secureHash, ...restParams } = body;\nconst generatedHash = generateRequestHash(restParams, secretKey);\nif (secureHash !== generatedHash) {\n        return {\n          isValid: false,\n          message: 'Invalid secureHash.'\n        };\n    }\nreturn {\n          isValid: true,\n          message: 'IPN accepted.'\n        };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        -260
+      ],
+      "id": "e960674d-7876-41d7-9723-6aa4e6d12ad4",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": "={{ $json.isValid ? 200 : 400 }}"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [
+        -220,
+        -260
+      ],
+      "id": "d27d5b81-fb97-4036-963f-04300d36fcb3",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "3b86d66e-e348-4525-971f-f622a159a8f8",
+  "activeVersionId": "3b86d66e-e348-4525-971f-f622a159a8f8",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-09-05T08:38:13.064Z",
+      "createdAt": "2025-09-05T08:38:13.064Z",
+      "role": "workflow:owner",
+      "workflowId": "kAMdhJVV8SXz2O5v",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-26T08:31:17.177Z",
+    "createdAt": "2026-02-26T08:31:17.177Z",
+    "versionId": "3b86d66e-e348-4525-971f-f622a159a8f8",
+    "workflowId": "kAMdhJVV8SXz2O5v",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "c2465fd1-e3f5-438d-bd63-8168939c01d9",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          -740,
+          -260
+        ],
+        "id": "30b12ca0-9d9b-456a-849f-dbe20aea118b",
+        "name": "Webhook",
+        "webhookId": "c2465fd1-e3f5-438d-bd63-8168939c01d9"
+      },
+      {
+        "parameters": {
+          "jsCode": "const crypto = require('crypto');\nfunction generateRequestHash(obj, secretKey) {\n  // Sort object keys to ensure consistency\n  const sortedKeys = Object.keys(obj).sort();\n\n  // Convert object to a consistent string format\n  const dataString = sortedKeys\n    .map((key) => `${key}:${JSON.stringify(obj[key])}`)\n    .join('|');\n\n  // Create HMAC hash using the secret key\n  return crypto\n    .createHmac('sha256', secretKey)\n    .update(dataString)\n    .digest('hex');\n}\nconst body = $input.first().json.body\nconst secretKey = \"XYjoOy277shY1z6Xex580QBwgDPgVqlovWkTmclThbjtPjpdkSOQszhHxx0RUg-PNqRWf3y8vNtSPdr9k0tXzg\";\nconst { secureHash, ...restParams } = body;\nconst generatedHash = generateRequestHash(restParams, secretKey);\nif (secureHash !== generatedHash) {\n        return {\n          isValid: false,\n          message: 'Invalid secureHash.'\n        };\n    }\nreturn {\n          isValid: true,\n          message: 'IPN accepted.'\n        };"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -440,
+          -260
+        ],
+        "id": "e960674d-7876-41d7-9723-6aa4e6d12ad4",
+        "name": "Code"
+      },
+      {
+        "parameters": {
+          "options": {
+            "responseCode": "={{ $json.isValid ? 200 : 400 }}"
+          }
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.2,
+        "position": [
+          -220,
+          -260
+        ],
+        "id": "d27d5b81-fb97-4036-963f-04300d36fcb3",
+        "name": "Respond to Webhook"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
