@@ -1,0 +1,330 @@
+{
+  "updatedAt": "2025-10-06T04:57:23.783Z",
+  "createdAt": "2024-12-25T12:07:01.995Z",
+  "id": "BnmOiZYTVQcefhOb",
+  "name": "Gnoc Test",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\nconst fileType = require('file-type');\n\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\n\nconst maxSizeMB = 10; // Max size in MB\nconst maxSizeBytes = maxSizeMB * 1024 * 1024;\n\n\nfunction getVideoSize(media) {\n  return Number(media.document.size)\n}\n\nfunction isVideo(media) {\n    return media.video && 1;\n}\n\nfunction isHandleVideo(medias){\n    return medias.some(media => media[\"Type\"] == 'FileType.VIDEO')\n}\n\nasync function connectWithTimeout(client, timeout = 20000) {\n    const timeoutPromise = new Promise((resolve) =>\n        setTimeout(() => resolve(false), timeout)\n    );\n\n    try {\n        const connectResult = await Promise.race([\n            client.connect().then(() => true),\n            timeoutPromise,\n        ]);\n        return connectResult;\n    } catch {\n        return false;\n    }\n}\n\n\nasync function handleMedia() {\n  const f_result = []\n  const client = new TelegramClient(\n        new StringSession(stringSession),\n        apiId,\n        apiHash,\n        { connectionRetries: 5 }\n      );\n  const connect_result = await connectWithTimeout(client);\n  console.log(\"connect ok: \", connect_result)\n  if (!connect_result) {\n      return [];\n  }\n  const result = await client.invoke(\n    new Api.channels.GetMessages({\n      channel: -1001858250254,\n      id: [9]\n    })\n  );\n  const teleMsgs = result.messages;\n\n  console.log(teleMsgs)\n\n  return teleMsgs;\n};\n\nconst returnData = await handleMedia();\n\nreturn returnData"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        -20
+      ],
+      "id": "d5a5783a-9668-44c8-ab42-5a0882f6d898",
+      "name": "GetTelegramMedia",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE XinhTelegramMedia\nSET ExtraData = N'{{ JSON.stringify($node[\"GetTelegramMedia\"].json[\"media\"]) }}'\nWHERE Id = 40444"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -20
+      ],
+      "id": "c1e78496-5140-45d2-811e-2ffb7da86da3",
+      "name": "Microsoft SQL",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -160
+      ],
+      "id": "f6b7e592-997d-4ce2-930d-ac6a3a4540b2",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM XinhTelegramMedia\nWHERE Id = 40444"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        -20
+      ],
+      "id": "c61dd4cb-2d0e-4cd5-a71b-0fa1e252ed5a",
+      "name": "Microsoft SQL1",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const { Api, TelegramClient } = require(\"telegram\");\nconst { StringSession } = require(\"telegram/sessions\");\nconst fileType = require('file-type');\n\nvar media = JSON.parse($node[\"Microsoft SQL1\"].json[\"ExtraData\"])\n\n// @islamiticDryas - sessionstring này chỉ chạy trên n8n\nconst stringSession = '1AZWarzUBuzz1xwVveVtTctL4oX1gOtV--5aR0F9PETJ-f9BzJJDy5NrZQtpq4DQGykBl3qIy_kL0nin4-ovubYRkRyAyZCs_mw1d2NIAhc_S5GV97Ck4yH6BuNBs2BHMBX-zxjpHXG-c8HwdELeRNsm7Ev-z0NOO1DCmVJuolUtg5oKjgXQ2z_9GPm-KcVCovKs93qX-31UTcRH26_vlSnVhlL6sOGZiB-EE9uQocx_3BYK5vw-jAJZMlUln0A6bgYkj49O7wvj4VfFMKOMOxPFgGyqd3eAWHzK8HFgB8_DkWrOpuaTzpL3gY7JUtvLPwMpk5pROEoRQNOcYkvKELyqk-33U1Yw=';\nconst apiId = \"22794803\";\nconst apiHash = \"7288e3cdab7a4de81262e54f7542ea9c\";\n\nconst maxSizeMB = 10; // Max size in MB\nconst maxSizeBytes = maxSizeMB * 1024 * 1024;\n\n\nfunction getVideoSize(media) {\n  return Number(media.document.size)\n}\n\nfunction isVideo(media) {\n    return media.video && 1;\n}\n\nfunction isHandleVideo(medias){\n    return medias.some(media => media[\"Type\"] == 'FileType.VIDEO')\n}\n\nasync function connectWithTimeout(client, timeout = 20000) {\n    const timeoutPromise = new Promise((resolve) =>\n        setTimeout(() => resolve(false), timeout)\n    );\n\n    try {\n        const connectResult = await Promise.race([\n            client.connect().then(() => true),\n            timeoutPromise,\n        ]);\n        return connectResult;\n    } catch {\n        return false;\n    }\n}\n\nasync function handleMedia() {\n  const f_result = []\n  const client = new TelegramClient(\n        new StringSession(stringSession),\n        apiId,\n        apiHash,\n        { connectionRetries: 5 }\n      );\n  const connect_result = await connectWithTimeout(client);\n  console.log(\"connect ok: \", connect_result)\n  if (!connect_result) {\n      return [];\n  }\n  \n  \n    // let buffer = await client.downloadMedia(media, {\n    //   worker: 1\n    // });\nphoto = media.photo;\n  // size = photo.sizes;\n  \n  console.log(photo);\n  \n  const buffer = await client.downloadFile(\n                    new Api.InputPhotoFileLocation({\n                        id: photo.id,\n                        accessHash: photo.accessHash,\n                        fileReference: photo.fileReference,\n                        thumbSize: 44854\n                    }),\n                    {\n                        dcId: photo.dcId,\n                        fileSize: 44854,\n                    }\n                );\n\n  console.log(buffer);\n  \n    const mimeType = await fileType.fromBuffer(buffer);\n    const size = buffer.length;\n  f_result.push({\n        json : {\n          mimeType,\n          size,\n          fileName: `file.${mimeType?.ext}`\n        },\n        binary: {\n            data: {\n              data: buffer,\n              mimeType: mimeType?.mime,\n              fileName: `file.${mimeType?.ext}`\n            }\n        }\n      })\n  \n  return f_result;\n};\n\nconst returnData = await handleMedia();\n\nreturn returnData"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        -20
+      ],
+      "id": "c0445f22-6ba3-4794-9fbc-57fc5fcd4fc7",
+      "name": "GetTelegramMedia1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "events": [
+          "updateNewMessage"
+        ]
+      },
+      "type": "@telepilotco/n8n-nodes-telepilot.telePilotTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -460
+      ],
+      "id": "01c1246d-0615-4888-9237-20a207dedf5c",
+      "name": "TelePilot Trigger",
+      "credentials": {
+        "telePilotApi": {
+          "id": "Hk8hPihzT5I3ZDuP",
+          "name": "Personal Telegram CoPilot - @islamiticDryas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-4711232852",
+        "text": "={{ $json.message.content.text.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        -500
+      ],
+      "id": "eb80fb9e-268e-4318-b8ab-6f9e3db2b5bb",
+      "name": "Telegram",
+      "webhookId": "3822cd6f-8965-463c-a7d2-fe908f6f41ff",
+      "credentials": {
+        "telegramApi": {
+          "id": "99TqAz9hlz4axOQg",
+          "name": "Telegram @generalforwardbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a9c94d23-e133-4afb-ae0a-67b776bcc6c3",
+              "leftValue": "={{ $json.message.chat_id }}",
+              "rightValue": -1001858250254,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        60,
+        -460
+      ],
+      "id": "e63422f2-875e-4726-85de-b0e810912d84",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "-1002406970750",
+        "file": "AgACAgUAAx0CbsKmDgACj_lnnlOzC5ExJhFGDkssi5_PpI3LIwACscUxG-tA8FRi7Yx6WzXxXQEAAwIAA3gAAy8E",
+        "additionalFields": {
+          "caption": ":)))))))"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        420,
+        -220
+      ],
+      "id": "af3cda3d-7113-4fc5-a8fc-43ded606c7c0",
+      "name": "Telegram1",
+      "webhookId": "8c5397f4-9593-4a3d-9d6d-25096a364ebd",
+      "credentials": {
+        "telegramApi": {
+          "id": "Liw4gD6J7RQpIkKE",
+          "name": "Telegram @APlusAssitantbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        -220
+      ],
+      "id": "59c34244-09c4-4e7e-aac9-75db77ece1b4",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getMessage",
+        "chat_id": "-1002465398483",
+        "message_id": "48566894592"
+      },
+      "type": "@telepilotco/n8n-nodes-telepilot.telePilot",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        -700
+      ],
+      "id": "0a07fd24-b70d-4032-aba6-f1ec4f99cf1b",
+      "name": "Telegram CoPilot",
+      "credentials": {
+        "telePilotApi": {
+          "id": "Hk8hPihzT5I3ZDuP",
+          "name": "Personal Telegram CoPilot - @islamiticDryas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-4613005386",
+        "text": "Hello",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        -700
+      ],
+      "id": "afe91bab-1838-48f4-b3be-ed7dac178867",
+      "name": "Telegram2",
+      "webhookId": "46949e67-249b-40c7-b4f1-1c396c6aa9c3",
+      "credentials": {
+        "telegramApi": {
+          "id": "ch9O6LqkjrVOP2nO",
+          "name": "Telegram Bot - @samsamcaterbot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "GetTelegramMedia": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL1": {
+      "main": [
+        [
+          {
+            "node": "GetTelegramMedia1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TelePilot Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "6e62db7e-1d64-4385-a459-a379a0e0612e",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-12-25T12:07:01.995Z",
+      "createdAt": "2024-12-25T12:07:01.995Z",
+      "role": "workflow:owner",
+      "workflowId": "BnmOiZYTVQcefhOb",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
