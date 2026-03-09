@@ -1,0 +1,70 @@
+{
+  "updatedAt": "2024-06-23T15:35:50.112Z",
+  "createdAt": "2024-06-23T15:35:50.112Z",
+  "id": "9hrWcKqYVB1Xh9sB",
+  "name": "My workflow 2",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "390459b2-9525-4ebd-a26a-5561adcbaf3f",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/bot1925826783:AAGGKOzOFTl6CRaXWY23iDkaDw3EsYU59lU/getUpdates",
+        "options": {}
+      },
+      "id": "7d310819-ddc0-49b5-991e-fbf138779951",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        920,
+        360
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "8b3f251c-3ea6-4c27-8583-50d7d4fe7160",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2024-06-23T15:35:50.112Z",
+      "createdAt": "2024-06-23T15:35:50.112Z",
+      "role": "workflow:owner",
+      "workflowId": "9hrWcKqYVB1Xh9sB",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
