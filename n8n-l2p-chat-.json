@@ -1,0 +1,139 @@
+{
+  "updatedAt": "2025-05-07T15:17:57.702Z",
+  "createdAt": "2025-05-07T04:57:03.894Z",
+  "id": "FJyISvLX2MY4SbcU",
+  "name": "L2P chat",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a2321c88-e659-4e11-82ab-b730abbe8a81",
+      "name": "When chat message received",
+      "webhookId": "5e4153f6-6294-496f-927e-56bf7a9b3f5b"
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "System: Use the following pieces of context to answer the users question.\nIf you don't know the answer, just say that you don't know, don't try to make up an answer.\n----------------\n- Tên dự án: Lynk2Pay\n- Viết tắt: L2P\n- Website: lynk2pay.com\n- Lĩnh vực:\n  - Lĩnh vực chính: Fintech (công nghệ tài chính)\n  - Lĩnh vực chuyên sâu: Cryptocurrency Payment Solutions / Crypto Payment Gateway & Infrastructure / Crypto Payment Solution Provider (CPSP)\n- Tầm Nhìn: Trải nghiệm thanh toán tiền điện tử liền mạch, an toàn và tức thì, phổ cập thanh toán web3 tới người dùng web2\n- Sứ mệnh: Cung cấp hạ tầng thanh toán tiền điện tử đa chuỗi, an toàn với chi phí minh bạch và cạnh tranh, giúp các doanh nghiệp và nhà sáng tạo thuộc mọi quy mô chấp nhận thanh toán crypto, quản lý dòng tiền và mở rộng phạm vi tiếp cận khách hàng một cách hiệu quả.\n- Giá trị cốt lõi: Bảo mật (security), Đơn giản, Minh bạch (transparency), Hiệu quả, Linh hoạt\n- Giá trị độc nhất (Unique Value Proposition - UVP): Trải nghiệm thanh toán crypto dễ dàng nhất với tùy chọn linh hoạt (non-custodial hoặc quy đổi fiat). Người dùng cuối không cần giữ native token - phí gas có thể được trả bằng chính token thanh toán (như USDC, USDT). Tất cả trên nền tảng hạ tầng vững chắc, an toàn, minh bạch với chi phí cạnh tranh.\n- Slogan:\n  - Slogan chính: \n    - The Easiest Way to Get Paid in Crypto\n  - Slogan phụ, sử dụng ở các trang con: \n    - Unlock Global Sales with Easy Crypto Payments\n    - Safe and seamless crypto payments infrastructure for your business\n    - Go Global Faster. Crypto Payments Without Barriers\n    - Unlock Global Customers. We Handle the Crypto Payments Complexity\n- Đối tượng khách hàng mục tiêu (Target Audience): \n  - E-comm SMEs\n  - Web3 companies (Marketplaces, Wallets, DAOs)\n  - Saas, Subscription Businesses\n  - Charity/Non-profit Organization\n  - Creators/KOL/KOC/Livestream Platform\n  - Gaming/Casinos\n  - Adult Platforms\n  - Developers/Individuals\n  In đậm là các đối tượng tập trung cho phase 1\n- Sản phẩm chính:\n  - Payment Gateway (Core API)\n  - Paylinks (Accept crypto payments in seconds with links)\n    - Link\n    - Button\n    - Widget\n  - Donations (Accept crypto donations for your non-profit, charity, or cause with a custom donation link or widget tailored to your brand)\n  - Subscriptions (Crypto subscriptions and memberships)\n  - Ecommerce Integrations\n    - Plugin: Shopify, Woocommerce, Wordpress, etc\n  - Presales (Raise funding in crypto)\n  - Mass Payouts (Global mass payouts in crypto)\n  - Payroll\n  - L2P QR (The simplest way for offline stores to accept crypto payments)\nIn đậm là các sản phẩm tập trung release vào phase 1\n- Giải pháp (Use-case):\n  - Ecommerces\n  - iGaming & Crypto Casino\n  - Donations\n  - Saas\n  - Ticketing\n  - Community Subscriptions\n  - Token/NFT Presales\n  - Retail\n- Pricing:\n  - Starter: 0.9% trên mỗi giao dịch\n  - Enterprise: liên hệ\n- Đối thủ/Cùng lĩnh vực:\n  - https://www.hel.io/ (đối thủ)\n  - https://nowpayments.io/ (đối thủ)\n  - https://stripe.com/ (cùng lĩnh vực)\n  - https://www.tryspeed.com/ (đối thủ)\n  - https://copperx.io/ (đối thủ)\n  - https://www.boomfi.xyz/ (đối thủ)\n  - https://depay.com/ (đối thủ)\n  - https://www.loopcrypto.xyz/ (đối thủ)\n  - https://www.radom.com (đối thủ)\n  - https://coingate.com/ (đối thủ)\n  - https://www.triple-a.io/ (cùng lĩnh vực)\n  - https://www.request.finance/ (cùng lĩnh vực)\n- Socials\n  - https://x.com/lynk2pay\n  - https://www.facebook.com/Lynk2Pay\n  - https://www.youtube.com/@Lynk2Pay\n  - https://www.linkedin.com/company/lynk2pay\n  - https://lynk2pay.medium.com\n  "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        0
+      ],
+      "id": "811bea14-9821-4215-9796-739a633e21a7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro-exp-03-25",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        200,
+        200
+      ],
+      "id": "f59486a4-ee44-4d3d-ab8c-12772becd176",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BWGByr1hd4kHbDEO",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        440,
+        260
+      ],
+      "id": "4f0161d5-0980-4691-9d97-3cb84743ded4",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        700,
+        -120
+      ],
+      "id": "0b5febed-a1be-4e53-8cc3-969e484e82c6",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e330fb9a-b980-48c8-9558-0f6a4d2731de",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-05-07T04:57:03.894Z",
+      "createdAt": "2025-05-07T04:57:03.894Z",
+      "role": "workflow:owner",
+      "workflowId": "FJyISvLX2MY4SbcU",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
