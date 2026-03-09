@@ -1,0 +1,2547 @@
+{
+  "updatedAt": "2025-11-17T17:37:41.723Z",
+  "createdAt": "2025-11-17T14:52:21.093Z",
+  "id": "s6I3CqWv2yhIsb0j",
+  "name": "Filen to Lark Drive Sync Workflow",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f309f2e0-3f6c-47ab-a070-059cd60ab560",
+      "name": "Trigger - Daily Sync",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -608
+      ],
+      "notesInFlow": true,
+      "notes": "Chạy hàng ngày lúc 2 AM để đồng bộ files"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gateway.filen.io/v3/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\": \"{{ $('env').item.json.FILEN_EMAIL }}\",\n  \"password\": \"{{ $json.derivedPassword }}\",\n  \"twoFactorCode\": \"XXXXXX\",\n  \"authVersion\": 2\n} ",
+        "options": {}
+      },
+      "id": "f50c1b4e-48e1-41ea-b6b6-c1b51c7fe632",
+      "name": "Filen - Login",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        624,
+        -608
+      ],
+      "retryOnOutput": "",
+      "executeOnce": false,
+      "notesInFlow": true,
+      "notes": "Đăng nhập vào Filen và lấy API key"
+    },
+    {
+      "parameters": {
+        "url": "https://gateway.filen.io/v3/user/baseFolder",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.data.apiKey }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "86b397e3-07e5-4a52-b1c4-20f0eca69a1c",
+      "name": "Filen - Get Base Folder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        848,
+        -608
+      ],
+      "notesInFlow": true,
+      "notes": "Lấy UUID của folder gốc"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Store auth data for later use\nconst apiKey = $('Filen - Login').first().json.data.apiKey;\nconst baseFolderUUID =$input.first().json.data.uuid;\nconst masterKeys = $('Filen - Login').first().json.data.masterKeys;\n\nreturn [{\n  json: {\n    apiKey: apiKey,\n    baseFolderUUID: baseFolderUUID,\n    masterKeys: masterKeys,\n    allFiles: []\n  }\n}];"
+      },
+      "id": "fba55caf-33d1-4ccc-a383-33456de9cfb3",
+      "name": "Store Auth Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        -608
+      ],
+      "notesInFlow": true,
+      "notes": "Lưu trữ authentication data và chuẩn bị cho bước tiếp theo"
+    },
+    {
+      "parameters": {
+        "jsCode": "var axios = require('axios')\n\n// Recursive function to list all files and folders from Filen\nconst apiKey = $json.apiKey;\nconst baseFolderUUID = $json.baseFolderUUID;\n\nasync function listFilesRecursive(folderUUID, parentPath = \"\", depth = 0) {\n  \n  console.log(folderUUID + \"_\" + parentPath)\n  \n  if (depth > 20) return []; // Prevent infinite recursion\n  \n  const allItems = [];\n  \n  try {\n    // Call Filen API to list folder content\n    // const response = await request('https://gateway.filen.io/v3/dir/content', {\n    //   method: 'POST',\n    //   headers: {\n    //     'Authorization': `Bearer ${apiKey}`,\n    //     'Content-Type': 'application/json'\n    //   },\n    //   body: JSON.stringify({\n    //     uuid: folderUUID\n    //   })\n    // });\n    \n    const response = await axios.post(\n      'https://gateway.filen.io/v3/dir/content',\n      {\n        uuid: folderUUID\n          },\n      {\n        headers: {\n      'Authorization': `Bearer ${apiKey}`,\n      'Content-Type': 'application/json'\n      },\n                                                                                                                             timeout: 30000\n      }\n    );\n    \n    const data = response.data;\n    \n    if (!data.status) {\n      console.error('Filen API error:', data.message);\n      return allItems;\n    }\n    \n    // Process files\n    if (data.data.uploads && Array.isArray(data.data.uploads)) {\n      for (const file of data.data.uploads) {\n        // Note: In production, decrypt file.name with master key\n        // For now, we'll use the encrypted name\n        const fileName = file.name;\n        \n        allItems.push({\n          type: 'file',\n          uuid: file.uuid,\n          name: fileName,\n          path: parentPath ? `${parentPath}/${fileName}` : fileName,\n          size: file.size || 0,\n          encrypted_metadata: file.metadata\n        });\n      }\n    }\n    console.log(data.data.folders)\n    // Recursively process folders\n    if (data.data.folders && Array.isArray(data.data.folders)) {\n      for (const folder of data.data.folders) {\n        const folderName = folder.name;\n        const newPath = parentPath ? `${parentPath}/${folderName}` : folderName;\n        \n        // Add folder to items\n        allItems.push({\n          type: 'folder',\n          uuid: folder.uuid,\n          name: folderName,\n          path: newPath\n        });\n        \n        // Recursively get files from subfolder\n        const subItems = await listFilesRecursive(folder.uuid, newPath, depth + 1);\n        allItems.push(...subItems);\n      }\n    }\n    \n  } catch (error) {\n    console.error('Error listing files:', error.message);\n  }\n  \n  return allItems;\n}\n\n// Start the recursive listing\nconst allItems = await listFilesRecursive(baseFolderUUID);\nconst allFiles = allItems.filter(item => item.type === 'file');\n\nconsole.log(`Found ${allFiles.length} files to sync`);\n\nreturn [{\n  json: {\n    files: allFiles,\n    totalFiles: allFiles.length,\n  }\n}];"
+      },
+      "id": "3d3436ba-6e16-4fd2-9435-6a537b8715db",
+      "name": "List All Files Recursively",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        -608
+      ],
+      "notesInFlow": true,
+      "notes": "Duyệt tất cả folders và files từ Filen recursively"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f10fecc2-b456-4ff0-a7b4-0bdbb7c13df5",
+      "name": "Split Out - Each File",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        416,
+        -384
+      ],
+      "notesInFlow": true,
+      "notes": "Chia array files thành từng item riêng để xử lý"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gateway.filen.io/v3/file",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Call \\'[Data Sync] Filen2Lark - Get Filen Api Token\\'').item.json.data.apiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"uuid\": \"{{ $json.uuid }}\"\n}",
+        "options": {}
+      },
+      "id": "2dc84bba-432a-44d6-8358-8894cfe21c08",
+      "name": "Filen - Get File Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        784,
+        -384
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Lấy thông tin chi tiết về file (size, type, key)"
+    },
+    {
+      "parameters": {
+        "url": "=https://egest.filen.io/v3/{{ $json.data.uuid }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Call \\'[Data Sync] Filen2Lark - Get Filen Api Token\\'').item.json.data.apiKey }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "638b8c0a-9b39-4100-bbb2-6799c1435cb3",
+      "name": "Filen - Download File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1216,
+        -384
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Download file binary từ egest.filen.io"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/drive/v1/files/upload_prepare",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.LARK_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file_name",
+              "value": "={{ $json.name }}"
+            },
+            {
+              "name": "parent_token",
+              "value": "={{ $env.LARK_ROOT_FOLDER_TOKEN }}"
+            },
+            {
+              "name": "size",
+              "value": "={{ $json.size }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "814e387d-c008-43bb-9951-d96aa96a126b",
+      "name": "Lark - Prepare Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1648,
+        -384
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Khởi tạo upload session trên Lark"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Upload file in blocks to Lark\nconst uploadId = $input.fromNode('Lark - Prepare Upload').json?.data?.upload_id;\nconst blockSize = $input.fromNode('Lark - Prepare Upload').json?.data?.block_size || 4194304;\nconst blockNum = $input.fromNode('Lark - Prepare Upload').json?.data?.block_num || 1;\nconst fileBinary = $input.fromNode('Filen - Download File').json; // This will be the binary buffer\nconst larkToken = $env.LARK_TOKEN;\nconst fileName = $json.name;\n\nif (!uploadId) {\n  throw new Error('Upload ID not found from prepare response');\n}\n\nconsole.log(`Starting upload for ${fileName} with upload_id: ${uploadId}`);\n\ntry {\n  for (let seq = 0; seq < blockNum; seq++) {\n    const start = seq * blockSize;\n    const end = Math.min(start + blockSize, fileBinary.length);\n    const chunk = fileBinary.slice(start, end);\n    \n    console.log(`Uploading block ${seq + 1}/${blockNum}`);\n    \n    const response = await fetch(\n      `https://open.larksuite.com/drive/v1/files/upload_part?upload_id=${uploadId}&seq=${seq}`,\n      {\n        method: 'POST',\n        headers: {\n          'Authorization': `Bearer ${larkToken}`,\n          'Content-Type': 'application/octet-stream'\n        },\n        body: chunk\n      }\n    );\n    \n    if (!response.ok) {\n      throw new Error(`Block ${seq} upload failed: ${response.statusText}`);\n    }\n    \n    // Add delay between blocks to avoid rate limiting\n    await new Promise(resolve => setTimeout(resolve, 500));\n  }\n  \n  console.log(`All blocks uploaded for ${fileName}`);\n  \n  return [{\n    json: {\n      uploadId: uploadId,\n      blockNum: blockNum,\n      fileName: fileName,\n      uploadStatus: 'blocks_uploaded'\n    }\n  }];\n  \n} catch (error) {\n  throw new Error(`Failed to upload file blocks: ${error.message}`);\n}"
+      },
+      "id": "b21d30ba-bd1d-4c93-9e04-372a1a9e5347",
+      "name": "Lark - Upload File Blocks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        -384
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Upload file theo từng block (chunk) để hỗ trợ file lớn"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/drive/v1/files/upload_finish",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.LARK_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "upload_id",
+              "value": "={{ $json.uploadId }}"
+            },
+            {
+              "name": "block_num",
+              "value": "={{ $json.blockNum }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8a782b73-7449-4cfd-b01c-2639d7efd2db",
+      "name": "Lark - Finish Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2096,
+        -384
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Hoàn tất upload session trên Lark"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "={{ $json.data?.file_token }}",
+            "operator": {
+              "name": "filter.operator.notEmpty",
+              "type": "any",
+              "singleValue": true
+            }
+          }
+        },
+        "options": {}
+      },
+      "id": "ab46be4c-f7fb-430e-83c8-32f490857270",
+      "name": "Check Upload Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        -384
+      ],
+      "notesInFlow": true,
+      "notes": "Kiểm tra upload thành công trước khi xóa file từ Filen"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gateway.filen.io/file/delete",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.apiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "uuid",
+              "value": "={{ $json.uuid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fb007817-6f67-4e0a-a887-e5ca49943e22",
+      "name": "Filen - Delete File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2544,
+        -384
+      ],
+      "notesInFlow": true,
+      "notes": "Xóa file khỏi Filen sau khi upload thành công"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log successful sync\nconst fileName = $json.name;\nconst fileSize = $json.size;\nconst larkFileToken = $json.data?.file_token;\n\nreturn [{\n  json: {\n    status: 'success',\n    fileName: fileName,\n    fileSize: fileSize,\n    larkFileToken: larkFileToken,\n    syncedAt: new Date().toISOString(),\n    message: `✅ Successfully synced ${fileName} (${(fileSize / 1024 / 1024).toFixed(2)}MB)`\n  }\n}];"
+      },
+      "id": "fc385c28-d21c-4d57-8662-c56c56284523",
+      "name": "Log Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2768,
+        -384
+      ],
+      "notesInFlow": true,
+      "notes": "Ghi log file đã đồng bộ thành công"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $env.TELEGRAM_CHAT_ID }}"
+            },
+            {
+              "name": "text",
+              "value": "=❌ <b>Filen→Lark Sync Error</b>\\n\\n<b>Node:</b> {{ $execution.getNode().name }}\\n<b>Error:</b> {{ $error.message }}\\n<b>File:</b> {{ $json.name || 'unknown' }}\\n<b>Time:</b> {{ now().toFormat('yyyy-MM-dd HH:mm:ss') }}\\n<b>Workflow:</b> {{ $workflow.name }}"
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1354ac46-1dc6-4e17-98d8-0988e3a51be8",
+      "name": "Telegram - Error Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -48,
+        -160
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Gửi thông báo lỗi tới Telegram"
+    },
+    {
+      "parameters": {},
+      "id": "16683e84-8c5a-4b86-ab52-235d5b94c7b8",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -160
+      ],
+      "notesInFlow": true,
+      "notes": "Bắt tất cả lỗi từ bất kỳ node nào trong workflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $env.TELEGRAM_CHAT_ID }}"
+            },
+            {
+              "name": "text",
+              "value": "=✅ <b>Filen→Lark Sync Complete</b>\\n\\n<b>Workflow:</b> {{ $workflow.name }}\\n<b>Execution:</b> {{ $execution.id }}\\n<b>Status:</b> Success\\n<b>Time:</b> {{ now().toFormat('yyyy-MM-dd HH:mm:ss') }}\\n\\n📦 All files synced successfully!"
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d2740499-870f-472a-89de-b3d440949e4e",
+      "name": "Telegram - Success Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2992,
+        -384
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Gửi thông báo thành công tới Telegram"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"FILEN_EMAIL\": \"toivanlatoi.120689@gmail.com\",\n  \"FILEN_PASSWORD\": \"idontlikezz12C!\",\n  \"LARK_TOKEN\":\"\",\n  \"LARK_ROOT_FOLDER_TOKEN\":\"\",\n  \"TELEGRAM_BOT_TOKEN\": \"\",\n  \"TELEGRAM_CHAT_ID\": \"\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        -608
+      ],
+      "id": "75901ea7-af53-4a9d-811d-453b42daf285",
+      "name": "env"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gateway.filen.io/v3//auth/info",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\": \"{{ $('env').item.json.FILEN_EMAIL }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        176,
+        -608
+      ],
+      "id": "1d9f8ee2-fb1a-41ea-8fb7-045007e29d76",
+      "name": "Filen-authInfo"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node - Mode: Run Once for Each Item\n// Input per item:\n// { \"data\": { \"rawPassword\": \"string\", \"authVersion\": 1|2, \"salt\": \"string\" } }\n\nconst { createHash, pbkdf2Sync } = require('crypto');\n\n// Helpers\nasync function hashPassword({ password }) {\n  // Nếu có thuật toán hash riêng, thay thế tại đây; mặc định SHA-512\n  return createHash('sha512')\n    .update(Buffer.from(password, 'utf8'))\n    .digest('hex');\n}\n\nasync function hashFn({ input }) {\n  return createHash('sha512')\n    .update(Buffer.from(input, 'utf8'))\n    .digest('hex');\n}\n\nasync function deriveKeyFromPassword({\n  password,\n  salt,\n  iterations,\n  hash,      // 'sha512'\n  bitLength, // 512\n  returnHex  // true\n}) {\n  const keylenBytes = bitLength / 8;\n  const derived = pbkdf2Sync(\n    Buffer.from(password, 'utf8'),\n    Buffer.from(salt, 'utf8'),\n    iterations,\n    keylenBytes,\n    hash\n  );\n  return returnHex ? derived.toString('hex') : derived;\n}\n\nasync function generatePasswordAndMasterKeyBasedOnAuthVersion({\n  rawPassword,\n  authVersion,\n  salt\n}) {\n  if (authVersion === 1) {\n    // DEPRECATED – backward compatibility\n    const derivedPassword = await hashPassword({ password: rawPassword });\n    const derivedMasterKeys = await hashFn({ input: rawPassword });\n    return { derivedMasterKeys, derivedPassword };\n  } else if (authVersion === 2) {\n    const derivedKey = await deriveKeyFromPassword({\n      password: rawPassword,\n      salt,\n      iterations: 200000,\n      hash: 'sha512',\n      bitLength: 512,\n      returnHex: true\n    });\n\n    const half = derivedKey.length / 2;\n    const derivedMasterKeys = derivedKey.substring(0, half);\n    const derivedPasswordHalf = derivedKey.substring(half);\n\n    const derivedPassword = createHash('sha512')\n      .update(Buffer.from(derivedPasswordHalf, 'utf8'))\n      .digest('hex');\n\n    return { derivedMasterKeys, derivedPassword };\n  } else {\n    throw new Error(`Invalid authVersion: ${authVersion}`);\n  }\n}\n\n// Đọc dữ liệu từ item hiện tại\nconst data = ($json && $json.data) ? $json.data : {};\nconst { rawPassword = 'idontlikezz12C!', authVersion = 2, salt = '' } = data;\n\n// Nếu muốn override bằng hằng số:\n// const rawPass = 'idkezC!';\n// const payload = { rawPassword: rawPass, authVersion, salt };\n\nconst payload = { rawPassword, authVersion, salt };\nconst result = await generatePasswordAndMasterKeyBasedOnAuthVersion(payload);\n\n// Trả ra đúng format của n8n\nreturn { json: result };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -608
+      ],
+      "id": "2a291a54-4faa-468e-92dc-632a959d3b93",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.first().json.files"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        -608
+      ],
+      "id": "95e0c5ce-9a4f-4505-90d2-9527e1f2ef81",
+      "name": "Data Update 2 Sheet - Gnoc",
+      "notes": "Chuẩn bị data để update vào Google sheet"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk",
+          "mode": "list",
+          "cachedResultName": "Filen-Lark Sync Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Gnoc",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "uuid"
+          ],
+          "schema": [
+            {
+              "id": "uuid",
+              "displayName": "uuid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "path",
+              "displayName": "path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "size",
+              "displayName": "size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "encrypted_metadata",
+              "displayName": "encrypted_metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        -608
+      ],
+      "id": "48bb822e-8d72-44c7-8334-f88760b97b3a",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      totalFiles: $node[\"List All Files Recursively\"].json[\"totalFiles\"],\n      date_string: $now.toLocaleString(),\n      date: $now,\n      status: 'Successfully',\n      message: ''\n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        -608
+      ],
+      "id": "6f8f40d8-a524-47ee-b0a3-e0fc7ac73aa0",
+      "name": "Data Update 2 Sheet - SyncLogs",
+      "notes": "Chuẩn bị data để update vào Google sheet"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk",
+          "mode": "list",
+          "cachedResultName": "Filen-Lark Sync Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 195506811,
+          "mode": "list",
+          "cachedResultName": "SyncLogs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit#gid=195506811"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date_string",
+              "displayName": "date_string",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "totalFiles",
+              "displayName": "totalFiles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2192,
+        -608
+      ],
+      "id": "29ce8a23-84fe-4965-bf39-0faef7bb7e61",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -688,
+        -384
+      ],
+      "id": "4cb70d31-8512-4f3d-99cc-ddd275ec944a",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk",
+          "mode": "list",
+          "cachedResultName": "Filen-Lark Sync Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Gnoc",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "sync_status"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -480,
+        -384
+      ],
+      "id": "c05554f7-124a-4799-8593-25a39712f5e5",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk",
+          "mode": "list",
+          "cachedResultName": "Filen-Lark Sync Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Gnoc",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "uuid": "={{ $json.uuid }}",
+            "sync_status": "Processing"
+          },
+          "matchingColumns": [
+            "uuid"
+          ],
+          "schema": [
+            {
+              "id": "uuid",
+              "displayName": "uuid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "path",
+              "displayName": "path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "size",
+              "displayName": "size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "encrypted_metadata",
+              "displayName": "encrypted_metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "sync_status",
+              "displayName": "sync_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -272,
+        -384
+      ],
+      "id": "6035a61d-e019-453a-9ebb-b46360c4ce59",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $node[\"Get row(s) in sheet\"].json;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -384
+      ],
+      "id": "d90295f4-5480-460d-956e-9d0feee1c77c",
+      "name": "return rows"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ujCMg5aHx1OIPiwS",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ujCMg5aHx1OIPiwS",
+          "cachedResultName": "[Data Sync] Filen2Lark - Get Filen Api Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        -384
+      ],
+      "id": "97b5ee87-8611-4f4d-aa58-3cc4b6d15eed",
+      "name": "Call '[Data Sync] Filen2Lark - Get Filen Api Token'"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { crypto, pbkdf2 } = require('crypto');\n// const { promisify } = require('util');\n\n// const pbkdf2 = promisify(crypto.pbkdf2);\n\n/**\n * Giải mã metadata từ Filen\n * @param {string} encryptedMetadata - Chuỗi metadata được mã hóa (bắt đầu với \"002\")\n * @param {string} masterKey - Master key của người dùng (đã được derive từ password)\n * @returns {Promise<string>} - Chuỗi metadata được giải mã\n */\nasync function decryptMetadata(encryptedMetadata, masterKey) {\n  try {\n    // Bước 1: Kiểm tra định dạng - phải bắt đầu với \"002\"\n    const version = encryptedMetadata.slice(0, 3);\n    \n    if (version !== \"002\") {\n      throw new Error(`Invalid metadata version: ${version}. Expected \"002\"`);\n    }\n\n    // Bước 2: Transform key sử dụng PBKDF2\n    // Sử dụng master key làm cả password và salt\n    const transformedKey = await pbkdf2(\n      masterKey,           // password\n      masterKey,           // salt\n      1,                   // iterations\n      32,                  // keylen (256 bits = 32 bytes)\n      'sha512'             // digest\n    );\n\n    // Bước 3: Tách các thành phần từ chuỗi mã hóa\n    // Cấu trúc: \"002\" + nonce (12 ký tự) + base64(encrypted + authTag)\n    const nonce = encryptedMetadata.slice(3, 15);      // Từ index 3 đến 15\n    const encryptedBase64 = encryptedMetadata.slice(15); // Từ index 15 trở đi\n\n    // Chuyển đổi nonce từ UTF-8 string thành Buffer\n    const nonceBuffer = Buffer.from(nonce, 'utf-8');\n\n    // Giải mã base64 để lấy encrypted data + auth tag\n    const encrypted = Buffer.from(encryptedBase64, 'base64');\n\n    // Auth tag luôn là 16 bytes cuối cùng\n    const authTag = encrypted.subarray(-16);\n    const cipherText = encrypted.subarray(0, encrypted.byteLength - 16);\n\n    // Bước 4: Giải mã sử dụng AES-256-GCM\n    const decipher = crypto.createDecipheriv('aes-256-gcm', transformedKey, nonceBuffer);\n    decipher.setAuthTag(authTag);\n\n    const decrypted = Buffer.concat([\n      decipher.update(cipherText),\n      decipher.final()\n    ]).toString('utf-8');\n\n    return decrypted;\n  } catch (error) {\n    throw new Error(`Metadata decryption failed: ${error.message}`);\n  }\n}\n\n/**\n * Giải mã tên file\n * Tên file được lưu dưới dạng metadata được mã hóa\n * @param {string} encryptedFileName - Tên file được mã hóa\n * @param {string} masterKey - Master key của người dùng\n * @returns {Promise<string>} - Tên file gốc\n */\nasync function decryptFileName(encryptedFileName, masterKey) {\n  try {\n    const decrypted = await decryptMetadata(encryptedFileName, masterKey);\n    \n    // Thường tên file được lưu dưới dạng JSON string\n    // Cố gắng parse nếu là JSON, nếu không trả về chuỗi thô\n    try {\n      const parsed = JSON.parse(decrypted);\n      return typeof parsed === 'string' ? parsed : JSON.stringify(parsed);\n    } catch {\n      return decrypted;\n    }\n  } catch (error) {\n    throw new Error(`File name decryption failed: ${error.message}`);\n  }\n}\n\n/**\n * Hàm tiện ích: Giải mã metadata với nhiều master keys\n * Dùng khi bạn có danh sách các master key (hiện tại và cũ)\n * @param {string} encryptedMetadata - Metadata được mã hóa\n * @param {string[]} masterKeys - Danh sách master keys\n * @returns {Promise<string|null>} - Metadata được giải mã hoặc null nếu không tìm thấy\n */\nasync function decryptMetadataWithMultipleKeys(encryptedMetadata, masterKeys) {\n  // Duyệt từ cuối về đầu để tối ưu hiệu suất\n  for (let i = masterKeys.length - 1; i >= 0; i--) {\n    try {\n      const decrypted = await decryptMetadata(encryptedMetadata, masterKeys[i]);\n      return decrypted;\n    } catch (error) {\n      // Tiếp tục thử key tiếp theo\n      continue;\n    }\n  }\n  \n  throw new Error('Failed to decrypt metadata with any available master key');\n}\n\nlet masterKey = $('Call \\'[Data Sync] Filen2Lark - Get Filen Api Token\\'').first().json.data.masterKeys;\nlet metadata = await decryptMetadata($input.first().json.data.metadata, masterKey);\n\nreturn [\n  {\n    json: {\n      metadata: metadata,\n      // name: \n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        -384
+      ],
+      "id": "e84e0096-f38f-4409-9080-cd61058580fc",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const filen  = require('@filen/sdk/crypto');\nconst key = \"cryptographicallySafeRandomGeneratedKey\"\n\nconsole.log(filen)\n\nconst decrypted = await filen.crypto().decrypt().metadata({\n\tmetadata: 'aa',\n\tkey\n})\n\nreturn [\n  {\n    json: {\n      encrypted: decrypted\n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -80
+      ],
+      "id": "6b2692c4-9cf4-40ff-a871-589fad148b74",
+      "name": "Code in JavaScript2"
+    }
+  ],
+  "connections": {
+    "Trigger - Daily Sync": {
+      "main": [
+        [
+          {
+            "node": "env",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filen - Login": {
+      "main": [
+        [
+          {
+            "node": "Filen - Get Base Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filen - Get Base Folder": {
+      "main": [
+        [
+          {
+            "node": "Store Auth Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Auth Data": {
+      "main": [
+        [
+          {
+            "node": "List All Files Recursively",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List All Files Recursively": {
+      "main": [
+        [
+          {
+            "node": "Data Update 2 Sheet - Gnoc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out - Each File": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Filen - Get File Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filen - Get File Info": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filen - Download File": {
+      "main": [
+        [
+          {
+            "node": "Lark - Prepare Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lark - Prepare Upload": {
+      "main": [
+        [
+          {
+            "node": "Lark - Upload File Blocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lark - Upload File Blocks": {
+      "main": [
+        [
+          {
+            "node": "Lark - Finish Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lark - Finish Upload": {
+      "main": [
+        [
+          {
+            "node": "Check Upload Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Upload Success": {
+      "main": [
+        [
+          {
+            "node": "Filen - Delete File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filen - Delete File": {
+      "main": [
+        [
+          {
+            "node": "Log Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Success": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Error Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "env": {
+      "main": [
+        [
+          {
+            "node": "Filen-authInfo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filen-authInfo": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Filen - Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Update 2 Sheet - Gnoc": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Data Update 2 Sheet - SyncLogs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Update 2 Sheet - SyncLogs": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Call '[Data Sync] Filen2Lark - Get Filen Api Token'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "return rows": {
+      "main": [
+        [
+          {
+            "node": "Split Out - Each File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call '[Data Sync] Filen2Lark - Get Filen Api Token'": {
+      "main": [
+        [
+          {
+            "node": "return rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Filen - Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "KG3wK34JqO8YiJsO"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9c8ae699-5cb4-47ea-8c9e-bc93f90a9fe5",
+  "activeVersionId": "9c8ae699-5cb4-47ea-8c9e-bc93f90a9fe5",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-11-17T14:52:21.093Z",
+      "createdAt": "2025-11-17T14:52:21.093Z",
+      "role": "workflow:owner",
+      "workflowId": "s6I3CqWv2yhIsb0j",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-26T08:31:17.458Z",
+    "createdAt": "2026-02-26T08:31:17.458Z",
+    "versionId": "9c8ae699-5cb4-47ea-8c9e-bc93f90a9fe5",
+    "workflowId": "s6I3CqWv2yhIsb0j",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "f309f2e0-3f6c-47ab-a070-059cd60ab560",
+        "name": "Trigger - Daily Sync",
+        "type": "n8n-nodes-base.cron",
+        "typeVersion": 1,
+        "position": [
+          -272,
+          -608
+        ],
+        "notesInFlow": true,
+        "notes": "Chạy hàng ngày lúc 2 AM để đồng bộ files"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://gateway.filen.io/v3/login",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"email\": \"{{ $('env').item.json.FILEN_EMAIL }}\",\n  \"password\": \"{{ $json.derivedPassword }}\",\n  \"twoFactorCode\": \"XXXXXX\",\n  \"authVersion\": 2\n} ",
+          "options": {}
+        },
+        "id": "f50c1b4e-48e1-41ea-b6b6-c1b51c7fe632",
+        "name": "Filen - Login",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          624,
+          -608
+        ],
+        "retryOnOutput": "",
+        "executeOnce": false,
+        "notesInFlow": true,
+        "notes": "Đăng nhập vào Filen và lấy API key"
+      },
+      {
+        "parameters": {
+          "url": "https://gateway.filen.io/v3/user/baseFolder",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.data.apiKey }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "86b397e3-07e5-4a52-b1c4-20f0eca69a1c",
+        "name": "Filen - Get Base Folder",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          848,
+          -608
+        ],
+        "notesInFlow": true,
+        "notes": "Lấy UUID của folder gốc"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Store auth data for later use\nconst apiKey = $('Filen - Login').first().json.data.apiKey;\nconst baseFolderUUID =$input.first().json.data.uuid;\nconst masterKeys = $('Filen - Login').first().json.data.masterKeys;\n\nreturn [{\n  json: {\n    apiKey: apiKey,\n    baseFolderUUID: baseFolderUUID,\n    masterKeys: masterKeys,\n    allFiles: []\n  }\n}];"
+        },
+        "id": "fba55caf-33d1-4ccc-a383-33456de9cfb3",
+        "name": "Store Auth Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1072,
+          -608
+        ],
+        "notesInFlow": true,
+        "notes": "Lưu trữ authentication data và chuẩn bị cho bước tiếp theo"
+      },
+      {
+        "parameters": {
+          "jsCode": "var axios = require('axios')\n\n// Recursive function to list all files and folders from Filen\nconst apiKey = $json.apiKey;\nconst baseFolderUUID = $json.baseFolderUUID;\n\nasync function listFilesRecursive(folderUUID, parentPath = \"\", depth = 0) {\n  \n  console.log(folderUUID + \"_\" + parentPath)\n  \n  if (depth > 20) return []; // Prevent infinite recursion\n  \n  const allItems = [];\n  \n  try {\n    // Call Filen API to list folder content\n    // const response = await request('https://gateway.filen.io/v3/dir/content', {\n    //   method: 'POST',\n    //   headers: {\n    //     'Authorization': `Bearer ${apiKey}`,\n    //     'Content-Type': 'application/json'\n    //   },\n    //   body: JSON.stringify({\n    //     uuid: folderUUID\n    //   })\n    // });\n    \n    const response = await axios.post(\n      'https://gateway.filen.io/v3/dir/content',\n      {\n        uuid: folderUUID\n          },\n      {\n        headers: {\n      'Authorization': `Bearer ${apiKey}`,\n      'Content-Type': 'application/json'\n      },\n                                                                                                                             timeout: 30000\n      }\n    );\n    \n    const data = response.data;\n    \n    if (!data.status) {\n      console.error('Filen API error:', data.message);\n      return allItems;\n    }\n    \n    // Process files\n    if (data.data.uploads && Array.isArray(data.data.uploads)) {\n      for (const file of data.data.uploads) {\n        // Note: In production, decrypt file.name with master key\n        // For now, we'll use the encrypted name\n        const fileName = file.name;\n        \n        allItems.push({\n          type: 'file',\n          uuid: file.uuid,\n          name: fileName,\n          path: parentPath ? `${parentPath}/${fileName}` : fileName,\n          size: file.size || 0,\n          encrypted_metadata: file.metadata\n        });\n      }\n    }\n    console.log(data.data.folders)\n    // Recursively process folders\n    if (data.data.folders && Array.isArray(data.data.folders)) {\n      for (const folder of data.data.folders) {\n        const folderName = folder.name;\n        const newPath = parentPath ? `${parentPath}/${folderName}` : folderName;\n        \n        // Add folder to items\n        allItems.push({\n          type: 'folder',\n          uuid: folder.uuid,\n          name: folderName,\n          path: newPath\n        });\n        \n        // Recursively get files from subfolder\n        const subItems = await listFilesRecursive(folder.uuid, newPath, depth + 1);\n        allItems.push(...subItems);\n      }\n    }\n    \n  } catch (error) {\n    console.error('Error listing files:', error.message);\n  }\n  \n  return allItems;\n}\n\n// Start the recursive listing\nconst allItems = await listFilesRecursive(baseFolderUUID);\nconst allFiles = allItems.filter(item => item.type === 'file');\n\nconsole.log(`Found ${allFiles.length} files to sync`);\n\nreturn [{\n  json: {\n    files: allFiles,\n    totalFiles: allFiles.length,\n  }\n}];"
+        },
+        "id": "3d3436ba-6e16-4fd2-9435-6a537b8715db",
+        "name": "List All Files Recursively",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1296,
+          -608
+        ],
+        "notesInFlow": true,
+        "notes": "Duyệt tất cả folders và files từ Filen recursively"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "f10fecc2-b456-4ff0-a7b4-0bdbb7c13df5",
+        "name": "Split Out - Each File",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          416,
+          -384
+        ],
+        "notesInFlow": true,
+        "notes": "Chia array files thành từng item riêng để xử lý"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://gateway.filen.io/v3/file",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $('Call \\'[Data Sync] Filen2Lark - Get Filen Api Token\\'').item.json.data.apiKey }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"uuid\": \"{{ $json.uuid }}\"\n}",
+          "options": {}
+        },
+        "id": "2dc84bba-432a-44d6-8358-8894cfe21c08",
+        "name": "Filen - Get File Info",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          784,
+          -384
+        ],
+        "notesInFlow": true,
+        "continueOnFail": true,
+        "notes": "Lấy thông tin chi tiết về file (size, type, key)"
+      },
+      {
+        "parameters": {
+          "url": "=https://egest.filen.io/v3/{{ $json.data.uuid }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $('Call \\'[Data Sync] Filen2Lark - Get Filen Api Token\\'').item.json.data.apiKey }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "638b8c0a-9b39-4100-bbb2-6799c1435cb3",
+        "name": "Filen - Download File",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          1216,
+          -384
+        ],
+        "notesInFlow": true,
+        "continueOnFail": true,
+        "notes": "Download file binary từ egest.filen.io"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://open.larksuite.com/drive/v1/files/upload_prepare",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $env.LARK_TOKEN }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "file_name",
+                "value": "={{ $json.name }}"
+              },
+              {
+                "name": "parent_token",
+                "value": "={{ $env.LARK_ROOT_FOLDER_TOKEN }}"
+              },
+              {
+                "name": "size",
+                "value": "={{ $json.size }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "814e387d-c008-43bb-9951-d96aa96a126b",
+        "name": "Lark - Prepare Upload",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          1648,
+          -384
+        ],
+        "notesInFlow": true,
+        "continueOnFail": true,
+        "notes": "Khởi tạo upload session trên Lark"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Upload file in blocks to Lark\nconst uploadId = $input.fromNode('Lark - Prepare Upload').json?.data?.upload_id;\nconst blockSize = $input.fromNode('Lark - Prepare Upload').json?.data?.block_size || 4194304;\nconst blockNum = $input.fromNode('Lark - Prepare Upload').json?.data?.block_num || 1;\nconst fileBinary = $input.fromNode('Filen - Download File').json; // This will be the binary buffer\nconst larkToken = $env.LARK_TOKEN;\nconst fileName = $json.name;\n\nif (!uploadId) {\n  throw new Error('Upload ID not found from prepare response');\n}\n\nconsole.log(`Starting upload for ${fileName} with upload_id: ${uploadId}`);\n\ntry {\n  for (let seq = 0; seq < blockNum; seq++) {\n    const start = seq * blockSize;\n    const end = Math.min(start + blockSize, fileBinary.length);\n    const chunk = fileBinary.slice(start, end);\n    \n    console.log(`Uploading block ${seq + 1}/${blockNum}`);\n    \n    const response = await fetch(\n      `https://open.larksuite.com/drive/v1/files/upload_part?upload_id=${uploadId}&seq=${seq}`,\n      {\n        method: 'POST',\n        headers: {\n          'Authorization': `Bearer ${larkToken}`,\n          'Content-Type': 'application/octet-stream'\n        },\n        body: chunk\n      }\n    );\n    \n    if (!response.ok) {\n      throw new Error(`Block ${seq} upload failed: ${response.statusText}`);\n    }\n    \n    // Add delay between blocks to avoid rate limiting\n    await new Promise(resolve => setTimeout(resolve, 500));\n  }\n  \n  console.log(`All blocks uploaded for ${fileName}`);\n  \n  return [{\n    json: {\n      uploadId: uploadId,\n      blockNum: blockNum,\n      fileName: fileName,\n      uploadStatus: 'blocks_uploaded'\n    }\n  }];\n  \n} catch (error) {\n  throw new Error(`Failed to upload file blocks: ${error.message}`);\n}"
+        },
+        "id": "b21d30ba-bd1d-4c93-9e04-372a1a9e5347",
+        "name": "Lark - Upload File Blocks",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1872,
+          -384
+        ],
+        "notesInFlow": true,
+        "continueOnFail": true,
+        "notes": "Upload file theo từng block (chunk) để hỗ trợ file lớn"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://open.larksuite.com/drive/v1/files/upload_finish",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $env.LARK_TOKEN }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "upload_id",
+                "value": "={{ $json.uploadId }}"
+              },
+              {
+                "name": "block_num",
+                "value": "={{ $json.blockNum }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "8a782b73-7449-4cfd-b01c-2639d7efd2db",
+        "name": "Lark - Finish Upload",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          2096,
+          -384
+        ],
+        "notesInFlow": true,
+        "continueOnFail": true,
+        "notes": "Hoàn tất upload session trên Lark"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "={{ $json.data?.file_token }}",
+              "operator": {
+                "name": "filter.operator.notEmpty",
+                "type": "any",
+                "singleValue": true
+              }
+            }
+          },
+          "options": {}
+        },
+        "id": "ab46be4c-f7fb-430e-83c8-32f490857270",
+        "name": "Check Upload Success",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          2320,
+          -384
+        ],
+        "notesInFlow": true,
+        "notes": "Kiểm tra upload thành công trước khi xóa file từ Filen"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://gateway.filen.io/file/delete",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.apiKey }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "uuid",
+                "value": "={{ $json.uuid }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "fb007817-6f67-4e0a-a887-e5ca49943e22",
+        "name": "Filen - Delete File",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          2544,
+          -384
+        ],
+        "notesInFlow": true,
+        "notes": "Xóa file khỏi Filen sau khi upload thành công"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Log successful sync\nconst fileName = $json.name;\nconst fileSize = $json.size;\nconst larkFileToken = $json.data?.file_token;\n\nreturn [{\n  json: {\n    status: 'success',\n    fileName: fileName,\n    fileSize: fileSize,\n    larkFileToken: larkFileToken,\n    syncedAt: new Date().toISOString(),\n    message: `✅ Successfully synced ${fileName} (${(fileSize / 1024 / 1024).toFixed(2)}MB)`\n  }\n}];"
+        },
+        "id": "fc385c28-d21c-4d57-8662-c56c56284523",
+        "name": "Log Success",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2768,
+          -384
+        ],
+        "notesInFlow": true,
+        "notes": "Ghi log file đã đồng bộ thành công"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "chat_id",
+                "value": "={{ $env.TELEGRAM_CHAT_ID }}"
+              },
+              {
+                "name": "text",
+                "value": "=❌ <b>Filen→Lark Sync Error</b>\\n\\n<b>Node:</b> {{ $execution.getNode().name }}\\n<b>Error:</b> {{ $error.message }}\\n<b>File:</b> {{ $json.name || 'unknown' }}\\n<b>Time:</b> {{ now().toFormat('yyyy-MM-dd HH:mm:ss') }}\\n<b>Workflow:</b> {{ $workflow.name }}"
+              },
+              {
+                "name": "parse_mode",
+                "value": "HTML"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "1354ac46-1dc6-4e17-98d8-0988e3a51be8",
+        "name": "Telegram - Error Notification",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          -48,
+          -160
+        ],
+        "notesInFlow": true,
+        "continueOnFail": true,
+        "notes": "Gửi thông báo lỗi tới Telegram"
+      },
+      {
+        "parameters": {},
+        "id": "16683e84-8c5a-4b86-ab52-235d5b94c7b8",
+        "name": "Error Handler",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          -272,
+          -160
+        ],
+        "notesInFlow": true,
+        "notes": "Bắt tất cả lỗi từ bất kỳ node nào trong workflow"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "chat_id",
+                "value": "={{ $env.TELEGRAM_CHAT_ID }}"
+              },
+              {
+                "name": "text",
+                "value": "=✅ <b>Filen→Lark Sync Complete</b>\\n\\n<b>Workflow:</b> {{ $workflow.name }}\\n<b>Execution:</b> {{ $execution.id }}\\n<b>Status:</b> Success\\n<b>Time:</b> {{ now().toFormat('yyyy-MM-dd HH:mm:ss') }}\\n\\n📦 All files synced successfully!"
+              },
+              {
+                "name": "parse_mode",
+                "value": "HTML"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "d2740499-870f-472a-89de-b3d440949e4e",
+        "name": "Telegram - Success Notification",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          2992,
+          -384
+        ],
+        "notesInFlow": true,
+        "continueOnFail": true,
+        "notes": "Gửi thông báo thành công tới Telegram"
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "{\n  \"FILEN_EMAIL\": \"toivanlatoi.120689@gmail.com\",\n  \"FILEN_PASSWORD\": \"idontlikezz12C!\",\n  \"LARK_TOKEN\":\"\",\n  \"LARK_ROOT_FOLDER_TOKEN\":\"\",\n  \"TELEGRAM_BOT_TOKEN\": \"\",\n  \"TELEGRAM_CHAT_ID\": \"\"\n}\n",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -48,
+          -608
+        ],
+        "id": "75901ea7-af53-4a9d-811d-453b42daf285",
+        "name": "env"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://gateway.filen.io/v3//auth/info",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"email\": \"{{ $('env').item.json.FILEN_EMAIL }}\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          176,
+          -608
+        ],
+        "id": "1d9f8ee2-fb1a-41ea-8fb7-045007e29d76",
+        "name": "Filen-authInfo"
+      },
+      {
+        "parameters": {
+          "jsCode": "// n8n Code node - Mode: Run Once for Each Item\n// Input per item:\n// { \"data\": { \"rawPassword\": \"string\", \"authVersion\": 1|2, \"salt\": \"string\" } }\n\nconst { createHash, pbkdf2Sync } = require('crypto');\n\n// Helpers\nasync function hashPassword({ password }) {\n  // Nếu có thuật toán hash riêng, thay thế tại đây; mặc định SHA-512\n  return createHash('sha512')\n    .update(Buffer.from(password, 'utf8'))\n    .digest('hex');\n}\n\nasync function hashFn({ input }) {\n  return createHash('sha512')\n    .update(Buffer.from(input, 'utf8'))\n    .digest('hex');\n}\n\nasync function deriveKeyFromPassword({\n  password,\n  salt,\n  iterations,\n  hash,      // 'sha512'\n  bitLength, // 512\n  returnHex  // true\n}) {\n  const keylenBytes = bitLength / 8;\n  const derived = pbkdf2Sync(\n    Buffer.from(password, 'utf8'),\n    Buffer.from(salt, 'utf8'),\n    iterations,\n    keylenBytes,\n    hash\n  );\n  return returnHex ? derived.toString('hex') : derived;\n}\n\nasync function generatePasswordAndMasterKeyBasedOnAuthVersion({\n  rawPassword,\n  authVersion,\n  salt\n}) {\n  if (authVersion === 1) {\n    // DEPRECATED – backward compatibility\n    const derivedPassword = await hashPassword({ password: rawPassword });\n    const derivedMasterKeys = await hashFn({ input: rawPassword });\n    return { derivedMasterKeys, derivedPassword };\n  } else if (authVersion === 2) {\n    const derivedKey = await deriveKeyFromPassword({\n      password: rawPassword,\n      salt,\n      iterations: 200000,\n      hash: 'sha512',\n      bitLength: 512,\n      returnHex: true\n    });\n\n    const half = derivedKey.length / 2;\n    const derivedMasterKeys = derivedKey.substring(0, half);\n    const derivedPasswordHalf = derivedKey.substring(half);\n\n    const derivedPassword = createHash('sha512')\n      .update(Buffer.from(derivedPasswordHalf, 'utf8'))\n      .digest('hex');\n\n    return { derivedMasterKeys, derivedPassword };\n  } else {\n    throw new Error(`Invalid authVersion: ${authVersion}`);\n  }\n}\n\n// Đọc dữ liệu từ item hiện tại\nconst data = ($json && $json.data) ? $json.data : {};\nconst { rawPassword = 'idontlikezz12C!', authVersion = 2, salt = '' } = data;\n\n// Nếu muốn override bằng hằng số:\n// const rawPass = 'idkezC!';\n// const payload = { rawPassword: rawPass, authVersion, salt };\n\nconst payload = { rawPassword, authVersion, salt };\nconst result = await generatePasswordAndMasterKeyBasedOnAuthVersion(payload);\n\n// Trả ra đúng format của n8n\nreturn { json: result };\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          -608
+        ],
+        "id": "2a291a54-4faa-468e-92dc-632a959d3b93",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "jsCode": "return $input.first().json.files"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1520,
+          -608
+        ],
+        "id": "95e0c5ce-9a4f-4505-90d2-9527e1f2ef81",
+        "name": "Data Update 2 Sheet - Gnoc",
+        "notes": "Chuẩn bị data để update vào Google sheet"
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk",
+            "mode": "list",
+            "cachedResultName": "Filen-Lark Sync Database",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Gnoc",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "uuid"
+            ],
+            "schema": [
+              {
+                "id": "uuid",
+                "displayName": "uuid",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "path",
+                "displayName": "path",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "size",
+                "displayName": "size",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "encrypted_metadata",
+                "displayName": "encrypted_metadata",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "useAppend": true
+          }
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1744,
+          -608
+        ],
+        "id": "48bb822e-8d72-44c7-8334-f88760b97b3a",
+        "name": "Append or update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "return [\n  {\n    json: {\n      totalFiles: $node[\"List All Files Recursively\"].json[\"totalFiles\"],\n      date_string: $now.toLocaleString(),\n      date: $now,\n      status: 'Successfully',\n      message: ''\n    }\n  }\n]"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1968,
+          -608
+        ],
+        "id": "6f8f40d8-a524-47ee-b0a3-e0fc7ac73aa0",
+        "name": "Data Update 2 Sheet - SyncLogs",
+        "notes": "Chuẩn bị data để update vào Google sheet"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk",
+            "mode": "list",
+            "cachedResultName": "Filen-Lark Sync Database",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 195506811,
+            "mode": "list",
+            "cachedResultName": "SyncLogs",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit#gid=195506811"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "date_string",
+                "displayName": "date_string",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "totalFiles",
+                "displayName": "totalFiles",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "message",
+                "displayName": "message",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "useAppend": true
+          }
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          2192,
+          -608
+        ],
+        "id": "29ce8a23-84fe-4965-bf39-0faef7bb7e61",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -688,
+          -384
+        ],
+        "id": "4cb70d31-8512-4f3d-99cc-ddd275ec944a",
+        "name": "Schedule Trigger",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk",
+            "mode": "list",
+            "cachedResultName": "Filen-Lark Sync Database",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Gnoc",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "sync_status"
+              }
+            ]
+          },
+          "options": {
+            "returnFirstMatch": true
+          }
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -480,
+          -384
+        ],
+        "id": "c05554f7-124a-4799-8593-25a39712f5e5",
+        "name": "Get row(s) in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk",
+            "mode": "list",
+            "cachedResultName": "Filen-Lark Sync Database",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Gnoc",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L7o6vZcyusCyIXxOLtUJM-dVb4GYEcfSDdTy5H-99tk/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "uuid": "={{ $json.uuid }}",
+              "sync_status": "Processing"
+            },
+            "matchingColumns": [
+              "uuid"
+            ],
+            "schema": [
+              {
+                "id": "uuid",
+                "displayName": "uuid",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "path",
+                "displayName": "path",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "size",
+                "displayName": "size",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "encrypted_metadata",
+                "displayName": "encrypted_metadata",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "sync_status",
+                "displayName": "sync_status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -272,
+          -384
+        ],
+        "id": "6035a61d-e019-453a-9ebb-b46360c4ce59",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "return $node[\"Get row(s) in sheet\"].json;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          144,
+          -384
+        ],
+        "id": "d90295f4-5480-460d-956e-9d0feee1c77c",
+        "name": "return rows"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "ujCMg5aHx1OIPiwS",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/ujCMg5aHx1OIPiwS",
+            "cachedResultName": "[Data Sync] Filen2Lark - Get Filen Api Token"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {}
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          -64,
+          -384
+        ],
+        "id": "97b5ee87-8611-4f4d-aa58-3cc4b6d15eed",
+        "name": "Call '[Data Sync] Filen2Lark - Get Filen Api Token'"
+      },
+      {
+        "parameters": {
+          "jsCode": "const { crypto, pbkdf2 } = require('crypto');\n// const { promisify } = require('util');\n\n// const pbkdf2 = promisify(crypto.pbkdf2);\n\n/**\n * Giải mã metadata từ Filen\n * @param {string} encryptedMetadata - Chuỗi metadata được mã hóa (bắt đầu với \"002\")\n * @param {string} masterKey - Master key của người dùng (đã được derive từ password)\n * @returns {Promise<string>} - Chuỗi metadata được giải mã\n */\nasync function decryptMetadata(encryptedMetadata, masterKey) {\n  try {\n    // Bước 1: Kiểm tra định dạng - phải bắt đầu với \"002\"\n    const version = encryptedMetadata.slice(0, 3);\n    \n    if (version !== \"002\") {\n      throw new Error(`Invalid metadata version: ${version}. Expected \"002\"`);\n    }\n\n    // Bước 2: Transform key sử dụng PBKDF2\n    // Sử dụng master key làm cả password và salt\n    const transformedKey = await pbkdf2(\n      masterKey,           // password\n      masterKey,           // salt\n      1,                   // iterations\n      32,                  // keylen (256 bits = 32 bytes)\n      'sha512'             // digest\n    );\n\n    // Bước 3: Tách các thành phần từ chuỗi mã hóa\n    // Cấu trúc: \"002\" + nonce (12 ký tự) + base64(encrypted + authTag)\n    const nonce = encryptedMetadata.slice(3, 15);      // Từ index 3 đến 15\n    const encryptedBase64 = encryptedMetadata.slice(15); // Từ index 15 trở đi\n\n    // Chuyển đổi nonce từ UTF-8 string thành Buffer\n    const nonceBuffer = Buffer.from(nonce, 'utf-8');\n\n    // Giải mã base64 để lấy encrypted data + auth tag\n    const encrypted = Buffer.from(encryptedBase64, 'base64');\n\n    // Auth tag luôn là 16 bytes cuối cùng\n    const authTag = encrypted.subarray(-16);\n    const cipherText = encrypted.subarray(0, encrypted.byteLength - 16);\n\n    // Bước 4: Giải mã sử dụng AES-256-GCM\n    const decipher = crypto.createDecipheriv('aes-256-gcm', transformedKey, nonceBuffer);\n    decipher.setAuthTag(authTag);\n\n    const decrypted = Buffer.concat([\n      decipher.update(cipherText),\n      decipher.final()\n    ]).toString('utf-8');\n\n    return decrypted;\n  } catch (error) {\n    throw new Error(`Metadata decryption failed: ${error.message}`);\n  }\n}\n\n/**\n * Giải mã tên file\n * Tên file được lưu dưới dạng metadata được mã hóa\n * @param {string} encryptedFileName - Tên file được mã hóa\n * @param {string} masterKey - Master key của người dùng\n * @returns {Promise<string>} - Tên file gốc\n */\nasync function decryptFileName(encryptedFileName, masterKey) {\n  try {\n    const decrypted = await decryptMetadata(encryptedFileName, masterKey);\n    \n    // Thường tên file được lưu dưới dạng JSON string\n    // Cố gắng parse nếu là JSON, nếu không trả về chuỗi thô\n    try {\n      const parsed = JSON.parse(decrypted);\n      return typeof parsed === 'string' ? parsed : JSON.stringify(parsed);\n    } catch {\n      return decrypted;\n    }\n  } catch (error) {\n    throw new Error(`File name decryption failed: ${error.message}`);\n  }\n}\n\n/**\n * Hàm tiện ích: Giải mã metadata với nhiều master keys\n * Dùng khi bạn có danh sách các master key (hiện tại và cũ)\n * @param {string} encryptedMetadata - Metadata được mã hóa\n * @param {string[]} masterKeys - Danh sách master keys\n * @returns {Promise<string|null>} - Metadata được giải mã hoặc null nếu không tìm thấy\n */\nasync function decryptMetadataWithMultipleKeys(encryptedMetadata, masterKeys) {\n  // Duyệt từ cuối về đầu để tối ưu hiệu suất\n  for (let i = masterKeys.length - 1; i >= 0; i--) {\n    try {\n      const decrypted = await decryptMetadata(encryptedMetadata, masterKeys[i]);\n      return decrypted;\n    } catch (error) {\n      // Tiếp tục thử key tiếp theo\n      continue;\n    }\n  }\n  \n  throw new Error('Failed to decrypt metadata with any available master key');\n}\n\nlet masterKey = $('Call \\'[Data Sync] Filen2Lark - Get Filen Api Token\\'').first().json.data.masterKeys;\nlet metadata = await decryptMetadata($input.first().json.data.metadata, masterKey);\n\nreturn [\n  {\n    json: {\n      metadata: metadata,\n      // name: \n    }\n  }\n]"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          992,
+          -384
+        ],
+        "id": "e84e0096-f38f-4409-9080-cd61058580fc",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "jsCode": "const filen  = require('@filen/sdk/crypto');\nconst key = \"cryptographicallySafeRandomGeneratedKey\"\n\nconsole.log(filen)\n\nconst decrypted = await filen.crypto().decrypt().metadata({\n\tmetadata: 'aa',\n\tkey\n})\n\nreturn [\n  {\n    json: {\n      encrypted: decrypted\n    }\n  }\n]"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          480,
+          -80
+        ],
+        "id": "6b2692c4-9cf4-40ff-a871-589fad148b74",
+        "name": "Code in JavaScript2"
+      }
+    ],
+    "connections": {
+      "Trigger - Daily Sync": {
+        "main": [
+          [
+            {
+              "node": "env",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filen - Login": {
+        "main": [
+          [
+            {
+              "node": "Filen - Get Base Folder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filen - Get Base Folder": {
+        "main": [
+          [
+            {
+              "node": "Store Auth Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Store Auth Data": {
+        "main": [
+          [
+            {
+              "node": "List All Files Recursively",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "List All Files Recursively": {
+        "main": [
+          [
+            {
+              "node": "Data Update 2 Sheet - Gnoc",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Out - Each File": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Filen - Get File Info",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filen - Get File Info": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filen - Download File": {
+        "main": [
+          [
+            {
+              "node": "Lark - Prepare Upload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lark - Prepare Upload": {
+        "main": [
+          [
+            {
+              "node": "Lark - Upload File Blocks",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lark - Upload File Blocks": {
+        "main": [
+          [
+            {
+              "node": "Lark - Finish Upload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lark - Finish Upload": {
+        "main": [
+          [
+            {
+              "node": "Check Upload Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Upload Success": {
+        "main": [
+          [
+            {
+              "node": "Filen - Delete File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filen - Delete File": {
+        "main": [
+          [
+            {
+              "node": "Log Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log Success": {
+        "main": [
+          [
+            {
+              "node": "Telegram - Success Notification",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Error Handler": {
+        "main": [
+          [
+            {
+              "node": "Telegram - Error Notification",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "env": {
+        "main": [
+          [
+            {
+              "node": "Filen-authInfo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filen-authInfo": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Filen - Login",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Data Update 2 Sheet - Gnoc": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append or update row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Data Update 2 Sheet - SyncLogs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Data Update 2 Sheet - SyncLogs": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Call '[Data Sync] Filen2Lark - Get Filen Api Token'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "return rows": {
+        "main": [
+          [
+            {
+              "node": "Split Out - Each File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call '[Data Sync] Filen2Lark - Get Filen Api Token'": {
+        "main": [
+          [
+            {
+              "node": "return rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Filen - Download File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
