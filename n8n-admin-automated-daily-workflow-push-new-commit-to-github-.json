@@ -1,0 +1,443 @@
+{
+  "updatedAt": "2026-03-09T08:30:28.384Z",
+  "createdAt": "2026-03-09T08:23:45.795Z",
+  "id": "f5GrzizgVgvIAoCV",
+  "name": "[Admin] Automated daily workflow Push new commit to GitHub",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 9,
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      },
+      "id": "f1d5e7bd-a9e2-4c0a-8f3d-6d6ece7fce99",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        368,
+        240
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "eae1a628-31b1-4b11-ba6f-798a4770aeab",
+      "name": "Retrieve workflows",
+      "type": "n8n-nodes-base.n8n",
+      "position": [
+        848,
+        240
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "n8nApi": {
+          "id": "5xBdsI7wkJVVpzRa",
+          "name": "n8n account - congnv@yoong.vn"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "081d1ad6-e30c-469b-88a2-d923481c4cd0",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        688,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "list",
+        "owner": {
+          "__rl": true,
+          "value": "StelixxData",
+          "mode": "list",
+          "cachedResultName": "StelixxData",
+          "cachedResultUrl": "https://github.com/StelixxData"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n-all-wf",
+          "mode": "list",
+          "cachedResultName": "n8n-all-wf",
+          "cachedResultUrl": "https://github.com/StelixxData/n8n-all-wf"
+        },
+        "filePath": "="
+      },
+      "id": "0ba559b4-1609-439e-98dc-5e2adc9ac91e",
+      "name": "List files from repo",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        528,
+        240
+      ],
+      "webhookId": "df52ea67-3c3c-456d-a121-953db8f0cfd0",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "githubApi": {
+          "id": "ci2b2ScH7aUp0ge9",
+          "name": "GitHub @StelixxData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "StelixxData",
+          "mode": "list",
+          "cachedResultName": "StelixxData",
+          "cachedResultUrl": "https://github.com/StelixxData"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n-all-wf",
+          "mode": "list",
+          "cachedResultName": "n8n-all-wf",
+          "cachedResultUrl": "https://github.com/StelixxData/n8n-all-wf"
+        },
+        "filePath": "={{ $('Commit date & file name').item.json.fileName }}",
+        "fileContent": "={{ $('To base64').item.json.data }}",
+        "commitMessage": "=auto-backup-{{ $('Commit date & file name').item.json.commitDate }}"
+      },
+      "id": "44e6fbf4-7fe6-410e-a338-615551e1e00e",
+      "name": "Update file",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1648,
+        160
+      ],
+      "webhookId": "b2a93a52-2e10-4864-94aa-ca44f8d2ee9a",
+      "typeVersion": 1,
+      "credentials": {
+        "githubApi": {
+          "id": "ci2b2ScH7aUp0ge9",
+          "name": "GitHub @StelixxData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "StelixxData",
+          "mode": "list",
+          "cachedResultName": "StelixxData",
+          "cachedResultUrl": "https://github.com/StelixxData"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n-all-wf",
+          "mode": "list",
+          "cachedResultName": "n8n-all-wf",
+          "cachedResultUrl": "https://github.com/StelixxData/n8n-all-wf"
+        },
+        "filePath": "={{ $('Commit date & file name').item.json.fileName }}",
+        "fileContent": "={{ $('To base64').item.json.data }}",
+        "commitMessage": "=auto-backup-{{ $node['Commit date & file name'].json.commitDate }}"
+      },
+      "id": "e9960d61-aaab-4b7d-ae26-a1c814d64677",
+      "name": "Upload file",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1648,
+        320
+      ],
+      "webhookId": "cdf2e3bf-9470-41bd-bcdd-d9773175795d",
+      "typeVersion": 1,
+      "credentials": {
+        "githubApi": {
+          "id": "ci2b2ScH7aUp0ge9",
+          "name": "GitHub @StelixxData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $('Aggregate').item.json.name }}",
+              "operation": "contains",
+              "value2": "={{ $json.fileName }}"
+            }
+          ]
+        }
+      },
+      "id": "5ecce4c1-fd28-4b05-bf83-485b9ed33c2e",
+      "name": "Check if file exists",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1488,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "format": true
+        }
+      },
+      "id": "36606424-6073-4287-8d3d-4345548af2a5",
+      "name": "Json file",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        1008,
+        240
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "id": "1c4490a4-e7c3-42cc-82d6-03498f9e3430",
+      "name": "To base64",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        1168,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Retrieve previous file names from Github",
+        "height": 380,
+        "width": 300,
+        "color": 5
+      },
+      "id": "a79a3cd9-d214-4511-be87-0dc3f6d8ebb6",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe4a36ef-9f04-40e3-99bd-cc517a49b440",
+              "name": "commitDate",
+              "type": "string",
+              "value": "={{ $now.format('dd-MM-yyyy-H:mm') }}"
+            },
+            {
+              "id": "b0fe1bcc-e79c-4a6b-b8b4-44222c8bf4e8",
+              "name": "fileName",
+              "type": "string",
+              "value": "=n8n-{{ $('Retrieve workflows').item.json.name.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim().replace(/\\s+/g, '-').toLowerCase() }}-{{ $('Retrieve workflows').item.json.tags[0].name }}.json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d1bc8b71-6041-43ef-a293-7846e4c51702",
+      "name": "Commit date & file name",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1328,
+        240
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "### Retrieve and process workflows from n8n",
+        "height": 380,
+        "width": 460,
+        "color": 3
+      },
+      "id": "602a2ae0-2def-4eb9-afb7-d7e62102b4c7",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        832,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Commit + edit/create files if needed",
+        "height": 380,
+        "width": 460,
+        "color": 4
+      },
+      "id": "0bc46dbc-df61-4510-9318-30a1c51e8f57",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1312,
+        112
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Retrieve workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Json file": {
+      "main": [
+        [
+          {
+            "node": "To base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To base64": {
+      "main": [
+        [
+          {
+            "node": "Commit date & file name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "List files from repo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve workflows": {
+      "main": [
+        [
+          {
+            "node": "Json file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if file exists": {
+      "main": [
+        [
+          {
+            "node": "Update file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List files from repo": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit date & file name": {
+      "main": [
+        [
+          {
+            "node": "Check if file exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "errorWorkflow": "w4dvHDDKdGVZOe0T",
+    "saveDataSuccessExecution": "all",
+    "timeSavedMode": "fixed",
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        18
+      ]
+    }
+  },
+  "meta": {
+    "templateId": "4064"
+  },
+  "pinData": {},
+  "versionId": "f566d95c-4033-496d-b307-f843af96e398",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-09T08:23:45.795Z",
+      "createdAt": "2026-03-09T08:23:45.795Z",
+      "role": "workflow:owner",
+      "workflowId": "f5GrzizgVgvIAoCV",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
