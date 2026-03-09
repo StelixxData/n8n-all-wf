@@ -1,0 +1,648 @@
+{
+  "updatedAt": "2024-10-25T17:30:59.472Z",
+  "createdAt": "2024-10-25T15:52:42.376Z",
+  "id": "pQMnmSPyaPkv7o5P",
+  "name": "Community - 4 - Twitter",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "var text = $node[\"Webhook\"].json[\"body\"][\"text\"];\nvar cleanText = text\n//  .replace(\"[Read More\\n\\n]\", \"[Read More]\")\n//  .replace(\"[Check\\n\\n]\", \"[Check]\")\n  .replace(\"\\n\\n]\", \"]\")\n  .replace(/(by\\s*)?\\[.*?\\]\\(.*?\\)|\\[.*?\\]/g, \"\")\n  .replace(/\\[.*?\\]\\(.*?\\)|\\[.*?\\]/g, \"\")\n  .replaceAll(\"  \", \" \")\n  .replaceAll(\"| @cryptoquant_official\", \"\")\n  .replaceAll(\"― @cryptoquant_official\", \"\")  \n  .replaceAll(\"@cryptoquant_official\", \"\");\n\nreturn {\n  text: cleanText\n}\n"
+      },
+      "id": "e46e496f-2e98-4e01-8658-60692d01305c",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        940,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $(\"Webhook\").item;"
+      },
+      "id": "68f17365-4305-421d-8301-6d6798b8e3f1",
+      "name": "Attachment",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "b4274a2a-23ed-410c-ae24-273c00f5c2b1",
+              "leftValue": "={{ $node[\"Webhook\"].json[\"body\"][\"type\"]}}",
+              "rightValue": "NOFILE",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "934c3f62-c8c5-45f4-8554-272b619b6e18",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "-4553313638",
+        "text": "={{ $node[\"Code\"].json[\"text\"] }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "d926df55-9968-4ccc-b24c-db2610d0e960",
+      "name": "Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        620
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wpMgkt8EZ5TveO30",
+          "name": "Telegram - @blackblock_trade_bot"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "@CryptoQuantTrade",
+        "binaryData": true,
+        "binaryPropertyName": "upload-file",
+        "additionalFields": {
+          "caption": "={{ $node[\"Code\"].json[\"text\"] }}\n\n@CryptoQuantTrade",
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "8b7bd9c5-e893-4eb0-9918-8483b9e81648",
+      "name": "Channel: Crypto Quant Trading",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1860,
+        360
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "jT7bHnzy5NK056nI",
+          "name": "Telegram @CryptoQuantTrading_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "-4553313638",
+        "binaryData": true,
+        "binaryPropertyName": "upload-file",
+        "additionalFields": {
+          "caption": "={{ $node[\"Code\"].json[\"text\"] }}",
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "9a5721b8-61c8-4c03-9288-7a1b396a92cc",
+      "name": "Group: Temp - Des 2",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1880,
+        540
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "wpMgkt8EZ5TveO30",
+          "name": "Telegram - @blackblock_trade_bot"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "@CryptoQuantTrade",
+        "text": "={{ $node[\"Code\"].json[\"text\"] }}\n\n@CryptoQuantTrade",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "d356fd25-5546-4c8c-9cdb-39c55c1578e3",
+      "name": "Channel: Crypto Quant Trading1",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        820
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "jT7bHnzy5NK056nI",
+          "name": "Telegram @CryptoQuantTrading_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $node[\"Code\"].json[\"text\"] }}",
+        "additionalFields": {
+          "attachments": "={{$json[\"media_id_string\"]}}"
+        }
+      },
+      "id": "c423a489-2cb1-485f-8ca1-ab7da935ef27",
+      "name": "X",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        440
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "Ndk1BzHJy8tTUOJu",
+          "name": "X -Oauth2.0 - @AidanNg10"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "07358a38-aed1-4fc8-84f7-67c73d9c2908",
+        "options": {}
+      },
+      "id": "d8cd5b25-7dd8-4b81-b194-3f6193df41de",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        720,
+        480
+      ],
+      "webhookId": "07358a38-aed1-4fc8-84f7-67c73d9c2908",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 45
+            }
+          ]
+        }
+      },
+      "id": "1447e33e-49f6-4e46-aec3-23a652f23d62",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code1\"].json[\"query\"] }}"
+      },
+      "id": "3350f58c-ce33-496b-950a-1d5b41f8652e",
+      "name": "Microsoft SQL",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        -20
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"DistributionTarget\": {\n    \"Id\": -1002372751585,\n    \"Link\": \"https://t.me/gai_xinhh\",\n    \"Username\": \"@gai_xinhh\"\n  },\n\"TelegramBotAccessToken\": \"7726671499:AAEa8tOLlUJFeaA22tAnh1yFs_HLFWE-Klk\" //@girlxinhbot\n}"
+      },
+      "id": "bab9098b-54c8-411c-a7b0-17ffc3c9a460",
+      "name": "env",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var distributionTarget  = $node[\"env\"].json[\"DistributionTarget\"];\n\nvar query = \n`\nSELECT t.Id, t.[Type], t.Text, t.MediaLink\nFROM XinhTelegramMedia t\nINNER JOIN (\n    SELECT TOP 1 m.MessageGroupedId\n    FROM XinhTelegramMedia m\n    LEFT JOIN XinhDistributionLog d ON m.Id = d.SourceId AND d.DistributionTarget <> '${ distributionTarget[\"Username\"] }'\n    WHERE d.SourceId IS NULL\n    ORDER BY NEWID()\n) AS sub ON t.MessageGroupedId = sub.MessageGroupedId;\n`\n\nreturn {\n  query: query\n}\n"
+      },
+      "id": "70a96e9f-9a4b-4a15-8a24-33144abe7b4f",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.MediaLink }}",
+          "mode": "url"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "id": "e211e7a7-a985-4ee7-ab4f-f27e41bb8bb3",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1900,
+        -20
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0bHKCm5aLWAfAeSb",
+          "name": "Google Drive - smars@gnok.top"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "e61345f4-715c-4328-8e0b-766e0543ff3c",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2260,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// {\n//   \"text\": \"Tweeting with media!\",\n//   \"media\": {\n//     \"media_ids\": [\n//       \"1455952740635586573\"\n//     ]\n//   }\n// }\n\nfunction randomInt(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n\nvar additionalTexts = [\n  \"🫡 https://t.me/gai_xinhh\",\n  \"Còn nhiều lắm 👉🏻: https://t.me/gai_xinhh\",\n  \"Check ở bio 🥵\",\n  \"https://t.me/gai_xinhh 👀👀👀\",\n  \"Full HD không che 💦: https://t.me/gai_xinhh\",\n  \"Ib để nhận thêm 🤫\", \n  \"Link ở đây nè: https://t.me/gai_xinhh\",\n  \"Xem thêm tại đây ➡️: https://t.me/gai_xinhh\",\n  \"Nhiều gái xinh lắm lắm: https://t.me/gai_xinhh\", \n  \"Cực phẩm 😋: https://t.me/gai_xinhh\",\n  \"Đảm bảo chất lượng 🔥: https://t.me/gai_xinhh\",\n  \"Nóng bỏng tay 🥵: https://t.me/gai_xinhh\",\n  \"Mỗi ngày một em xinh 💋: https://t.me/gai_xinhh\",\n  \"Ghé thăm kênh mình nhé 😉: https://t.me/gai_xinhh\",\n  \"Tuyển mem VIP 💎: https://t.me/gai_xinhh\" ,\n  \"Hí ae, link full HD bên dưới nhé 🤫 \\nhttps://t.me/gai_xinhh\",\n  \"Gái xinh chất lượng cao đây, click link bio nha 😉\",\n  \"Muốn xem thêm thì vào đây 💦: https://t.me/gai_xinhh\",\n  \"Hàng tuyển chọn kỹ càng, đảm bảo anh em hài lòng 🔥: https://t.me/gai_xinhh\",\n  \"Đừng quên follow kênh để cập nhật hình mới mỗi ngày nha anh em 🤤\",\n  \"Inbox mình để nhận thêm ảnh độc quyền nhé 📩\",\n  \"Chấm cái (.) để mình gửi ... cho 😜\",\n  \"ae nhanh tay thì còn, chậm tay cũng còn luôn =)) https://t.me/gai_xinhh\",\n  \"Kênh kín dành riêng cho ae đó 🤫\",\n  \"ae có thích livestream không?\",\n  \"Gái xinh mọi miền tổ quốc 🤤🤤🤤 https://t.me/gai_xinhh\",\n  \"Thiên đường đang chờ đón ae 😇: https://t.me/gai_xinhh\",\n  \"Lưu ý: chỉ dành cho người trên 18 tuổi 🔞\" \n]\nvar additionalText = additionalTexts[randomInt(0, additionalTexts.length - 1)];\n\nvar medias = $items(\"Microsoft SQL\");\nvar json = \n{\n  \"text\": medias.find(item => item.json.text !== null)?.json.text,\n  \"media\": {\n    \"media_ids\": $node[\"Aggregate\"].json[\"data\"].map(item => item.media_id_string).slice(0, 4)\n  }\n}\nif(json.text)\n  json.text += \"\\n\" + additionalText;\nelse \n  json.text = additionalText;\nreturn {\n  \"postData\": JSON.stringify(json)\n}\n"
+      },
+      "id": "3240086b-4168-42c5-8020-a549f5276e4d",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2440,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "text": "FOLLOW OUR OFFICIAL CHANNELS:\n- Telegram: https://t.me/CryptoQuantTrade\n- Discussion: https://t.me/CryptoQuantTradeChat",
+        "additionalFields": {
+          "inReplyToStatusId": {
+            "__rl": true,
+            "value": "={{ $node[\"X\"].json[\"id\"] }}",
+            "mode": "id"
+          }
+        }
+      },
+      "id": "73366575-5897-46a5-b567-10b6314a3c8f",
+      "name": "Reply X",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        220
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "Ndk1BzHJy8tTUOJu",
+          "name": "X -Oauth2.0 - @AidanNg10"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.x.com/2/tweets",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twitterOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.postData }}",
+        "options": {}
+      },
+      "id": "ad928ead-9d3f-4254-a14c-db58a3c57312",
+      "name": "Create Tweet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2620,
+        -20
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "D47OWNn8MH6a9M2Z",
+          "name": "X OAuth 1.0 - @AidanNg10"
+        },
+        "twitterOAuth2Api": {
+          "id": "Ndk1BzHJy8tTUOJu",
+          "name": "X -Oauth2.0 - @AidanNg10"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "b949abc6-ea08-4e8f-8e7d-ec5e87023693",
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://upload.twitter.com/1.1/media/upload.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twitterOAuth1Api",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "media",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "050f940e-78bd-4955-b310-0f0fde74ac54",
+      "name": "Upload Media",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2080,
+        -20
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "D47OWNn8MH6a9M2Z",
+          "name": "X OAuth 1.0 - @AidanNg10"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// X allow maximum 4 image/video\nvar text =  $node[\"Aggregate1\"].json[\"data\"].find(item => item.Text !== null)?.Text;\nvar fourItem = $node[\"Aggregate1\"].json[\"data\"].slice(0, 4);\nfourItem[0].Text = text;\n\nconst newItems = [];\nfourItem.forEach((item) => {\n  newItems.push({json: item})\n})\nreturn newItems;"
+      },
+      "id": "0c5c0c3d-77c7-4956-bf09-9dc6bee1ea0b",
+      "name": "Take 4",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        -20
+      ]
+    }
+  ],
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment": {
+      "main": [
+        [
+          {
+            "node": "Group: Temp - Des 2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Channel: Crypto Quant Trading",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Attachment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Channel: Crypto Quant Trading1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "env",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "env": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Upload Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Create Tweet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Take 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Media": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Take 4": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "91dd1434-bba3-4f7c-bc10-a1d3361119d0",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-10-25T15:52:42.376Z",
+      "createdAt": "2024-10-25T15:52:42.376Z",
+      "role": "workflow:owner",
+      "workflowId": "pQMnmSPyaPkv7o5P",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
