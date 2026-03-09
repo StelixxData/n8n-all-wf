@@ -1,0 +1,1392 @@
+{
+  "updatedAt": "2025-11-21T16:58:20.123Z",
+  "createdAt": "2025-11-19T05:41:49.074Z",
+  "id": "SRiv1nC8oJ73l55G",
+  "name": "[Shared] Get Gemini Key",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "get-gemini-key",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        0
+      ],
+      "id": "03697052-6c29-47dd-95b9-3676b255e3d5",
+      "name": "Webhook",
+      "webhookId": "b2e3ff1d-3988-4f38-900e-b79aee4eb6aa"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -192
+      ],
+      "id": "71e841e0-560c-40ce-b56d-d3f20a80292d",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "let pickType = $node[\"Params\"]?.json?.pick ?? 'random';\nlet keys = $node[\"AllKeys\"].json.data;\n\nif(!pickType)\n  pickType = 'random';\n\nswitch (pickType) {\n  case 'random':\n    return keys[randomInt(0, keys.length - 1)];\n    break;\n  case 'lowest-use':\n    {\n      console.log(pickType)\n      keys.sort((a, b) => a.use_count - b.use_count);\n      return keys[0];\n    }\n    break;\n  default:\n    {\n      return [];\n    }\n    break;\n  }\n\n\n\nfunction randomInt(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -96
+      ],
+      "id": "4d24c7c5-5d87-49bf-b3a4-f3d9b6275f31",
+      "name": "Get Key"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0",
+          "mode": "list",
+          "cachedResultName": "[Gemini] Gemini Keys (Yoong & Stelixx Internal)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Keys",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "active"
+            },
+            {
+              "lookupColumn": "auto_check_status",
+              "lookupValue": "ok"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        -96
+      ],
+      "id": "578b1225-09ed-4f28-849a-9942bb30ca6e",
+      "name": "GetAllKeys",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        528,
+        -96
+      ],
+      "id": "d0bdc1e3-0d93-4bb6-873c-976d3550f1af",
+      "name": "AllKeys"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"pick\": \"{{ $json?.query?.pick ?? ''}}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        -96
+      ],
+      "id": "e3f77973-de00-49ab-9d7a-49d9e3f0b7c6",
+      "name": "Params"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        976,
+        -192
+      ],
+      "id": "9c4504b2-d440-440c-86b0-574e4022d1a8",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      gemini_key: $input.first().json.gemini_key,\n      use_count: ($input.first().json.use_count ?? 0) + 1,\n      latest_use_timestamp: $now.toMillis(),\n      latest_use_date: $now.toFormat('dd/MM/yyyy HH:mm:ss')\n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        0
+      ],
+      "id": "c0239d81-14fe-4526-a91c-764239807fc8",
+      "name": "Update 2 Sheet"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0",
+          "mode": "list",
+          "cachedResultName": "[Gemini] Gemini Keys (Yoong & Stelixx Internal)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Keys",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "gemini_key"
+          ],
+          "schema": [
+            {
+              "id": "gemini_key",
+              "displayName": "gemini_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "account",
+              "displayName": "account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "creator",
+              "displayName": "creator",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "use_count",
+              "displayName": "use_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latest_use_timestamp",
+              "displayName": "latest_use_timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latest_use_date",
+              "displayName": "latest_use_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1200,
+        0
+      ],
+      "id": "cb21e1ae-2d01-4a20-ab74-5a25f673ff67",
+      "name": "UpdateSheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Hello",
+        "options": {
+          "batching": {
+            "batchSize": 1,
+            "delayBetweenBatches": 5000
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        528,
+        328
+      ],
+      "id": "53220311-139a-466c-97ae-e1dbb226dde3",
+      "name": "AI Agent",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelName": "=models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        528,
+        496
+      ],
+      "id": "2ccee9bf-2fce-49d9-86c0-9cc3e993999d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "lK2FjwKHkWhaBWs1",
+          "name": "Google Gemini(PaLM) Api Dynamic Key {{gemini_key}}"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        452
+      ],
+      "id": "b424de29-8323-4eee-8c79-e479d67d96a8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let error = $node[\"AI Agent\"].json[\"error\"] ?? \"\";\n\nreturn {\n  \"gemini_key\": $node[\"Loop Over Items\"].json.gemini_key,\n  \"auto_check_status\": error ? \"error\" : \"ok\",\n  \"auto_check_latest_date\": $now.toFormat('dd/MM/yyyy HH:mm:ss')\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        328
+      ],
+      "id": "e8d74b91-5aac-474f-a6b2-35883f8a6998",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0",
+          "mode": "list",
+          "cachedResultName": "[Internal] Gemini Keys (Yoong & Stelixx Internal)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Keys",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "active"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        80,
+        452
+      ],
+      "id": "7c2b1407-ff16-4002-a8f1-944f4ef7edd2",
+      "name": "GeminiKeys",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0",
+          "mode": "list",
+          "cachedResultName": "[Gemini] Gemini Keys (Yoong & Stelixx Internal)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Keys",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "gemini_key"
+          ],
+          "schema": [
+            {
+              "id": "gemini_key",
+              "displayName": "gemini_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "account",
+              "displayName": "account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "creator",
+              "displayName": "creator",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "use_count",
+              "displayName": "use_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latest_use_timestamp",
+              "displayName": "latest_use_timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latest_use_date",
+              "displayName": "latest_use_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1104,
+        452
+      ],
+      "id": "080f3ac1-d786-4b4f-9fc1-50580fa6be46",
+      "name": "UpdateSheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SbEDajbjVxU25N23",
+          "name": "Google Sheets - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        304,
+        452
+      ],
+      "id": "5da79161-882b-44a2-b784-709212d6d3a7",
+      "name": "Loop Over Items"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetAllKeys": {
+      "main": [
+        [
+          {
+            "node": "AllKeys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AllKeys": {
+      "main": [
+        [
+          {
+            "node": "Get Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Params": {
+      "main": [
+        [
+          {
+            "node": "GetAllKeys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Key": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update 2 Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 2 Sheet": {
+      "main": [
+        [
+          {
+            "node": "UpdateSheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "GeminiKeys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GeminiKeys": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "UpdateSheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UpdateSheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "140db109-07e4-4397-846f-cc92b4249345",
+  "activeVersionId": "140db109-07e4-4397-846f-cc92b4249345",
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2025-11-19T05:41:49.074Z",
+      "createdAt": "2025-11-19T05:41:49.074Z",
+      "role": "workflow:owner",
+      "workflowId": "SRiv1nC8oJ73l55G",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-26T08:31:17.177Z",
+    "createdAt": "2026-02-26T08:31:17.177Z",
+    "versionId": "140db109-07e4-4397-846f-cc92b4249345",
+    "workflowId": "SRiv1nC8oJ73l55G",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "get-gemini-key",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -144,
+          0
+        ],
+        "id": "03697052-6c29-47dd-95b9-3676b255e3d5",
+        "name": "Webhook",
+        "webhookId": "b2e3ff1d-3988-4f38-900e-b79aee4eb6aa"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -144,
+          -192
+        ],
+        "id": "71e841e0-560c-40ce-b56d-d3f20a80292d",
+        "name": "When clicking ‘Execute workflow’",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "jsCode": "let pickType = $node[\"Params\"]?.json?.pick ?? 'random';\nlet keys = $node[\"AllKeys\"].json.data;\n\nif(!pickType)\n  pickType = 'random';\n\nswitch (pickType) {\n  case 'random':\n    return keys[randomInt(0, keys.length - 1)];\n    break;\n  case 'lowest-use':\n    {\n      console.log(pickType)\n      keys.sort((a, b) => a.use_count - b.use_count);\n      return keys[0];\n    }\n    break;\n  default:\n    {\n      return [];\n    }\n    break;\n  }\n\n\n\nfunction randomInt(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          752,
+          -96
+        ],
+        "id": "4d24c7c5-5d87-49bf-b3a4-f3d9b6275f31",
+        "name": "Get Key"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0",
+            "mode": "list",
+            "cachedResultName": "[Gemini] Gemini Keys (Yoong & Stelixx Internal)",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Keys",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "status",
+                "lookupValue": "active"
+              },
+              {
+                "lookupColumn": "auto_check_status",
+                "lookupValue": "ok"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          304,
+          -96
+        ],
+        "id": "578b1225-09ed-4f28-849a-9942bb30ca6e",
+        "name": "GetAllKeys",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          528,
+          -96
+        ],
+        "id": "d0bdc1e3-0d93-4bb6-873c-976d3550f1af",
+        "name": "AllKeys"
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "={\n  \"pick\": \"{{ $json?.query?.pick ?? ''}}\"\n}\n",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          80,
+          -96
+        ],
+        "id": "e3f77973-de00-49ab-9d7a-49d9e3f0b7c6",
+        "name": "Params"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.4,
+        "position": [
+          976,
+          -192
+        ],
+        "id": "9c4504b2-d440-440c-86b0-574e4022d1a8",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [\n  {\n    json: {\n      gemini_key: $input.first().json.gemini_key,\n      use_count: ($input.first().json.use_count ?? 0) + 1,\n      latest_use_timestamp: $now.toMillis(),\n      latest_use_date: $now.toFormat('dd/MM/yyyy HH:mm:ss')\n    }\n  }\n]"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          976,
+          0
+        ],
+        "id": "c0239d81-14fe-4526-a91c-764239807fc8",
+        "name": "Update 2 Sheet"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0",
+            "mode": "list",
+            "cachedResultName": "[Gemini] Gemini Keys (Yoong & Stelixx Internal)",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Keys",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "gemini_key"
+            ],
+            "schema": [
+              {
+                "id": "gemini_key",
+                "displayName": "gemini_key",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "account",
+                "displayName": "account",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "creator",
+                "displayName": "creator",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "use_count",
+                "displayName": "use_count",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "latest_use_timestamp",
+                "displayName": "latest_use_timestamp",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "latest_use_date",
+                "displayName": "latest_use_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1200,
+          0
+        ],
+        "id": "cb21e1ae-2d01-4a20-ab74-5a25f673ff67",
+        "name": "UpdateSheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "Hello",
+          "options": {
+            "batching": {
+              "batchSize": 1,
+              "delayBetweenBatches": 5000
+            }
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3,
+        "position": [
+          528,
+          328
+        ],
+        "id": "53220311-139a-466c-97ae-e1dbb226dde3",
+        "name": "AI Agent",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "modelName": "=models/gemini-2.5-flash-lite",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          528,
+          496
+        ],
+        "id": "2ccee9bf-2fce-49d9-86c0-9cc3e993999d",
+        "name": "Google Gemini Chat Model",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "lK2FjwKHkWhaBWs1",
+            "name": "Google Gemini(PaLM) Api Dynamic Key {{gemini_key}}"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtMinute": 30
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -144,
+          452
+        ],
+        "id": "b424de29-8323-4eee-8c79-e479d67d96a8",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "let error = $node[\"AI Agent\"].json[\"error\"] ?? \"\";\n\nreturn {\n  \"gemini_key\": $node[\"Loop Over Items\"].json.gemini_key,\n  \"auto_check_status\": error ? \"error\" : \"ok\",\n  \"auto_check_latest_date\": $now.toFormat('dd/MM/yyyy HH:mm:ss')\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          328
+        ],
+        "id": "e8d74b91-5aac-474f-a6b2-35883f8a6998",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0",
+            "mode": "list",
+            "cachedResultName": "[Internal] Gemini Keys (Yoong & Stelixx Internal)",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Keys",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "status",
+                "lookupValue": "active"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          80,
+          452
+        ],
+        "id": "7c2b1407-ff16-4002-a8f1-944f4ef7edd2",
+        "name": "GeminiKeys",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0",
+            "mode": "list",
+            "cachedResultName": "[Gemini] Gemini Keys (Yoong & Stelixx Internal)",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Keys",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JFxenwcsya3PNhzyVhPZWq_0wEPndkB4bRu0oGdYqW0/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "gemini_key"
+            ],
+            "schema": [
+              {
+                "id": "gemini_key",
+                "displayName": "gemini_key",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "account",
+                "displayName": "account",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "status",
+                "displayName": "status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "creator",
+                "displayName": "creator",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "use_count",
+                "displayName": "use_count",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "latest_use_timestamp",
+                "displayName": "latest_use_timestamp",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "latest_use_date",
+                "displayName": "latest_use_date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1104,
+          452
+        ],
+        "id": "080f3ac1-d786-4b4f-9fc1-50580fa6be46",
+        "name": "UpdateSheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "SbEDajbjVxU25N23",
+            "name": "Google Sheets - gnoc.ng@gmail.com"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          304,
+          452
+        ],
+        "id": "5da79161-882b-44a2-b784-709212d6d3a7",
+        "name": "Loop Over Items"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Params",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Execute workflow’": {
+        "main": [
+          [
+            {
+              "node": "Params",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GetAllKeys": {
+        "main": [
+          [
+            {
+              "node": "AllKeys",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AllKeys": {
+        "main": [
+          [
+            {
+              "node": "Get Key",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Params": {
+        "main": [
+          [
+            {
+              "node": "GetAllKeys",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Key": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Update 2 Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update 2 Sheet": {
+        "main": [
+          [
+            {
+              "node": "UpdateSheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "GeminiKeys",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GeminiKeys": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "UpdateSheet1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [],
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "UpdateSheet1": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
