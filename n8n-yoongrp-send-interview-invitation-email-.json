@@ -1,0 +1,87 @@
+{
+  "updatedAt": "2024-04-04T09:26:19.460Z",
+  "createdAt": "2024-03-27T04:06:41.297Z",
+  "id": "2qXTcyTFt2eJ6D6K",
+  "name": "YoongRP - Send interview invitation email",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7ed6adf2-11f2-46bb-8191-b59ea02713e5",
+        "options": {}
+      },
+      "id": "b715504c-9ae1-4454-9ceb-148aa51dc6ad",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        420
+      ],
+      "webhookId": "7ed6adf2-11f2-46bb-8191-b59ea02713e5"
+    },
+    {
+      "parameters": {
+        "fromEmail": "hr@yoong.vn",
+        "toEmail": "=long.le@yoong.vn",
+        "subject": "[Yoong] Invitation to an interview with Yoong",
+        "html": "=Dear {{ $json.body.CandidateName }}\n\nFirst of all, thank you for your time and interest of career opportunity with Yoong.\nThis correspondence is to invite you to participate in an interview for the position of {{ $json.body.JobName }} with our company. Your qualifications and experience have drawn our attention, and we are keen on engaging in a more comprehensive dialogue concerning your potential role within our company.\n\nPlease find the details of the interview outlined below:\n1/ Time: {{ $json.body.InterviewTime }}\n2/ Place: Online interview in Lark\nMeeting link 1: {{ $json.body.InterviewLink1 }}\nMeeting link 2 (if require additional time): {{ $json.body.InterviewLink2 }}\n3/ Yoong information:\n•\tWebsite: https://yoong.vn/en/ \n•\tContact point: {{ $json.body.InterviewerName + \"-\" + $json.body.InterviewerPhoneNo }}\n\nIf there are any special accommodations required or if you have any preliminary inquiries, please contact us directly at +84 38 3590 766 (Ms. An) or account@yoong.vn. We are prepared to provide any necessary assistance to ensure a smooth interview process.\nKindly confirm your availability for the interview or suggest an alternative date or time by a replied email.\n\nThanks & Regards,",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "lv.long.tn@gmail.com"
+        }
+      },
+      "id": "05249b21-ec09-4ae4-8104-1551ad45c783",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        420
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "udGKOrKEf4LJZaBb",
+          "name": "SMTP account HR"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "8faec062-acde-4020-bc14-5ea105beeca3",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2024-03-27T04:06:41.297Z",
+      "createdAt": "2024-03-27T04:06:41.297Z",
+      "role": "workflow:owner",
+      "workflowId": "2qXTcyTFt2eJ6D6K",
+      "projectId": "hDIKqbgmMJE1kKCr"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
