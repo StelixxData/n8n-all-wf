@@ -1,0 +1,532 @@
+{
+  "updatedAt": "2025-10-29T16:03:54.412Z",
+  "createdAt": "2024-03-31T04:16:03.024Z",
+  "id": "E1rTGpuexLSL8Iw6",
+  "name": "Admin - Auto Backup All WF to Dropbox",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "subtractFromDate",
+        "magnitude": "={{ $now }}",
+        "duration": 30,
+        "options": {}
+      },
+      "id": "971b73a1-b40f-4d43-8d05-5a7cec651928",
+      "name": "PURGE DAYS",
+      "type": "n8n-nodes-base.dateTime",
+      "position": [
+        740,
+        820
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "path": "={{ $json.pathDisplay }}"
+      },
+      "id": "621ec74b-3aa7-450c-91d6-290ba91a8646",
+      "name": "DELETE OLD BACKUPS",
+      "type": "n8n-nodes-base.dropbox",
+      "position": [
+        1340,
+        820
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "dropboxApi": {
+          "id": "aIE2a9njJKWGZXPH",
+          "name": "Dropbox - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "MOVE CURRENT BACKUPS TO OLD FOLDER",
+        "height": 223.80675203725258,
+        "width": 932.4394074276975
+      },
+      "id": "167841a9-0603-49f9-a97a-5d2ac9838ab5",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        640,
+        340
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "BACKUP ALL CURRENT WORKFLOWS",
+        "height": 185.32013969732247,
+        "width": 931.4765002625034
+      },
+      "id": "b54d44c3-5885-48f6-bad4-39c8fdb4f05b",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        640,
+        580
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "PURGE BACKUPS OLDER THEN 30 DAYS\n",
+        "height": 203.55064027939466,
+        "width": 932.4394074276973
+      },
+      "id": "8bba107f-7632-4b67-a529-b8539539ea02",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        637.111278504417,
+        780
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "8c9d1e27-2601-46a9-95f1-fdea87d6ffb0",
+      "name": "GET WORKFLOWS",
+      "type": "n8n-nodes-base.n8n",
+      "position": [
+        940,
+        620
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "n8nApi": {
+          "id": "5xBdsI7wkJVVpzRa",
+          "name": "n8n account - congnv@yoong.vn"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "jsonToBinary",
+        "options": {
+          "fileName": "={{ $json.name }}"
+        }
+      },
+      "id": "61805d13-3ab8-4f45-8047-ecfd8008fb9a",
+      "name": "MAKE JSON FILES",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "position": [
+        1140,
+        620
+      ],
+      "notesInFlow": true,
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "={{ $('DESTINATION FOLDER').last().json.folder }}{{ $('GET WORKFLOWS').item.json.name }}.json",
+        "binaryData": true
+      },
+      "id": "fdb73237-9d0b-446a-a529-f8f5226bccc0",
+      "name": "UPLOAD WORKFLOWS",
+      "type": "n8n-nodes-base.dropbox",
+      "position": [
+        1360,
+        620
+      ],
+      "notesInFlow": true,
+      "typeVersion": 1,
+      "credentials": {
+        "dropboxApi": {
+          "id": "aIE2a9njJKWGZXPH",
+          "name": "Dropbox - gnoc.ng@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "folder",
+              "stringValue": "/Yoong - N8N Backups/"
+            }
+          ]
+        },
+        "include": "none",
+        "options": {}
+      },
+      "id": "4813eaee-3643-40f4-877e-1ec7fd883f60",
+      "name": "DESTINATION FOLDER",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        400,
+        600
+      ],
+      "notesInFlow": true,
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "output": "input2"
+      },
+      "id": "977d479b-fcce-48a9-afa6-09b126054df6",
+      "name": "WAIT FOR MOVE TO FINISH",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        740,
+        620
+      ],
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "list",
+        "path": "={{ $('DESTINATION FOLDER').last().json.folder }}",
+        "limit": 250,
+        "filters": {}
+      },
+      "id": "cad71875-253c-4aff-a36a-be910ebe88f7",
+      "name": "GET CURRENT BACKUPS",
+      "type": "n8n-nodes-base.dropbox",
+      "position": [
+        940,
+        400
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "dropboxApi": {
+          "id": "aIE2a9njJKWGZXPH",
+          "name": "Dropbox - gnoc.ng@gmail.com"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "a13e9fd6-ef31-4e23-bde6-955ffab5849b",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              },
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "folder"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "79d98700-378a-4775-b97c-7aa4254a819d",
+      "name": "IGNORE FOLDERS",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        1140,
+        400
+      ],
+      "typeVersion": 2,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "path": "={{ $json.pathDisplay }}",
+        "toPath": "={{ $('DESTINATION FOLDER').last().json.folder }}old/{{ $json.name }}_{{ $('GET CURRENT DATE').last().json.formattedDate }}.json"
+      },
+      "id": "df1eed69-fe03-4187-a283-84ca63e478d2",
+      "name": "MOVE INTO OLD FOLDER",
+      "type": "n8n-nodes-base.dropbox",
+      "position": [
+        1360,
+        400
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "retryOnFail": false,
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "dropboxApi": {
+          "id": "aIE2a9njJKWGZXPH",
+          "name": "Dropbox - gnoc.ng@gmail.com"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "list",
+        "path": "={{ $('DESTINATION FOLDER').last().json.folder }}old",
+        "limit": 500,
+        "filters": {}
+      },
+      "id": "8ae5b993-fb0c-47c9-923c-80039c2b79f5",
+      "name": "LIST OLD BACKUPS",
+      "type": "n8n-nodes-base.dropbox",
+      "position": [
+        920,
+        820
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "dropboxApi": {
+          "id": "aIE2a9njJKWGZXPH",
+          "name": "Dropbox - gnoc.ng@gmail.com"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "e0aa83a7-a65b-4008-9010-bf4f14c0c398",
+              "operator": {
+                "type": "dateTime",
+                "operation": "before"
+              },
+              "leftValue": "={{ $json.lastModifiedServer }}",
+              "rightValue": "={{ $('PURGE DAYS').item.json.newDate }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b773582e-17bc-459b-b32b-1a172c21c501",
+      "name": "CHECK DATES",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1120,
+        820
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "c4bf239c-ede3-4f4c-98e1-ab1e1cf3c5ab",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const date = new Date();\n\nreturn {\n  formattedDate: `${date.getFullYear()}.${date.getMonth() < 9 ? \"0\" + (date.getMonth()+1) : date.getMonth() + 1}.${date.getDate() < 10 ? \"0\" + date.getDate() : date.getDate()}_${date.getHours()}.${date.getMinutes()}`\n}"
+      },
+      "id": "d1950b19-fc54-4aac-b01b-f2dbae75aa65",
+      "name": "GET CURRENT DATE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "PURGE DAYS": {
+      "main": [
+        [
+          {
+            "node": "LIST OLD BACKUPS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHECK DATES": {
+      "main": [
+        [
+          {
+            "node": "DELETE OLD BACKUPS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET WORKFLOWS": {
+      "main": [
+        [
+          {
+            "node": "MAKE JSON FILES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IGNORE FOLDERS": {
+      "main": [
+        [
+          {
+            "node": "MOVE INTO OLD FOLDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAKE JSON FILES": {
+      "main": [
+        [
+          {
+            "node": "UPLOAD WORKFLOWS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LIST OLD BACKUPS": {
+      "main": [
+        [
+          {
+            "node": "CHECK DATES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DESTINATION FOLDER": {
+      "main": [
+        [
+          {
+            "node": "WAIT FOR MOVE TO FINISH",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "PURGE DAYS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET CURRENT DATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET CURRENT BACKUPS": {
+      "main": [
+        [
+          {
+            "node": "IGNORE FOLDERS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MOVE INTO OLD FOLDER": {
+      "main": [
+        [
+          {
+            "node": "WAIT FOR MOVE TO FINISH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAIT FOR MOVE TO FINISH": {
+      "main": [
+        [
+          {
+            "node": "GET WORKFLOWS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "DESTINATION FOLDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET CURRENT DATE": {
+      "main": [
+        [
+          {
+            "node": "GET CURRENT BACKUPS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "errorWorkflow": "tVa1fbkE9BESGesN"
+  },
+  "staticData": {
+    "node:Schedule Trigger1": {
+      "recurrencyRules": [],
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d5250d46-284d-403d-aa3f-f2c06a09c8f4",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-03-31T04:16:03.024Z",
+      "createdAt": "2024-03-31T04:16:03.024Z",
+      "role": "workflow:owner",
+      "workflowId": "E1rTGpuexLSL8Iw6",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
