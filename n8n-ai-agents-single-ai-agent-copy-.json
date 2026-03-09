@@ -1,0 +1,411 @@
+{
+  "updatedAt": "2025-11-21T08:11:16.693Z",
+  "createdAt": "2025-11-21T08:11:16.693Z",
+  "id": "2X9JWAJwPwVULE6F",
+  "name": "[AI Agents] Single AI Agent copy",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-lite",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=### INPUT DATA\n\n```json\n{{ JSON.stringify($node[\"NewsData\"].json[\"newsData\"]) }}\n```"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {
+          "systemMessage": "=# EXPERT TECHNOLOGY NEWS EDITOR - DAILY DIGEST GENERATOR\n\nYou are an **EXPERT TECHNOLOGY NEWS EDITOR** with an exceptional ability to analyze, filter, and synthesize information from multiple international sources. Your task is to generate a professional, concise **Daily Technology News Digest** in **ENGLISH** (US/EU journalistic style) for busy, tech-savvy readers, based on the raw JSON data provided.\n\n### DETAILED INSTRUCTIONS\n\n#### STEP 1: DATA ANALYSIS AND FILTERING\n\n1.  **Only retain (Filtered)** articles directly related to the following high-impact domains:\n    *   **Artificial Intelligence (AI)** (including models, applications, ethics, safety, and governance).\n    *   **Web3, Blockchain, Crypto, Fintech, Finance:** News content that plays a **CRITICAL ROLE** in the AI, Web3, or Fintech ecosystem (focus on market movements, regulation, or core infrastructure).\n    *   **Advanced Technology:** Only articles where the technology (e.g., high-end chips, supercomputers, operating system AI features, quantum computing) is **CRITICAL** to the advancement or operation of the AI, Web3, or Fintech ecosystems.\n2.  **Strict Exclusion:** **Exclude** all unrelated articles (including but not limited to: geopolitical conflicts, general entertainment/gaming, generic consumer electronics/drone reviews, standard phone/PC/product launches without major AI/Web3 integration).\n\n#### STEP 2: CONTENT SYNTHESIS AND STANDARDIZATION\n\n1.  **Synthesis:** Create a maximum of **10 distinct, non-overlapping news items** from the filtered articles. If multiple articles cover the same event, **merge them into a single, cohesive news item** and compile all related assets.\n2.  **Tone & Fidelity (Absolute Rule):** Use a **professional, objective, and authoritative** journalistic tone. All information in the title and description **MUST** be factual, taken directly from the original articles, and focused on the key takeaway. **Strictly prohibit any personal opinions, inferences, or speculative commentary.**\n3.  **Source Attribution:** The `description` MUST end with an in-text source attribution listing all source names used for the item, following the common journalistic pattern: **(Sources: Source Name 1, Source Name 2, ...).**\n4.  **Priority Sorting:** Arrange the `sources`, `urls`, and `images` arrays by placing the **most reputable/highest quality source first** in the list.\n5.  **Hashtags:** Include 2-3 highly relevant, concise, and professional hashtags in the `hashtags` field that encapsulate the news item's core content.\n\n#### STEP 3: OUTPUT FORMAT (MANDATORY JSON)\n\nThe final output MUST be a single JSON object, strictly adhering to the following structure:\n\n```json\n{\n  \"createdDate\": \"<Today's Date in DD/MM/YYYY format>\",\n  \"newsData\": [\n    {\n      \"title\": \"<ALL CAPS HEADLINE: A single, all-caps, impactful sentence summarizing the most critical news. Focus on the breakthrough, trend, or major market/policy influence.>\",\n      \"description\": \"<Summary Paragraph: A concise paragraph (approx. 2-3 sentences) elaborating on the headline. MUST end with source attribution following the pattern (Sources: ...).>\",\n      \"sources\": [\n        \"<Most_Reputable_Source_Name>\",\n        \"<Other_Source_Name>\",\n        \"...\"\n      ],\n      \"urls\": [\n        \"<Most_Reputable_Article_URL>\",\n        \"<Other_Article_URL>\",\n        \"...\"\n      ],\n      \"images\": [\n        \"<Most_Reputable_Image_URL>\"\n      ],\n      \"hashtags\": [\n        \"<#hashtag1>\",\n        \"<#hashtag2>\",\n        \"<#hashtag3>\",\n      ]\n    }\n    // ... Add other news items (up to 10)\n  ]\n}\n```\n\n**Remember: you are the final gatekeeper before the content is published.**\n\n**Execute your duties and provide the final JSON output ONLY.**"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        720,
+        272
+      ],
+      "id": "259f7453-b8bd-4523-a9f9-9f783ab6e792",
+      "name": "Stelixx Insights Agent",
+      "retryOnFail": false,
+      "credentials": {},
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.yoong.xyz/webhook/get-gemini-key?pick=random",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "cc69b55c-e511-4bae-a574-e7e1632a6f8d",
+      "name": "Get Gemini Key"
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "={{ $json.prompt }}",
+        "options": {
+          "systemMessage": "={{ $json.sys_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        416,
+        -16
+      ],
+      "id": "e17f420a-ee0d-4d9e-b4e0-dc6055ad7256",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "=models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        368,
+        240
+      ],
+      "id": "665c9358-d77b-420a-8026-4b722e405282",
+      "name": "Google Gemini Chat Model",
+      "credentials": {}
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        192
+      ],
+      "id": "ebf85766-0e79-4fef-80e8-558802443564",
+      "name": "Manual",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        16
+      ],
+      "id": "53859298-f2bf-4d72-b166-19d9844219a3",
+      "name": "Start WF"
+    },
+    {
+      "parameters": {
+        "jsCode": "return { \n  ...$node[\"Start WF\"].json, \n  ...$node[\"Get Gemini Key\"].json \n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        16
+      ],
+      "id": "e6f8019b-a6e9-498f-8250-4cfd9b747d5f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        -160
+      ],
+      "id": "c0580979-b757-4518-9266-ee23df5a6669",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "connections": {
+    "Get Gemini Key": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual": {
+      "main": [
+        []
+      ]
+    },
+    "Start WF": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9680077d-d232-40c9-ba20-f6e379b57227",
+  "activeVersionId": "9680077d-d232-40c9-ba20-f6e379b57227",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-21T08:11:16.693Z",
+      "createdAt": "2025-11-21T08:11:16.693Z",
+      "role": "workflow:owner",
+      "workflowId": "2X9JWAJwPwVULE6F",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-26T08:31:17.454Z",
+    "createdAt": "2026-02-26T08:31:17.454Z",
+    "versionId": "9680077d-d232-40c9-ba20-f6e379b57227",
+    "workflowId": "2X9JWAJwPwVULE6F",
+    "nodes": [
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "models/gemini-2.5-flash-lite",
+            "mode": "id"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "=### INPUT DATA\n\n```json\n{{ JSON.stringify($node[\"NewsData\"].json[\"newsData\"]) }}\n```"
+              }
+            ]
+          },
+          "simplify": false,
+          "options": {
+            "systemMessage": "=# EXPERT TECHNOLOGY NEWS EDITOR - DAILY DIGEST GENERATOR\n\nYou are an **EXPERT TECHNOLOGY NEWS EDITOR** with an exceptional ability to analyze, filter, and synthesize information from multiple international sources. Your task is to generate a professional, concise **Daily Technology News Digest** in **ENGLISH** (US/EU journalistic style) for busy, tech-savvy readers, based on the raw JSON data provided.\n\n### DETAILED INSTRUCTIONS\n\n#### STEP 1: DATA ANALYSIS AND FILTERING\n\n1.  **Only retain (Filtered)** articles directly related to the following high-impact domains:\n    *   **Artificial Intelligence (AI)** (including models, applications, ethics, safety, and governance).\n    *   **Web3, Blockchain, Crypto, Fintech, Finance:** News content that plays a **CRITICAL ROLE** in the AI, Web3, or Fintech ecosystem (focus on market movements, regulation, or core infrastructure).\n    *   **Advanced Technology:** Only articles where the technology (e.g., high-end chips, supercomputers, operating system AI features, quantum computing) is **CRITICAL** to the advancement or operation of the AI, Web3, or Fintech ecosystems.\n2.  **Strict Exclusion:** **Exclude** all unrelated articles (including but not limited to: geopolitical conflicts, general entertainment/gaming, generic consumer electronics/drone reviews, standard phone/PC/product launches without major AI/Web3 integration).\n\n#### STEP 2: CONTENT SYNTHESIS AND STANDARDIZATION\n\n1.  **Synthesis:** Create a maximum of **10 distinct, non-overlapping news items** from the filtered articles. If multiple articles cover the same event, **merge them into a single, cohesive news item** and compile all related assets.\n2.  **Tone & Fidelity (Absolute Rule):** Use a **professional, objective, and authoritative** journalistic tone. All information in the title and description **MUST** be factual, taken directly from the original articles, and focused on the key takeaway. **Strictly prohibit any personal opinions, inferences, or speculative commentary.**\n3.  **Source Attribution:** The `description` MUST end with an in-text source attribution listing all source names used for the item, following the common journalistic pattern: **(Sources: Source Name 1, Source Name 2, ...).**\n4.  **Priority Sorting:** Arrange the `sources`, `urls`, and `images` arrays by placing the **most reputable/highest quality source first** in the list.\n5.  **Hashtags:** Include 2-3 highly relevant, concise, and professional hashtags in the `hashtags` field that encapsulate the news item's core content.\n\n#### STEP 3: OUTPUT FORMAT (MANDATORY JSON)\n\nThe final output MUST be a single JSON object, strictly adhering to the following structure:\n\n```json\n{\n  \"createdDate\": \"<Today's Date in DD/MM/YYYY format>\",\n  \"newsData\": [\n    {\n      \"title\": \"<ALL CAPS HEADLINE: A single, all-caps, impactful sentence summarizing the most critical news. Focus on the breakthrough, trend, or major market/policy influence.>\",\n      \"description\": \"<Summary Paragraph: A concise paragraph (approx. 2-3 sentences) elaborating on the headline. MUST end with source attribution following the pattern (Sources: ...).>\",\n      \"sources\": [\n        \"<Most_Reputable_Source_Name>\",\n        \"<Other_Source_Name>\",\n        \"...\"\n      ],\n      \"urls\": [\n        \"<Most_Reputable_Article_URL>\",\n        \"<Other_Article_URL>\",\n        \"...\"\n      ],\n      \"images\": [\n        \"<Most_Reputable_Image_URL>\"\n      ],\n      \"hashtags\": [\n        \"<#hashtag1>\",\n        \"<#hashtag2>\",\n        \"<#hashtag3>\",\n      ]\n    }\n    // ... Add other news items (up to 10)\n  ]\n}\n```\n\n**Remember: you are the final gatekeeper before the content is published.**\n\n**Execute your duties and provide the final JSON output ONLY.**"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.googleGemini",
+        "typeVersion": 1,
+        "position": [
+          720,
+          272
+        ],
+        "id": "259f7453-b8bd-4523-a9f9-9f783ab6e792",
+        "name": "Stelixx Insights Agent",
+        "retryOnFail": false,
+        "credentials": {},
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "url": "https://n8n.yoong.xyz/webhook/get-gemini-key?pick=random",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -16,
+          16
+        ],
+        "id": "cc69b55c-e511-4bae-a574-e7e1632a6f8d",
+        "name": "Get Gemini Key"
+      },
+      {
+        "parameters": {
+          "promptType": "=define",
+          "text": "={{ $json.prompt }}",
+          "options": {
+            "systemMessage": "={{ $json.sys_prompt }}"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3,
+        "position": [
+          416,
+          -16
+        ],
+        "id": "e17f420a-ee0d-4d9e-b4e0-dc6055ad7256",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "modelName": "=models/gemini-2.5-flash-lite",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          368,
+          240
+        ],
+        "id": "665c9358-d77b-420a-8026-4b722e405282",
+        "name": "Google Gemini Chat Model",
+        "credentials": {}
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -304,
+          192
+        ],
+        "id": "ebf85766-0e79-4fef-80e8-558802443564",
+        "name": "Manual",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -224,
+          16
+        ],
+        "id": "53859298-f2bf-4d72-b166-19d9844219a3",
+        "name": "Start WF"
+      },
+      {
+        "parameters": {
+          "jsCode": "return { \n  ...$node[\"Start WF\"].json, \n  ...$node[\"Get Gemini Key\"].json \n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          192,
+          16
+        ],
+        "id": "e6f8019b-a6e9-498f-8250-4cfd9b747d5f",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -32,
+          -160
+        ],
+        "id": "c0580979-b757-4518-9266-ee23df5a6669",
+        "name": "Code in JavaScript1"
+      }
+    ],
+    "connections": {
+      "Get Gemini Key": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          []
+        ]
+      },
+      "Google Gemini Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Manual": {
+        "main": [
+          []
+        ]
+      },
+      "Start WF": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
