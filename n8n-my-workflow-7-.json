@@ -1,0 +1,140 @@
+{
+  "updatedAt": "2026-02-25T02:53:01.516Z",
+  "createdAt": "2026-02-25T02:46:37.766Z",
+  "id": "gwbKvVrS4eNvZbm4",
+  "name": "My workflow 7",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        272,
+        0
+      ],
+      "id": "d6cd9763-c457-4d8d-8098-867e9c2f41ff",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ba26d712-65ba-4b49-be77-c6b652cfe2c7",
+      "name": "When chat message received",
+      "webhookId": "59f916a9-f03b-4502-ab7e-4281dd3bd5a3"
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "cca13e48-a046-4854-860a-0d7ad2175958",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "t7LMuZYMFsVlgfYP",
+          "name": "Ollama - cloud - toivanlatoi.120689"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-4992404459",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "0c11d3e5-b98c-4a17-9ece-0e3e541fa72b",
+      "name": "Send a text message",
+      "webhookId": "b28e84ec-c60f-4e85-b153-91d3bbe6befc",
+      "credentials": {
+        "telegramApi": {
+          "id": "SN4VdH7gHc9Ajx0F",
+          "name": "Telegram - @generalmanagedbot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9499119b-0d76-45dd-8ff4-b9f88a7bba3a",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-25T02:46:37.766Z",
+      "createdAt": "2026-02-25T02:46:37.766Z",
+      "role": "workflow:owner",
+      "workflowId": "gwbKvVrS4eNvZbm4",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
