@@ -1,0 +1,958 @@
+{
+  "updatedAt": "2024-01-09T15:10:52.155Z",
+  "createdAt": "2024-01-09T14:17:59.577Z",
+  "id": "I5PdYIDq4NbXaMSs",
+  "name": "Az Lark - Work Items Sync - 25Fit Only Get",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev.azure.com/25fittech/25FIT/_apis/wit/wiql",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api-version",
+              "value": "7.0"
+            },
+            {
+              "name": "timePrecision",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={     \"query\": \"Select [System.Id] From WorkItems WHERE [System.ChangedDate] >= '{{ $json.data.record.fields['Last Run Date'] }}'\" }",
+        "options": {}
+      },
+      "id": "610722ef-4ae3-42ac-8698-f1a87b9d4aad",
+      "name": "Az. Get Updated Work Items",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1860,
+        1220
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "0NDVTGOvYtw961d3",
+          "name": "25Fit AZ Basic Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/auth/v3/app_access_token/internal",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{ \"app_id\" : \"cli_a466e82acaf8d010\", \"app_secret\" : \"f7aFFUOj1okYt5EtypATvhWxpLJ0HNSp\"  }",
+        "options": {}
+      },
+      "id": "67cee51f-afce-47b6-9308-c80e364f84a7",
+      "name": "Lark. Get Access Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2300,
+        1220
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "4e97ad34-4f2d-4a91-96b4-cf36d910e625",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        -1460,
+        1780
+      ]
+    },
+    {
+      "parameters": {
+        "value1": "={{ $json.data.total }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal"
+            },
+            {
+              "operation": "larger",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "c598dd91-c9e3-4140-91f6-0260df50966c",
+      "name": "Switch1",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -460,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node[\"Split In Batches\"].json[\"url\"] }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "78732b89-cbe0-4327-a3cb-8755e83cf05f",
+      "name": "Az. Get Work Item Details1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -880,
+        1700
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "0NDVTGOvYtw961d3",
+          "name": "25Fit AZ Basic Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/Hsu9b4sqiaTQmVsdxaUlO3SUgVt/tables/tblUVxnumbX8vlu7/records",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark. Get Access Token').item.json.app_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.a }}",
+        "options": {}
+      },
+      "id": "32b0eca5-f48f-47bb-9bb7-e1ef31052bff",
+      "name": "Create Lark Work Item Record1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        120,
+        1720
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 0.5,
+        "unit": "seconds"
+      },
+      "id": "75191755-16e9-45a6-9ae6-a506a7d0e9c9",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -1240,
+        1760
+      ],
+      "webhookId": "4d5f3f9d-aa54-4ebd-a6b3-ece1812148bc"
+    },
+    {
+      "parameters": {
+        "url": "={{ $node[\"Split In Batches\"].json[\"url\"] }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "50ae850b-fb5d-4835-8121-523af71b588e",
+      "name": "Az. Get Work Item Comment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -380,
+        2340
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $('Az. Get Work Item Details1').item.json.rev }}",
+              "operation": "larger",
+              "value2": "={{ $('Lark. Get Work Item Records').item.json.data.items[0].fields.Revision }}"
+            }
+          ]
+        }
+      },
+      "id": "572232df-2539-42a9-b852-b01fc2126315",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        2020
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var larkWorkItem = {\n  \"AcceptanceCriteria\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"Microsoft.VSTS.Common.AcceptanceCriteria\"],\n\"ActivatedBy\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"Microsoft.VSTS.Common.ActivatedBy\"]?.[\"uniqueName\"],\n\"ActivatedDate\": Date.parse($item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"Microsoft.VSTS.Common.ActivatedDate\"]),\n\"AreaPath\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.AreaPath\"],\n\"AssignedTo\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.AssignedTo\"]?.[\"uniqueName\"],\n\"BoardColumn\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.BoardColumn\"],\n\"BoardColumnDone\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.BoardColumnDone\"],\n\"ChangedBy\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.ChangedBy\"]?.[\"uniqueName\"],\n\"ChangedDate\": Date.parse($item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.ChangedDate\"]),\n\"ClosedBy\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"Microsoft.VSTS.Common.ClosedBy\"]?.[\"uniqueName\"],\n\"ClosedDate\": Date.parse($item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"Microsoft.VSTS.Common.ClosedDate\"]),\n\"Column\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"WEF_CD9626585F694D908E8D6FF16E53992A_Kanban.Column\"],\n\"Column.Done\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"WEF_CD9626585F694D908E8D6FF16E53992A_Kanban.Column.Done\"],\n\"CommentCount\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.CommentCount\"],\n\"CreatedBy\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.CreatedBy\"]?.[\"uniqueName\"],\n\"CreatedDate\": Date.parse($item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.CreatedDate\"]),\n\"Description\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.Description\"],\n\"Id\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"id\"],\n\"IterationPath\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.IterationPath\"],\n\"Link.Fields\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"_links\"][\"fields\"][\"href\"],\n\"Link.Html\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"_links\"][\"html\"][\"href\"],\n\"Link.Self\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"_links\"][\"self\"][\"href\"],\n\"Link.WorkItemComments\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"_links\"][\"workItemComments\"][\"href\"],\n\"Link.WorkItemRevisions\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"_links\"][\"workItemRevisions\"][\"href\"],\n\"Link.WorkItemType\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"_links\"][\"workItemType\"][\"href\"],\n\"Link.WorkItemUpdates\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"_links\"][\"workItemUpdates\"][\"href\"],\n\"Priority\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"Microsoft.VSTS.Common.Priority\"],\n\"Reason\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.Reason\"],\n\"Revision\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"rev\"],\n\"StackRank\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"Microsoft.VSTS.Common.StackRank\"] + \"\",\n\"State\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.State\"],\n\"StateChangeDate\": Date.parse($item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"Microsoft.VSTS.Common.StateChangeDate\"]),\n\"Tags\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.Tags\"],\n\"TeamProject\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.TeamProject\"],\n\"Title\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.Title\"],\n\"ValueArea\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"Microsoft.VSTS.Common.ValueArea\"],\n\"WorkItemType\": $item(\"0\").$node[\"Az. Get Work Item Details1\"].json[\"fields\"][\"System.WorkItemType\"]\n};\n\nreturn {\n\t\"fields\": \n\t\tlarkWorkItem\n};"
+      },
+      "id": "a975b75e-03c9-484d-8187-668c54c4cfef",
+      "name": "Json Lark Work Item  Fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn {\n  \"a\": {\n\t\"fields\": $node[\"Json Lark Work Item  Fields\"].json[\"fields\"]\n  }\n};\n\nreturn larkWorkItem;"
+      },
+      "id": "87b6a1cf-045a-488f-b3b8-66eb5b914aeb",
+      "name": "Json Lark Create",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        1720
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn {\n  \"a\": {\n    \"records\":[\n      {\n        \"record_id\": $node[\"Lark. Get Work Item Records\"].json[\"data\"][\"items\"][\"0\"][\"record_id\"],\n        \"fields\": $node[\"Json Lark Work Item  Fields\"].json[\"fields\"]\n      }\n    ]\n\n  }\n};\n\nreturn larkWorkItem;"
+      },
+      "id": "f9dad64d-5851-4334-a982-4b8136291b67",
+      "name": "Json Lark Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        2020
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/Hsu9b4sqiaTQmVsdxaUlO3SUgVt/tables/tblUVxnumbX8vlu7/records/batch_update",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark. Get Access Token').item.json.app_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.a }}",
+        "options": {}
+      },
+      "id": "fa2c6a2d-4651-47d6-a592-af973ccd4868",
+      "name": "Update Lark Work Item Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        120,
+        2020
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://open.larksuite.com/open-apis/bitable/v1/apps/Hsu9b4sqiaTQmVsdxaUlO3SUgVt/tables/tbl48tiF9HC8v2eU/records/{{ $('env').item.json.StatusRecordId_25Fit }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark. Get Access Token').item.json.app_access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cbb3fee9-8a58-4c07-99d4-083d0468e23a",
+      "name": "Lark. Get Last Run Date",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2080,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/Hsu9b4sqiaTQmVsdxaUlO3SUgVt/tables/tblUVxnumbX8vlu7/records",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "={{ $item(\"0\").$node[\"Create OR logical formula\"].json[\"logicalFormula\"] }}"
+            },
+            {
+              "name": "field_names",
+              "value": "[\"Id\", \"Revision\", \"TeamProject\"]"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark. Get Access Token').item.json.app_access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b9083e67-b5b2-4b9f-a4fc-cb14215d0c39",
+      "name": "Lark. Get Work Item Records",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        480,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var ids = $node[\"WorkItemID200\"].json[\"id\"];\nvar logicalFormulaArray = [];\n\nfor (let index = 0; index < ids.length; index++) {\n  logicalFormulaArray.push(\"CurrentValue.[Id] = \" + ids[index]);\n}\n\nvar orFormulaArray = [];\nconst chunkSize = 30;\nfor (let i = 0; i < logicalFormulaArray.length; i += chunkSize) {\n    let chunk = logicalFormulaArray.slice(i, i + chunkSize);\n    orFormulaArray.push(\"OR(\" + chunk.join() + \")\");\n}\n\n\n\nreturn {\n  ...orFormulaArray\n}\n"
+      },
+      "id": "c7759063-c6f0-4a97-8221-c58b18c2df47",
+      "name": "Create OR logical formula",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -180,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var azWorkItems = $node[\"Az. Get List\"].json[\"value\"];\nvar larkWorkItems = $node[\"Lark. Get Work Item Records\"].json[\"data\"][\"items\"];\nvar newItems = [];\nvar updateItems = [];\nvar exceptionItems = [];\n\nfor (let index = 0; index < azWorkItems.length; index++) {\n  var larkItems = larkWorkItems.filter((p) => p[\"fields\"][\"Id\"] == azWorkItems[index][\"id\"]);\n  if(larkItems.length == 1){\n    updateItems.push({\n        \"record_id\": larkItems[0][\"record_id\"],\n        ...azWorkItems[index]\n      });\n  }else if (larkItems.length == 0) {\n    newItems.push(azWorkItems[index]);\n  }else{\n    exceptionItems.push(azWorkItems[index]);\n  }\n}\n\nreturn {\n  \"newItems\": newItems,\n  \"updateItems\": updateItems,\n  \"exceptionItems\": exceptionItems\n};"
+      },
+      "id": "a0cacb76-6fb2-4628-af2b-c911be140b1f",
+      "name": "New or Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        1520
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "url": "=https://dev.azure.com/25fittech/25FIT/_apis/wit/workitems",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api-version",
+              "value": "7.0"
+            },
+            {
+              "name": "ids",
+              "value": "={{$node[\"WorkItemID200\"].json[\"workItemId\"].join() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ac15f4c9-9799-4656-9ca2-fa24bd6463d7",
+      "name": "Az. Get List",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -600,
+        1200
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "0NDVTGOvYtw961d3",
+          "name": "25Fit AZ Basic Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "id": "03d721c6-509a-4f50-85a5-19f83576de5d",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://112.78.8.137:5678/webhook/36d7eb4e-a0db-4b79-9332-925e043e6dfc",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{$('New or Update').json}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "65021260-d2b2-46bb-a93d-ad953538d35c",
+      "name": "Trigger WF: Send Msg",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        660,
+        1220
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "eff6cd16-1d4d-435d-87ef-22beb9e86908",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "concatenateItems",
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "workItemId"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "39939b8c-5e82-4fbe-9f17-389f7d2ba9ea",
+      "name": "WorkItemID200",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        -840,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "e28fa149-b0b6-4e94-9241-84d7ffcd675c",
+      "name": "Split In Batches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        80,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $node[\"Split In Batches1\"].json;"
+      },
+      "id": "bae87278-895a-435b-8d35-25afef67d3c6",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "4471ff02-5852-4b11-aa49-53a7c90c1e3a",
+      "name": "5min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2760,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var azWorkItems = $node[\"Az. Get Updated Work Items\"].json[\"workItems\"].map(p=> p.id);\nvar larkWorkItems = [];\nvar larkWorkItemsTemp = $node[\"Lark. Get Last Run Date\"].json[\"data\"][\"record\"][\"fields\"][\"Work Item IDs\"];\nif(larkWorkItemsTemp != null)\n{\n  larkWorkItems = larkWorkItemsTemp[0][\"text\"].split(\",\").map(p=> p.split(\"_\"));\n}\n\nvar newItems = [];\nvar updateItems = [];\nvar exceptionItems = [];\n\nfor (let index = 0; index < azWorkItems.length; index++) {\n  var larkItems = larkWorkItems.filter((p) => p[0] == azWorkItems[index]);\n  if(larkItems.length == 1){\n    updateItems.push({\n        \"record_id\": larkItems[0][1],\n        \"workItemId\": azWorkItems[index]\n      });\n  }else if (larkItems.length == 0) {\n    newItems.push(azWorkItems[index]);\n  }else{\n    exceptionItems.push(azWorkItems[index]);\n  }\n}\n\nreturn {\n  \"newItems\": newItems,\n  \"updateItems\": updateItems,\n  \"exceptionItems\": exceptionItems\n};"
+      },
+      "id": "9ef633b5-c65d-49f0-bdcf-305e6c6e00e0",
+      "name": "New Or Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1660,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"TeamProject\": \"25FIT\",\n  \"StatusRecordId_25Fit\": \"recB23Vxmz\"\n}"
+      },
+      "id": "a9857ffb-e8b1-4192-8dc9-72b9909e580a",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1660,
+        1620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"TeamProject\": \"25FIT\",\n  \"StatusRecordId_25Fit\": \"recB23Vxmz\"\n}"
+      },
+      "id": "79328fd6-210f-45df-9b24-3629a1c41822",
+      "name": "env",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2540,
+        1220
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn $node[\"New Or Update\"].json[\"newItems\"].map(el => ({json: {workItemId: el}}));"
+      },
+      "id": "9bcbf922-e025-4078-8b10-dfa4ff4c3e61",
+      "name": "New Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1380,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn $node[\"New Or Update\"].json[\"updateItems\"];"
+      },
+      "id": "09da2b6a-e681-40db-8a77-5f930147c5e0",
+      "name": "Update Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1380,
+        1420
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 50,
+        "options": {}
+      },
+      "id": "4f2f69ee-0a8a-409a-aa65-c1abbd8f6c3a",
+      "name": "Az: Max 100 work Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var workItems = $node[\"Az. Get List\"].json[\"value\"];\n//return workItems;\n\nvar larkInsertJson = {\n  \"records\": []\n};\n\n//return workItems[0];\n\nfor (let index = 0; index < workItems.length ; index++) {\n  let larkRecord = {\n//  \"fields\": {\n    \"fields\": {\n    \"AcceptanceCriteria\": workItems[index].fields[\"Microsoft.VSTS.Common.AcceptanceCriteria\"],\n\"ActivatedBy\": workItems[index].fields[\"Microsoft.VSTS.Common.ActivatedBy\"]?.[\"uniqueName\"],\n\"ActivatedDate\": Date.parse(workItems[index].fields[\"Microsoft.VSTS.Common.ActivatedDate\"]),\n\"AreaPath\": workItems[index].fields[\"System.AreaPath\"],\n\"AssignedTo\": workItems[index].fields[\"System.AssignedTo\"]?.[\"uniqueName\"],\n\"BoardColumn\": workItems[index].fields[\"System.BoardColumn\"],\n\"BoardColumnDone\": workItems[index].fields[\"System.BoardColumnDone\"],\n\"ChangedBy\": workItems[index].fields[\"System.ChangedBy\"]?.[\"uniqueName\"],\n\"ChangedDate\": Date.parse(workItems[index].fields[\"System.ChangedDate\"]),\n\"ClosedBy\": workItems[index].fields[\"Microsoft.VSTS.Common.ClosedBy\"]?.[\"uniqueName\"],\n\"ClosedDate\": Date.parse(workItems[index].fields[\"Microsoft.VSTS.Common.ClosedDate\"]),\n\"Column\": workItems[index].fields[\"WEF_CD9626585F694D908E8D6FF16E53992A_Kanban.Column\"],\n\"Column.Done\": workItems[index].fields[\"WEF_CD9626585F694D908E8D6FF16E53992A_Kanban.Column.Done\"],\n\"CommentCount\": workItems[index].fields[\"System.CommentCount\"],\n\"CreatedBy\": workItems[index].fields[\"System.CreatedBy\"]?.[\"uniqueName\"],\n\"CreatedDate\": Date.parse(workItems[index].fields[\"System.CreatedDate\"]),\n\"Description\": workItems[index].fields[\"System.Description\"],\n\"Id\": workItems[index][\"id\"],\n\"IterationPath\": workItems[index].fields[\"System.IterationPath\"],\n//\"Link.Fields\": workItems[index][\"_links\"][\"fields\"][\"href\"],\n//\"Link.Html\": workItems[index][\"_links\"][\"html\"][\"href\"],\n\"Link.Self\": workItems[index][\"url\"],\n\"Link.WorkItemComments\": workItems[index][\"url\"] + \"/comments\",\n\"Link.WorkItemRevisions\": workItems[index][\"url\"] + \"/revisions\",\n//\"Link.WorkItemType\": workItems[index][\"url\"] + \"/updates\",\n\"Link.WorkItemUpdates\": workItems[index][\"url\"] + \"/updates\",\n\"Priority\": workItems[index].fields[\"Microsoft.VSTS.Common.Priority\"],\n\"Reason\": workItems[index].fields[\"System.Reason\"],\n\"Revision\": workItems[index][\"rev\"],\n\"StackRank\": workItems[index].fields[\"Microsoft.VSTS.Common.StackRank\"] + \"\",\n\"State\": workItems[index].fields[\"System.State\"],\n\"StateChangeDate\": Date.parse(workItems[index].fields[\"Microsoft.VSTS.Common.StateChangeDate\"]),\n\"Tags\": workItems[index].fields[\"System.Tags\"],\n\"TeamProject\": workItems[index].fields[\"System.TeamProject\"],\n\"Title\": workItems[index].fields[\"System.Title\"],\n\"ValueArea\": workItems[index].fields[\"Microsoft.VSTS.Common.ValueArea\"],\n\"workItems[index]Type\": workItems[index].fields[\"System.workItems[index]Type\"]\n  }\n//  }\n  };\n  \n  larkInsertJson.records.push(larkRecord);\n}\n\nreturn {\n  a: larkInsertJson\n};"
+      },
+      "id": "52393d49-b599-4333-b5e0-7b02bc46c6eb",
+      "name": "Create Json",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -380,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/Hsu9b4sqiaTQmVsdxaUlO3SUgVt/tables/tblUVxnumbX8vlu7/records/batch_create",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark. Get Access Token').item.json.app_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.a }}",
+        "options": {}
+      },
+      "id": "2b27fe81-65ca-4f07-9f3d-dbb713096104",
+      "name": "Create Lark Work Item Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -120,
+        1200
+      ]
+    }
+  ],
+  "connections": {
+    "Lark. Get Access Token": {
+      "main": [
+        [
+          {
+            "node": "Lark. Get Last Run Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Json Lark Create",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Az. Get Work Item Details1": {
+      "main": [
+        [
+          {
+            "node": "Json Lark Work Item  Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Lark Work Item Record1": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Json Lark Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Json Lark Work Item  Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Json Lark Create": {
+      "main": [
+        [
+          {
+            "node": "Create Lark Work Item Record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Json Lark Update": {
+      "main": [
+        [
+          {
+            "node": "Update Lark Work Item Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Lark Work Item Record": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lark. Get Last Run Date": {
+      "main": [
+        [
+          {
+            "node": "Az. Get Updated Work Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Az. Get Updated Work Items": {
+      "main": [
+        [
+          {
+            "node": "New Or Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create OR logical formula": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Az. Get List": {
+      "main": [
+        [
+          {
+            "node": "Create Json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New or Update": {
+      "main": [
+        [
+          {
+            "node": "Trigger WF: Send Msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger WF: Send Msg": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WorkItemID200": {
+      "main": [
+        [
+          {
+            "node": "Az. Get List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5min": {
+      "main": [
+        [
+          {
+            "node": "env",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Or Update": {
+      "main": [
+        [
+          {
+            "node": "New Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "env": {
+      "main": [
+        [
+          {
+            "node": "Lark. Get Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Items": {
+      "main": [
+        [
+          {
+            "node": "Az: Max 100 work Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Az: Max 100 work Items": {
+      "main": [
+        [
+          {
+            "node": "WorkItemID200",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Json": {
+      "main": [
+        [
+          {
+            "node": "Create Lark Work Item Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Lark Work Item Record": {
+      "main": [
+        [
+          {
+            "node": "Az: Max 100 work Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4da929a2-7882-4057-aa3e-a681c76c6f5c",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2024-01-09T14:17:59.577Z",
+      "createdAt": "2024-01-09T14:17:59.577Z",
+      "role": "workflow:owner",
+      "workflowId": "I5PdYIDq4NbXaMSs",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
