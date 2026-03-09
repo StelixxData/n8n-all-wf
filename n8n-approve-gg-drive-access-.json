@@ -1,0 +1,816 @@
+{
+  "updatedAt": "2025-12-09T15:44:50.535Z",
+  "createdAt": "2025-12-03T10:03:46.901Z",
+  "id": "7eEjjkucHXHLfHaj",
+  "name": "Approve GG drive access",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "filters": {
+          "receivedAfter": "={{ $json.lastApproved }}",
+          "sender": "drive-shares-dm-noreply@google.com"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4f990e82-3878-4d84-aa73-e697198b8420",
+      "name": "Get many messages",
+      "webhookId": "4f978470-632e-4db2-a660-79938a174116",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "E6MYHQ0rXmlI8Ft6",
+          "name": "Victor account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1tuMn0JcaZ1WCDxkT-AEE6ceo_h84wE5vBqwXM6lDHbI"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "AutoAcceptPer",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "a9a515a3-f216-472f-9b29-706d6b266701",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "13z42gexMgBVfcu7",
+          "name": "Victor"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.all().map(x => x.json);\nif (!data.length) {\n  return {\n    lastApproved: new Date('2025-12-01')\n  }\n}\nconst latestItem = data.reduce((latest, current) => {\n    return new Date(current.ApprovedAt) > new Date(latest.ApprovedAt) ? current : latest;\n});\n\n\nreturn {\n  lastApproved: latestItem.ApprovedAt\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "6f327c6b-64c2-4ad1-b786-d0aff52afa8d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst data = []\nfor (const item of $input.all()) {\n  const subject = item.json.Subject || '';\n  const isRequestAccess = /(share\\s+request\\s+for|request(ing|ed)?\\s+access|yêu\\s+cầu\\s+(quyền\\s+)?truy\\s+cập|muốn\\s+truy\\s+cập)/i\n.test(subject);\n  if (isRequestAccess) {\n    const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi;\n    const matches = item.json.snippet.match(emailRegex);\n    if (matches && matches.length) {\n      const date =  new Date(Number(item.json.internalDate) + 10000)\n      data.push({\n        email: matches[0],\n        date: date.toISOString(),\n      })\n    }\n  }\n}\n\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "d7014055-4756-449c-bdd4-a66ecc7c05e0",
+      "name": "Extract"
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "1YCZuNZIwC6Orz_6mqzG7ZrPfG36Y8MGN",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "user",
+            "emailAddress": "={{ $json.email }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        128
+      ],
+      "id": "db2aa5d4-62a7-4151-9866-e77c0b636932",
+      "name": "Share file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CwacNyGqCFPeKoLU",
+          "name": "Victor"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        688,
+        0
+      ],
+      "id": "7e1d2e8a-a8a3-45a9-8991-8856f57dac6a",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1tuMn0JcaZ1WCDxkT-AEE6ceo_h84wE5vBqwXM6lDHbI",
+          "mode": "list",
+          "cachedResultName": "Request Access To Folder",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tuMn0JcaZ1WCDxkT-AEE6ceo_h84wE5vBqwXM6lDHbI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "AutoAcceptPer",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tuMn0JcaZ1WCDxkT-AEE6ceo_h84wE5vBqwXM6lDHbI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('Loop Over Items').item.json.email }}",
+            "ApprovedAt": "={{ $('Loop Over Items').item.json.date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ApprovedAt",
+              "displayName": "ApprovedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1168,
+        128
+      ],
+      "id": "d691b005-6e02-4348-b2b0-540223946975",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "13z42gexMgBVfcu7",
+          "name": "Victor"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -512,
+        0
+      ],
+      "id": "65cc61d1-488f-40c1-8575-ae1aae542b90",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "readStatus": "unread",
+          "sender": "drive-shares-dm-noreply@google.com"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -640,
+        592
+      ],
+      "id": "a4a787d7-f4e4-4b93-ad94-44e3abc7d6eb",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vzOMln2sddrEhJjV",
+          "name": "Gmail @gnokaar"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Gmail Trigger').all();\nconst data = []\nfor (const item of input) {\n  const subject = item.json.Subject || '';\n  const isRequestAccess = /(share\\s+request\\s+for|request(ing|ed)?\\s+access|yêu\\s+cầu\\s+(quyền\\s+)?truy\\s+cập|muốn\\s+truy\\s+cập)/i\n.test(subject);\n  if (isRequestAccess) {\n    const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi;\n    const matches = item.json.snippet.match(emailRegex);\n    const folderName = subject.replace(/.*\"([^\"]+)\".*/, '$1');\n    if (matches && matches.length && folderName) {\n      const date =  new Date(Number(item.json.internalDate) + 10000)\n      const from = item.json.From || '';\n      const fromName = from.replace(/.*\"([^\"]+)\".*/, '$1').replace(\"(via Google Drive)\", \"\").trim();\n      data.push({\n        mailId: item.json.id,\n        email: matches[0],\n        approvedAt: date.toISOString(),\n        folderName: folderName,\n        fromName: fromName\n      })\n    }\n  }\n}\n\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        592
+      ],
+      "id": "ef805247-f603-4de7-b143-1d313611562c",
+      "name": "Extract1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.folderId }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "user",
+            "emailAddress": "={{ $('Loop Over Items1').item.json.email }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        912,
+        720
+      ],
+      "id": "d0069f67-8865-43ed-a90b-98df64b50d28",
+      "name": "Share file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "rG0Vg8MRZdlfn5ws",
+          "name": "Google Drive @gnokaar"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        224,
+        592
+      ],
+      "id": "bfdea6d0-cff4-4ae8-8fc3-d9e29cfe0c76",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1oQBTGr4fz22cyXWV0tTozN3Pn3upSWqWGCCjJfGFGAU",
+          "mode": "list",
+          "cachedResultName": "[Data] Email Request Access To Folder",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oQBTGr4fz22cyXWV0tTozN3Pn3upSWqWGCCjJfGFGAU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('If').item.json.folderName }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ApprovedAt",
+              "displayName": "ApprovedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1408,
+        720
+      ],
+      "id": "09bd4f4e-2490-4797-b6a6-132e8d4ceada",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HZwzxCeDsY98EDAF",
+          "name": "Google Sheets - gnokaar@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const folderList = $('GetFolderList').all().map(x => x.json);\nconst json = $input.first().json;\nconst folder = folderList.find(x => x.FolderName === $input.first().json.folderName)\n\nif (folder) {\n  return {\n    ...json,\n    folderId: folder.FolderId,\n  }\n}\n\nreturn {\n  folderId: ''\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        688
+      ],
+      "id": "67929e94-a52f-47ed-be11-33a6d3c58432",
+      "name": "GetFolderId"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1oQBTGr4fz22cyXWV0tTozN3Pn3upSWqWGCCjJfGFGAU",
+          "mode": "list",
+          "cachedResultName": "[Data] Email Request Access To Folder",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oQBTGr4fz22cyXWV0tTozN3Pn3upSWqWGCCjJfGFGAU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1664118679,
+          "mode": "list",
+          "cachedResultName": "SharedFolder",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oQBTGr4fz22cyXWV0tTozN3Pn3upSWqWGCCjJfGFGAU/edit#gid=1664118679"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -464,
+        592
+      ],
+      "id": "4bf2f32c-3abd-4b49-9c75-2277badaab19",
+      "name": "GetFolderList",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HZwzxCeDsY98EDAF",
+          "name": "Google Sheets - gnokaar@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "801b21fb-6cf7-4aaa-9a01-2f18626ee778",
+              "leftValue": "={{ $json.folderId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        736
+      ],
+      "id": "40f19f56-a318-411b-9ecd-fba05e99e455",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $(\"If\").first().json;\nreturn {\n  Email: data.email,\n  ApprovedAt: data.approvedAt,\n  FromName: data.fromName\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        720
+      ],
+      "id": "68d0f21c-0af0-4321-a939-56418028ee95",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "content": "## Old",
+        "height": 544,
+        "width": 2048,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -208
+      ],
+      "id": "ad80a1fa-83b7-4615-94f2-fd1b9786842d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## New",
+        "height": 544,
+        "width": 2416,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        448
+      ],
+      "id": "64cdfad2-bb69-4c3d-a083-75816a63b09e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        848
+      ],
+      "id": "6ac577d9-34ad-4d2d-b01c-29405d570546",
+      "name": "Mark a message as read1",
+      "webhookId": "fe61bd0b-8664-4ac5-93c2-4cec1c3042e4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vzOMln2sddrEhJjV",
+          "name": "Gmail @gnokaar"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5e21536d-2bac-46ca-923d-b64dd435af5f",
+              "leftValue": "={{ $('Extract1').item.json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        592
+      ],
+      "id": "21735945-f611-4c20-9376-bab68b6efbdd",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        608,
+        496
+      ],
+      "id": "6379d5dd-0a48-4ead-b2cc-7e5e4de9971a",
+      "name": "Mark a message as read2",
+      "webhookId": "fe61bd0b-8664-4ac5-93c2-4cec1c3042e4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vzOMln2sddrEhJjV",
+          "name": "Gmail @gnokaar"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Mark a message as read2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GetFolderId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "GetFolderList",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetFolderId": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetFolderList": {
+      "main": [
+        [
+          {
+            "node": "Extract1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Share file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark a message as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Gmail Trigger": {
+      "Gmail Trigger": {
+        "lastTimeChecked": 1765291426,
+        "possibleDuplicates": [
+          "19b0391858b6f3ad"
+        ]
+      }
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "58fac422-d24c-489d-8676-92329e199f6e",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-03T10:03:46.901Z",
+      "createdAt": "2025-12-03T10:03:46.901Z",
+      "role": "workflow:owner",
+      "workflowId": "7eEjjkucHXHLfHaj",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
