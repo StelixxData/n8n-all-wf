@@ -1,0 +1,362 @@
+{
+  "updatedAt": "2025-01-16T07:06:01.237Z",
+  "createdAt": "2025-01-15T07:05:58.955Z",
+  "id": "4b7tZclMeZZE4Ct6",
+  "name": "Community - 2.2 - Meta (Facebook) Distribution Processor thang",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "1d6fddd1-b34d-40d6-8bf4-bfbb48a1b089",
+        "options": {}
+      },
+      "id": "73b2e6e9-4a29-4657-9307-a8f7d70deebb",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        500,
+        160
+      ],
+      "webhookId": "1d6fddd1-b34d-40d6-8bf4-bfbb48a1b089",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// const input = $input.first().json\nreturn {\n  body : {\n    DistributionTarget: {\n      //Id: input[\"ChatId\"],\n      Link: 'https://www.facebook.com/profile.php?id=515973044936179',\n      Username: 'jmjm8127.911@gmail.com',\n      GroupType: 'XINH'\n    },\n  }\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        160
+      ],
+      "id": "4a06010b-d785-4878-b8a6-ee2aa8a38e1d",
+      "name": "FakeWebhookRequest"
+    },
+    {
+      "parameters": {
+        "content": "Fake webhook request",
+        "height": 240,
+        "width": 200,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        680,
+        80
+      ],
+      "id": "5b55b463-f71e-4754-bdbc-eae1fea295ee",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH TopRecord AS\n(\n    SELECT TOP 1 x.Id, x.\"Type\", \"Text\", MediaLink , MessageGroupedId, x.ChatId\n    FROM XinhTelegramMedia x\n    JOIN TelegramGroupSource tg ON x.ChatId = tg.ChatId\n    WHERE \n    NOT EXISTS (\n        SELECT 1\n        FROM XinhDistributionLog xl\n        WHERE x.Id = xl.SourceId AND DistributionTarget <> '{{ $json.Link }}'\n    )\n    --AND \"Status\"  = 'APPROVED' -- THIS LINE WILL BE UNCOMMENT\n    AND MediaLink NOT LIKE 'https://drive.google.com%' -- THIS LINE MAY BE REMOVED\n    AND MessageGroupedId IS NULL -- THIS LINE WILL BE REMOVED\n    AND tg.GroupType = '{{ $json.GroupType }}'\n    AND x.\"Type\" = 'FileType.PHOTO' -- THIS LINE WILL BE REMOVED \n)\nSELECT x.Id, x.\"Type\", x.\"Text\", x.MediaLink, x.MessageGroupedId, ChatId, ca.Credentials\nFROM XinhTelegramMedia x\nJOIN CommunityAccount ca ON x.DriveAccount = ca.\"User\"\nWHERE \n    (SELECT MessageGroupedId FROM TopRecord) IS NULL \n    AND x.Id = (SELECT Id FROM TopRecord)\n    OR \n    ( x.MessageGroupedId = (SELECT MessageGroupedId FROM TopRecord) AND x.ChatId = (SELECT ChatId from TopRecord)  )"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        1560,
+        160
+      ],
+      "id": "00ee1a64-b7d8-4ed1-bcda-4af7beb2cd74",
+      "name": "GetMediaToDeliver",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all().map(i => i[\"json\"]);\n\nreturn input.map(i => {\n  return {\n    file_token: i[\"MediaLink\"],\n    action: 'DOWNLOAD',\n    credential: i[\"Credentials\"],\n    type: i[\"Type\"],\n    text: i[\"Text\"],\n  }\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1820,
+        160
+      ],
+      "id": "33bdd130-518c-4494-821f-10d98c5307fb",
+      "name": "DownloadRequest"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ogmJgoLqdW6PB9NO",
+          "mode": "list",
+          "cachedResultName": "Lark Process"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        2060,
+        160
+      ],
+      "id": "66e8c45a-817f-4b41-8574-6e7f202d85f3",
+      "name": "DownloadMedia"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = $('FakeWebhookRequest').first().json.body // should change to webhook\n\nreturn data[\"DistributionTarget\"]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        160
+      ],
+      "id": "ad114bd9-80a6-447b-baa8-3cf2f4c03737",
+      "name": "LinkAndGroupTypeToGetMedia"
+    },
+    {
+      "parameters": {
+        "content": "#### This can be reuse for different platform, just pass in:\n1. DistributionTarget - Link (from distribution log)\n2. Type of group (XINH, HAI, ...)\n#### Then get the suitable media to distribute",
+        "height": 320,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        0
+      ],
+      "id": "0e553c47-d487-4072-8ed4-937a15d10f67",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e88ad698-289d-42b8-bbac-014a2c5392c8",
+              "leftValue": "={{ $json.distributed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2580,
+        160
+      ],
+      "id": "78febc02-526a-48b1-a130-5602e5740a06",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const APP_ID = '1365969261255188'\nconst ACCESS_TOKEN = 'EAATaV4CXWhQBO7uZBGtBYciKsoocjNodEEbXw2nkIEHKiVKOPQiIs0FytwwOGEVjTYfD4QTIgCflLDQsH4VPPZAHFL1V10hMkQ3Y3ANQcov8WPar545af4R6H7Yi22srRUL6uFeojktZCJORIsgW61rLjvcZCz0ZCPUWP3azlzbRMFod6bQjqTZBZA5YFxagAlgfqbT37qp'\nconst PAGE_ID = '515973044936179'\nreturn {\n  ACCESS_TOKEN,\n  APP_ID,\n  PAGE_ID\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        420
+      ],
+      "id": "44600cd6-4d0f-4aeb-a6c8-00e665b7da84",
+      "name": "FakeGetAccessToken"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n9n.yoong.xyz/webhook/aes-f545f8a6-0c16-4131-8162-8caa8c41f5ad",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"text\": \"{{$json[\"body\"][\"BotAccessToken\"]}}\",\n    \"action\": \"DECRYPT\"\n}",
+        "options": {}
+      },
+      "id": "b0349358-039e-4446-a153-54da1af1e0ad",
+      "name": "GetFBAccessToken",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        980,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fetch = require('node-fetch');\nconst { Headers } = fetch; \nconst { URLSearchParams } = require('url');\nconst qs = require('querystring');\nconst crypto = require('crypto');\nconst FormData = require('form-data');\nconst keys = $('FakeGetAccessToken').first().json;\nconst { ACCESS_TOKEN, PAGE_ID } = keys;\n\n\nasync function uploadMedia(i, fN, mT) {\n  let url = `https://graph.facebook.com/v21.0/${PAGE_ID}/photos`;\n  let method = 'POST';\n  let buffer = await this.helpers.getBinaryDataBuffer(i, 'data')\n  let formData = new FormData();\n  formData.append('source', buffer, { filename: fN, contentType: mT });\n  \n  formData.append('published', 'false')\n  \n  let response = await fetch(url, {\n    method: method,\n    headers: {\n      ...formData.getHeaders(),\n      'Authorization': `OAuth ${ACCESS_TOKEN}`,\n    },\n    body: formData,\n  });\n  console.log(response)\n  if (!response.ok) {\n    console.error('Failed to upload media:', await response.text());\n    return null;\n  }\n  const data = await response.json();\n  console.log(\"Meta media upload result: \", data)\n  return data.id;\n}\n\nasync function postTweet(text, mediaIds) {\n  let url = `https://graph.facebook.com/${PAGE_ID}/feed`;\n  let method = 'POST';\n\n  const myHeaders = new Headers();\n  myHeaders.append(\"Content-Type\", \"application/x-www-form-urlencoded\");\n  const urlencoded = new URLSearchParams();\n  urlencoded.append(\"message\", text);\n  for(let i = 0; i < mediaIds.length; i++ ){\n    let key = \"attached_media[\" + i.toString() + \"]\"\n    let value = \"{media_fbid:\" + mediaIds[i] + \"}\"\n    console.log(key)\n    console.log(value)\n    urlencoded.append(key,value);\n  }\n  urlencoded.append(\"access_token\", ACCESS_TOKEN);\n  console.log('z: ',urlencoded)\n  const requestOptions = {\n    method: \"POST\",\n    headers: myHeaders,\n    body: urlencoded,\n  };\n\n  const response = await fetch(url, requestOptions);\n  console.log('post tweet: ',response)\n  if (!response.ok) {\n    return null;\n  }\n  let res = await response.json()\n  console.log('Tweet posted successfully:', res);\n  return res;\n}\n\nasync function handle() {\n  let inputs = $input.all()\n  let mediaIds = [];\n  for (let i = 0; i < inputs.length; i ++) {\n    let fileName = inputs[i][\"binary\"][\"data\"][\"fileName\"];\n    let mimeType = inputs[i][\"binary\"][\"data\"][\"mimeType\"];\n    let mediaId = await uploadMedia(i, fileName, mimeType);\n    mediaIds.push(mediaId);\n  }\n  if (mediaIds.length) {\n    const postTweetResult = await postTweet('Hi', mediaIds );\n    return {\n      tweet: postTweetResult,\n      media: mediaIds\n    };\n  }\n  return null;\n  \n}\n\nconst res = await handle();\nif (res == null ){\n  return {\n    distributed: false\n  }\n} else {\n  return {\n    distributed: true,\n    data: res\n  }\n}\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        160
+      ],
+      "id": "1a55986a-5a55-40a9-916f-210565fe745b",
+      "name": "DistributeToFBAccount"
+    },
+    {
+      "parameters": {
+        "jsCode": "const distributedMedias = $('GetMediaToDeliver').all().map(x => x[\"json\"]);\nconst distributedFBaccount = $('LinkAndGroupTypeToGetMedia').first().json.Link\nconst input = $input.first()[\"json\"];\nconst tweet = input[\"data\"][\"tweet\"][\"id\"]\nconst part = tweet.split('_')\nconst tweetLink = `https://www.facebook.com/${part[0]}/posts/${part[1]}/`;\n\nconst values = distributedMedias.map(item => {\n  const { Id } = item;\n  return `(${Id}, '${distributedFBaccount}', '${tweetLink}' )`;\n}).join(',\\n');\nconst insertSQL = `\nBEGIN TRANSACTION;\n\nBEGIN TRY\n\n  INSERT INTO XinhDistributionLog \n    (SourceId, DistributionTarget, DistributionLink) \n  VALUES ${values};\n\nCOMMIT TRANSACTION;\nEND TRY\nBEGIN CATCH\n    ROLLBACK TRANSACTION;\nEND CATCH;\n`\nreturn {\n  query: insertSQL.replace(/\\s+/g, ' ').trim()\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2920,
+        140
+      ],
+      "id": "99da93f4-8ee3-462a-a92e-1c459ed02743",
+      "name": "PrepareFBDistributionLog"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "FakeWebhookRequest": {
+      "main": [
+        [
+          {
+            "node": "FakeGetAccessToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DownloadRequest": {
+      "main": [
+        [
+          {
+            "node": "DownloadMedia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetMediaToDeliver": {
+      "main": [
+        [
+          {
+            "node": "DownloadRequest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DownloadMedia": {
+      "main": [
+        [
+          {
+            "node": "DistributeToFBAccount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkAndGroupTypeToGetMedia": {
+      "main": [
+        [
+          {
+            "node": "GetMediaToDeliver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "PrepareFBDistributionLog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FakeGetAccessToken": {
+      "main": [
+        [
+          {
+            "node": "LinkAndGroupTypeToGetMedia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetFBAccessToken": {
+      "main": [
+        []
+      ]
+    },
+    "DistributeToFBAccount": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "KG3wK34JqO8YiJsO",
+    "saveDataSuccessExecution": "none"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        14
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "893343ef-2658-4c4f-99f3-4da5713b3e0f",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-01-15T07:05:58.955Z",
+      "createdAt": "2025-01-15T07:05:58.955Z",
+      "role": "workflow:owner",
+      "workflowId": "4b7tZclMeZZE4Ct6",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
