@@ -1,0 +1,599 @@
+{
+  "updatedAt": "2025-04-08T16:34:04.841Z",
+  "createdAt": "2025-01-08T09:47:51.322Z",
+  "id": "4OHqBDVrirxZhaxa",
+  "name": "Community - 2.2 - Twitter Distribution Processor thang",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.MediaLink }}",
+          "mode": "url"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "id": "a4d91874-7db5-4123-a005-689ea6d1397d",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1840,
+        820
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0bHKCm5aLWAfAeSb",
+          "name": "Google Drive - smars@gnok.top"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// {\n//   \"text\": \"Tweeting with media!\",\n//   \"media\": {\n//     \"media_ids\": [\n//       \"1455952740635586573\"\n//     ]\n//   }\n// }\n\nfunction randomInt(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n\nconst additionalTexts = [\n  \"🫡 https://t.me/gai_xinhh\",\n  \"Còn nhiều lắm 👉🏻: https://t.me/gai_xinhh\",\n  \"Check ở bio 🥵\",\n  \"https://t.me/gai_xinhh 👀👀👀\",\n  \"Full HD không che 💦: https://t.me/gai_xinhh\",\n  \"Ib để nhận thêm 🤫\", \n  \"Link ở đây nè: https://t.me/gai_xinhh\",\n  \"Xem thêm tại đây ➡️: https://t.me/gai_xinhh\",\n  \"Nhiều gái xinh lắm lắm: https://t.me/gai_xinhh\", \n  \"Cực phẩm 😋: https://t.me/gai_xinhh\",\n  \"Đảm bảo chất lượng 🔥: https://t.me/gai_xinhh\",\n  \"Nóng bỏng tay 🥵: https://t.me/gai_xinhh\",\n  \"Mỗi ngày một em xinh 💋: https://t.me/gai_xinhh\",\n  \"Ghé thăm kênh mình nhé 😉: https://t.me/gai_xinhh\",\n  \"Tuyển mem VIP 💎: https://t.me/gai_xinhh\" ,\n  \"Hí ae, link full HD bên dưới nhé 🤫 \\nhttps://t.me/gai_xinhh\",\n  \"Gái xinh chất lượng cao đây, click link bio nha 😉\",\n  \"Muốn xem thêm thì vào đây 💦: https://t.me/gai_xinhh\",\n  \"Hàng tuyển chọn kỹ càng, đảm bảo anh em hài lòng 🔥: https://t.me/gai_xinhh\",\n  \"Đừng quên follow kênh để cập nhật hình mới mỗi ngày nha anh em 🤤\",\n  \"Inbox mình để nhận thêm ảnh độc quyền nhé 📩\",\n  \"Chấm cái (.) để mình gửi ... cho 😜\",\n  \"ae nhanh tay thì còn, chậm tay cũng còn luôn =)) https://t.me/gai_xinhh\",\n  \"Kênh kín dành riêng cho ae đó 🤫\",\n  \"ae có thích livestream không?\",\n  \"Gái xinh mọi miền tổ quốc 🤤🤤🤤 https://t.me/gai_xinhh\",\n  \"Thiên đường đang chờ đón ae 😇: https://t.me/gai_xinhh\",\n  \"Lưu ý: chỉ dành cho người trên 18 tuổi 🔞\" \n]\nconst additionalText = additionalTexts[randomInt(0, additionalTexts.length - 1)];\n\nconst medias = $items(\"Microsoft SQL\");\nconst json = \n{\n  \"text\": medias.find(item => item.json.text !== null)?.json.text,\n  \"media\": {\n    \"media_ids\": $node[\"Aggregate2\"].json[\"data\"].map(item => item.media_id_string).slice(0, 4)\n  }\n}\nif(json.text)\n  json.text += \"\\n\" + additionalText;\nelse \n  json.text = additionalText;\nreturn {\n  \"postData\": JSON.stringify(json)\n}\n"
+      },
+      "id": "e860ee3e-9abe-41a2-87b6-ec33628a6b39",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2380,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.x.com/2/tweets",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twitterOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.postData }}",
+        "options": {}
+      },
+      "id": "e99e69ad-2126-41ef-a924-96f26c4dcfaf",
+      "name": "Create Tweet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2560,
+        820
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "D47OWNn8MH6a9M2Z",
+          "name": "X OAuth 1.0 - @AidanNg10"
+        },
+        "twitterOAuth2Api": {
+          "id": "mOVEl5bsMRTRJrcQ",
+          "name": "X Oauth 2.0 - @Gai_Xinhhh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://upload.twitter.com/1.1/media/upload.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twitterOAuth1Api",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "media",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5d362ba8-82d2-45e7-a505-f0be2d7a711a",
+      "name": "Upload Media",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2020,
+        820
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "Nqfz2xhZuwdZ9XCU",
+          "name": "X OAuth 1.0 - @Gai_Xinhhh"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// X allow maximum 4 image/video\nvar text =  $node[\"Aggregate1\"].json[\"data\"].find(item => item.Text !== null)?.Text;\nvar fourItem = $node[\"Aggregate1\"].json[\"data\"].filter(item => item.Type.replace(\"FileType.\", \"\").toLowerCase() !== 'video').slice(0, 4);\nfourItem[0].Text = text;\n\nconst newItems = [];\nfourItem.forEach((item) => {\n  newItems.push({json: item})\n})\nreturn newItems;"
+      },
+      "id": "e0ea446b-7863-40ca-a54c-2ec95e80e70f",
+      "name": "Take 4",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        820
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "e85388d8-1852-43d0-aa44-162969b27377",
+      "name": "Aggregate2",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "a2b8831a-533c-4ce8-bc58-f4bc3727893f",
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        820
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7f3765bd-debe-4040-9114-0dcf34fdd386",
+        "options": {}
+      },
+      "id": "5cf310f9-a6dd-4c1c-83c1-d8463cd636c7",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        500,
+        160
+      ],
+      "webhookId": "7f3765bd-debe-4040-9114-0dcf34fdd386",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// const input = $input.first().json\nreturn {\n  body : {\n    DistributionTarget: {\n      //Id: input[\"ChatId\"],\n      Link: 'https://x.com/thang_nd_2802',\n      Username: 'thang_nd_2802',\n      GroupType: 'XINH'\n    },\n  }\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        160
+      ],
+      "id": "674bf563-f709-4cb8-9b15-4f7aa11c6374",
+      "name": "FakeWebhookRequest"
+    },
+    {
+      "parameters": {
+        "content": "Fake webhook request",
+        "height": 240,
+        "width": 200,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        680,
+        80
+      ],
+      "id": "7cbf7d49-d3f5-4f7c-a073-96b0fc8f18b7",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH TopRecord AS\n(\n    SELECT TOP 1 x.Id, x.\"Type\", \"Text\", MediaLink , MessageGroupedId, x.ChatId\n    FROM XinhTelegramMedia x\n    JOIN TelegramGroupSource tg ON x.ChatId = tg.ChatId\n    WHERE \n    NOT EXISTS (\n        SELECT 1\n        FROM XinhDistributionLog xl\n        WHERE x.Id = xl.SourceId AND DistributionTarget <> '{{ $json.Link }}'\n    )\n    --AND \"Status\"  = 'APPROVED' -- THIS LINE WILL BE UNCOMMENT\n    AND MediaLink NOT LIKE 'https://drive.google.com%' -- THIS LINE MAY BE REMOVED\n    AND MessageGroupedId IS NULL -- THIS LINE WILL BE REMOVED\n    AND tg.GroupType = '{{ $json.GroupType }}'\n    AND x.\"Type\" = 'FileType.PHOTO' -- THIS LINE WILL BE REMOVED \n)\nSELECT x.Id, x.\"Type\", x.\"Text\", x.MediaLink, x.MessageGroupedId, ChatId, ca.Credentials\nFROM XinhTelegramMedia x\nJOIN CommunityAccount ca ON x.DriveAccount = ca.\"User\"\nWHERE \n    (SELECT MessageGroupedId FROM TopRecord) IS NULL \n    AND x.Id = (SELECT Id FROM TopRecord)\n    OR \n    ( x.MessageGroupedId = (SELECT MessageGroupedId FROM TopRecord) AND x.ChatId = (SELECT ChatId from TopRecord)  )"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        1340,
+        160
+      ],
+      "id": "2e7bf63d-8397-4425-86ee-d12511152ced",
+      "name": "GetMediaToDeliver",
+      "credentials": {
+        "microsoftSql": {
+          "id": "sBluV7uBt8ahdNUT",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_CommunityData"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all().map(i => i[\"json\"]);\n\nreturn input.map(i => {\n  return {\n    file_token: i[\"MediaLink\"],\n    action: 'DOWNLOAD',\n    credential: i[\"Credentials\"],\n    type: i[\"Type\"],\n    text: i[\"Text\"],\n  }\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        160
+      ],
+      "id": "7f707cb6-e92a-450a-a4a4-1af6acda2d67",
+      "name": "DownloadRequest"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ogmJgoLqdW6PB9NO",
+          "mode": "list",
+          "cachedResultName": "Lark Process"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        1840,
+        160
+      ],
+      "id": "16d80fec-da44-471d-8f49-a770a071e953",
+      "name": "DownloadMedia"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = $('FakeWebhookRequest').first().json.body // should change to webhook\n\nreturn data[\"DistributionTarget\"]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        160
+      ],
+      "id": "8a8ba1e9-24e0-4270-8e5d-dfb73386b24f",
+      "name": "LinkAndGroupTypeToGetMedia"
+    },
+    {
+      "parameters": {
+        "content": "#### This can be reuse for different platform, just pass in:\n1. DistributionTarget - Link (from distribution log)\n2. Type of group (XINH, HAI, ...)\n#### Then get the suitable media to distribute",
+        "height": 320,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        0
+      ],
+      "id": "3f853410-d85f-4d62-a003-7a40c904774c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n9n.yoong.xyz/webhook/aes-f545f8a6-0c16-4131-8162-8caa8c41f5ad",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"text\": \"{{$json[\"body\"][\"BotAccessToken\"]}}\",\n    \"action\": \"DECRYPT\"\n}",
+        "options": {}
+      },
+      "id": "90c2d138-8a96-4f4d-a202-029ff332dcd0",
+      "name": "GetTwitterKeys",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const API_KEY = 'TEHE13PjM0m4F04tpREn8iWNZ';\nconst ACCESS_TOKEN = '1766431905514463232-DtrVZhd9jscqulLDTdWOlP5surwIHo';\nconst API_SECRET_KEY = 'T4nhkYlfmkHFakX5uiGdYXZB6nLY4R8VO5wIMDpZMUMY7Tv6YR';\nconst ACCESS_TOKEN_SECRET = 'NiPsudHXhrXXqPDo9BHjtOSS1klM5OUy7dnlwY6Jh2AZw';\nconst BEARER_TOKEN = 'AAAAAAAAAAAAAAAAAAAAAC7uxwEAAAAAvS2hVfEGUAZ9fMmHl90N3aw75%2Fo%3DSJUarz9HmeNva2DUbi1Ln4zsALoioAdxqRkcWzsyYrCYWiJ3do'\nreturn {\n  BEARER_TOKEN,\n  API_KEY,\n  ACCESS_TOKEN,\n  API_SECRET_KEY,\n  ACCESS_TOKEN_SECRET\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        440
+      ],
+      "id": "dc59eeda-d594-4d16-9753-73476597569e",
+      "name": "FakeGetTwitterKeys"
+    },
+    {
+      "parameters": {
+        "jsCode": "const distributedMedias = $('GetMediaToDeliver').all().map(x => x[\"json\"]);\nconst distributedXaccount = $('LinkAndGroupTypeToGetMedia').first().json.Link\nconst input = $input.first()[\"json\"];\nconst tweet = input[\"data\"][\"tweet\"][\"data\"][\"text\"];\nconst regex = /(http[s]?:\\/\\/\\S+)/g; // Regular expression to match URLs\nconst tweetLink = tweet.match(regex);\n// should take the mediaIds to create extraData\n\nconst values = distributedMedias.map(item => {\n  const { Id } = item;\n  return `(${Id}, '${distributedXaccount}', '${tweetLink}' )`;\n}).join(',\\n');\nconst insertSQL = `\nBEGIN TRANSACTION;\n\nBEGIN TRY\n\n  INSERT INTO XinhDistributionLog \n    (SourceId, DistributionTarget, DistributionLink) \n  VALUES ${values};\n\nCOMMIT TRANSACTION;\nEND TRY\nBEGIN CATCH\n    ROLLBACK TRANSACTION;\nEND CATCH;\n`\nreturn {\n  query: insertSQL.replace(/\\s+/g, ' ').trim()\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2700,
+        140
+      ],
+      "id": "485e573f-ce66-41a6-94d1-424c8ecc5f7c",
+      "name": "PrepareXDistributionLog"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fetch = require('node-fetch');\nconst { URLSearchParams } = require('url');\nconst qs = require('querystring');\nconst crypto = require('crypto');\nconst FormData = require('form-data');\n// this is Thang's tokens. Account just like a bot. Please don't hack me \nconst keys = $('FakeGetTwitterKeys').first().json;\nconst { BEARER_TOKEN, API_KEY, ACCESS_TOKEN, API_SECRET_KEY, ACCESS_TOKEN_SECRET } = keys;\nfunction generateOAuthParams(url, method) {\n  const oauthParams = {\n    oauth_consumer_key: API_KEY,\n    oauth_nonce: crypto.randomBytes(16).toString('hex'),\n    oauth_signature_method: 'HMAC-SHA1',\n    oauth_timestamp: Math.floor(Date.now() / 1000).toString(),\n    oauth_token: ACCESS_TOKEN,\n    oauth_version: '1.0',\n  };\n\n  const baseString = [\n    method.toUpperCase(),\n    encodeURIComponent(url),\n    encodeURIComponent(new URLSearchParams(oauthParams).toString()),\n  ].join('&');\n\n  const signingKey = `${API_SECRET_KEY}&${ACCESS_TOKEN_SECRET}`;\n  oauthParams.oauth_signature = crypto.createHmac('sha1', signingKey).update(baseString).digest('base64');\n\n  return oauthParams;\n}\n\nfunction buildOAuthHeader(oauthParams) {\n  let header = 'OAuth ' + Object.keys(oauthParams)\n    .map(key => `${encodeURIComponent(key)}=\"${encodeURIComponent(oauthParams[key])}\"`)\n    .join(', ');\n  return header;\n}\n\nasync function uploadMedia(i, fN, mT) {\n  let url = 'https://upload.twitter.com/1.1/media/upload.json';\n  let method = 'POST';\n  let oauth = generateOAuthParams(url, method);\n  let buffer = await this.helpers.getBinaryDataBuffer(i, 'data')\n  let formData = new FormData();\n  formData.append('media', buffer, { filename: fN, contentType: mT });\n  let response = await fetch(url, {\n    method: method,\n    headers: {\n      ...formData.getHeaders(),\n      'Authorization': buildOAuthHeader(oauth),\n    },\n    body: formData,\n  });\n  console.log(response)\n  if (!response.ok) {\n    console.error('Failed to upload media:', await response.text());\n    return null;\n  }\n  const data = await response.json();\n  console.log(\"x media upload result: \", data)\n  return data.media_id_string;\n}\n\nasync function postTweet(text, mediaIds) {\n  let url = 'https://api.twitter.com/2/tweets';\n  let method = 'POST';\n  let oauth = generateOAuthParams(url, method);\n  const response = await fetch(url, {\n    method: 'POST',\n    headers: {\n      // 'Authorization': `Bearer ${BEARER_TOKEN}`,\n      'Authorization': buildOAuthHeader(oauth),\n      'Content-Type': 'application/json',\n    },\n    body: JSON.stringify({\n      text: text,\n      media: { media_ids: mediaIds }\n    })\n  });\n  console.log('post tweet: ',response)\n  if (!response.ok) {\n    return null;\n  }\n  let res = await response.json()\n  console.log('Tweet posted successfully:', res);\n  return res;\n}\n\nasync function handle() {\n  let inputs = $input.all()\n  let mediaIds = ['1876552771157291008'];\n  // for (let i = 0; i < inputs.length; i ++) {\n  //   let fileName = inputs[i][\"binary\"][\"data\"][\"fileName\"];\n  //   let mimeType = inputs[i][\"binary\"][\"data\"][\"mimeType\"];\n  //   let mediaId = await uploadMedia(i, fileName, mimeType);\n  //   mediaIds.push(mediaId);\n  // }\n  if (mediaIds.length) {\n    const postTweetResult = await postTweet('Hi', mediaIds );\n    return {\n      tweet: postTweetResult,\n      media: mediaIds\n    };\n  }\n  return null;\n  \n}\n\nconst res = await handle();\nif (res == null ){\n  return {\n    distributed: false\n  }\n} else {\n  return {\n    distributed: true,\n    data: res\n  }\n}\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2140,
+        160
+      ],
+      "id": "ecacacc7-520b-4952-ba19-bd3625a2a4f1",
+      "name": "DistributeToXAccount"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e88ad698-289d-42b8-bbac-014a2c5392c8",
+              "leftValue": "={{ $json.distributed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2360,
+        160
+      ],
+      "id": "83cce4c3-1ba7-46f1-8ea9-46fd1fe69dd1",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        2380,
+        460
+      ],
+      "id": "01fcd030-ed76-4f89-a059-1a3798a83225",
+      "name": "X",
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "mOVEl5bsMRTRJrcQ",
+          "name": "X Oauth 2.0 - @Gai_Xinhhh"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Upload Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Create Tweet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Media": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Take 4": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Take 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "FakeWebhookRequest": {
+      "main": [
+        [
+          {
+            "node": "FakeGetTwitterKeys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DownloadRequest": {
+      "main": [
+        [
+          {
+            "node": "DownloadMedia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetMediaToDeliver": {
+      "main": [
+        [
+          {
+            "node": "DownloadRequest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DownloadMedia": {
+      "main": [
+        [
+          {
+            "node": "DistributeToXAccount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkAndGroupTypeToGetMedia": {
+      "main": [
+        [
+          {
+            "node": "GetMediaToDeliver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetTwitterKeys": {
+      "main": [
+        []
+      ]
+    },
+    "FakeGetTwitterKeys": {
+      "main": [
+        [
+          {
+            "node": "LinkAndGroupTypeToGetMedia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DistributeToXAccount": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "PrepareXDistributionLog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "KG3wK34JqO8YiJsO",
+    "saveDataSuccessExecution": "none"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        14
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "0ff1e260-8bef-49b1-92e0-8eb4dc07cd03",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-01-08T09:47:51.322Z",
+      "createdAt": "2025-01-08T09:47:51.322Z",
+      "role": "workflow:owner",
+      "workflowId": "4OHqBDVrirxZhaxa",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
