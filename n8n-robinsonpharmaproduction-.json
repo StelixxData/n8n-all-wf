@@ -1,0 +1,1063 @@
+{
+  "updatedAt": "2025-07-22T03:20:39.098Z",
+  "createdAt": "2025-07-22T03:08:36.992Z",
+  "id": "sBa6du0eTmVqllJf",
+  "name": "RobinsonPharmaProduction",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const mailData =  [\n  {\n    \"thread_id\": \"thread-PO-2504-1162\",\n    \"order_id\": \"PO-2504-1162\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-1162-1\",\n        \"from\": \"Thanh Nguyen <ThanhNguyen@rpi.inc>\",\n        \"to\": [\"Sara New <customerservice@pdgusa.com>\", \"Kevin Gwartney <kgwartney@pdgusa.com>\"],\n        \"cc\": [\"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"Kody Nguyen <kodynguyen@rpi.inc>\"],\n        \"subject\": \"2504-1162 BX-15X9LX7L-01\",\n        \"date\": \"2025-04-07T12:18:00+07:00\",\n        \"body\": \"Hello Sara,\\nPlease process the order attached and confirm the soonest ETA. Please provide me with a copy of the packing list and Certificate of Compliance once it becomes available.\\nThank you!\\nBest Regards,\\nThanh Nguyen\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-1162-2\",\n        \"from\": \"Sara New <customerservice@pdgusa.com>\",\n        \"to\": [\"Thanh Nguyen <ThanhNguyen@rpi.inc>\", \"Kevin Gwartney <kgwartney@pdgusa.com>\"],\n        \"cc\": [\"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"Kody Nguyen <kodynguyen@rpi.inc>\"],\n        \"subject\": \"RE: 2504-1162 BX-15X9LX7L-01\",\n        \"date\": \"2025-04-07T14:08:00+07:00\",\n        \"body\": \"Hello Thanh,\\nThe PO has been received and I will update you with the soonest ETA.\\nThank you,\\nSara\\nNewPackage Design Global\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-1162-3\",\n        \"from\": \"Kody Nguyen <kodynguyen@rpi.inc>\",\n        \"to\": [\"Sara New <customerservice@pdgusa.com>\", \"Thanh Nguyen <ThanhNguyen@rpi.inc>\", \"Kevin Gwartney <kgwartney@pdgusa.com>\"],\n        \"cc\": [\"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"subject\": \"Re: 2504-1162 BX-15X9LX7L-01\",\n        \"date\": \"2025-04-08T14:43:00+07:00\",\n        \"body\": \"Hi Sara,\\nI wanted to follow and see if there were any updates regarding the ETA for this PO\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-1162-4\",\n        \"from\": \"Kevin Gwartney <kgwartney@pdgusa.com>\",\n        \"to\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Sara New <customerservice@pdgusa.com>\", \"Thanh Nguyen <ThanhNguyen@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: 2504-1162 BX-15X9LX7L-01\",\n        \"date\": \"2025-04-11T09:00:00+07:00\",\n        \"body\": \"Hey Kody,\\nOrder is confirmed for 4/11.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-1162-5\",\n        \"from\": \"Kody Nguyen <kodynguyen@rpi.inc>\",\n        \"to\": [\"Kevin Gwartney <kgwartney@pdgusa.com>\", \"Sara New <customerservice@pdgusa.com>\", \"Thanh Nguyen <ThanhNguyen@rpi.inc>\"],\n        \"cc\": [\"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"subject\": \"Re: 2504-1162 BX-15X9LX7L-01\",\n        \"date\": \"2025-04-14T13:29:00+07:00\",\n        \"body\": \"Hi Kevin,\\nWe received 18,000/20,000. Could you please confirm if the remaining bottles will be shipped, or should we consider this order complete?\\nThank you\",\n        \"is_new_email\": false\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-MR2503-0325\",\n    \"order_id\": \"MR2503-0325\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0325-1\",\n        \"from\": \"Dennis Nguyen <DennisNguyen@rpi.inc>\",\n        \"to\": [\"Kyle Whipple <kyle.whipple@pretiumpkg.com>\", \"William McGee <william.mcgee@pretiumpkg.com>\"],\n        \"cc\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Aden Lam <AdenLam@rpi.inc>\"],\n        \"subject\": \"[EXTERNAL] MR2503-0325\",\n        \"date\": \"2025-04-02T14:26:00+07:00\",\n        \"body\": \"Hello, Please process the order attached and confirm the soonest ETA.***a confirmed ETA must be provided within 48 hours after the PO placement. If there is no feedback, the buyer will assume the vendor can meet the required ETA mentioned on the PO. Thank you!***\\n\\nBest Regards\\nDennis Nguyen\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0325-2\",\n        \"from\": \"Kyle Whipple <kyle.whipple@pretiumpkg.com>\",\n        \"to\": [\"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"William McGee <william.mcgee@pretiumpkg.com>\", \"Jennifer Monroe <jmonroe@pretiumpkg.com>\"],\n        \"cc\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Aden Lam <AdenLam@rpi.inc>\", \"Katia Martinez <kmartinez@pretiumpkg.com>\"],\n        \"subject\": \"RE: [EXTERNAL] MR2503-0325\",\n        \"date\": \"2025-04-02T14:30:00+07:00\",\n        \"body\": \"Thanks Dennis for sending this order over for more 10oz White HDPE Jars! Its exciting to hear Bausch & Lomb are getting back on track with their soft gel product line.We’ll process this order and have an order acknowledgment for you shortly.\\nBest regards,\\nKyle Whipple\",\n        \"is_new_email\": false,\n      },\n      {\n        \"message_id\": \"msg-0325-3\",\n        \"from\": \"Jennifer Monroe <jmonroe@pretiumpkg.com>\",\n        \"to\": [\"Kyle Whipple <kyle.whipple@pretiumpkg.com>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"William McGee <william.mcgee@pretiumpkg.com>\"],\n        \"cc\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Aden Lam <AdenLam@rpi.inc>\", \"Katia Martinez <kmartinez@pretiumpkg.com>\"],\n        \"subject\": \"RE: [EXTERNAL] MR2503-032\",\n        \"date\": \"2025-04-03T09:22:00+07:00\",\n        \"body\": \"Hi Dennis,\\nThank you for your order! Confirmation is attached for your records. Please review and advise if you have any questions.\\nThank you,\\nJennifer Monroe\",\n        \"is_new_email\": true\n      },\n      {\n        \"message_id\": \"msg-0325-4\",\n        \"from\": \"Kody Nguyen <kodynguyen@rpi.inc>\",\n        \"to\": [\"Jennifer Monroe <jmonroe@pretiumpkg.com>\", \"Kyle Whipple <kyle.whipple@pretiumpkg.com>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"William McGee <william.mcgee@pretiumpkg.com>\"],\n        \"cc\": [\"Aden Lam <AdenLam@rpi.inc>\", \"Katia Martinez <kmartinez@pretiumpkg.com>\"],\n        \"subject\": \"Re: [EXTERNAL] MR2503-0325\",\n        \"date\": \"2025-04-04T16:14:00+07:00\",\n        \"body\": \"Hi Jennifer,\\nThank you for the order acknowledgement. I already updated the pricing in our system. However, upper management would like to know the reason for the price increase. Is it due to the recent tariffs or is it due to something else?\\nBest regards,\\nKody Nguyen\",\n        \"is_new_email\": true\n      },\n      {\n        \"message_id\": \"msg-0325-5\",\n        \"from\": \"Jennifer Monroe <jmonroe@pretiumpkg.com>\",\n        \"to\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Kyle Whipple <kyle.whipple@pretiumpkg.com>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"William McGee <william.mcgee@pretiumpkg.com>\"],\n        \"cc\": [\"Aden Lam <AdenLam@rpi.inc>\", \"Katia Martinez <kmartinez@pretiumpkg.com>\"],\n        \"subject\": \"RE: [EXTERNAL] MR2503-032\",\n        \"date\": \"2025-04-04T16:19:00+07:00\",\n        \"body\": \"Hi Kody,\\nIt is due to the cost of resin.\\nThank you\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-MR2503-0158\",\n    \"order_id\": \"MR2503-0158\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0158-1\",\n        \"from\": \"Dennis Nguyen <DennisNguyen@rpi.inc>\",\n        \"to\": [\"Chandler Labrum <chandler@h3plastics.com>\", \"Kassidy Francis <kassidy@h3plastics.com>\"],\n        \"cc\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Aden Lam <AdenLam@rpi.inc>\"],\n        \"subject\": \"PO MR2503-0158\",\n        \"date\": \"2025-03-14T11:27:00+07:00\",\n        \"body\": \"Hello,\\nPlease process the order attached and confirm the soonest ETA.\\n***a confirmed ETA must be provided within 48 hours after the PO placement. If there is no feedback, the buyer will assume the vendor can meet the required ETA mentioned on the PO. Thank you!***\\nBest Regards,\\nDennis Nguyen\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0158-2\",\n        \"from\": \"Kassidy Francis <kassidy@h3plastics.com>\",\n        \"to\": [\"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"Chandler Labrum <chandler@h3plastics.com>\"],\n        \"cc\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Aden Lam <AdenLam@rpi.inc>\", \"Shipping <shipping@h3plastics.com>\", \"Mike Young <mike@h3plastics.com>\"],\n        \"subject\": \"RE: PO MR2503-0158\",\n        \"date\": \"2025-04-07T09:15:00+07:00\",\n        \"body\": \"Schedule pick up\\nPick up Date  4/8/2025\\nCompany name  H3 Plastics\\nWarehouse address  756 E Quality Drive, American Fork UT  84003\\nWarehouse hours  8:00am - 3:30pm\\nPoint of contact name  Gabe Black\\nPoint of contact phone#  385-327-9141\\nPick up# (OR RPI PO#)   RPI PO-MR2503-0158\\nTotal pallets  4\\nGross weight with pallet(s) LBS  1600\\nPallet Dimensions  48x40x103\\nClass #  175\\nCommodity name   BA-225-PET(Plastic Bottles)\\nAdditional NOTE  SHIP TO ROBINSON PHARMA, INC.  1683 SUNFLOWER AVE  COSTA MESA, CA 92626\\n\\nWe have these ready for you!\\nThank you!\\nKassidy Francis\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0158-3\",\n        \"from\": \"Aden Lam <AdenLam@rpi.inc>\",\n        \"to\": [\"Kassidy Francis <kassidy@h3plastics.com>\", \"Chandler Labrum <chandler@h3plastics.com>\", \"Felisha Jones <felisha.jones@tallgrassfreight.com>\"],\n        \"cc\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Shipping <shipping@h3plastics.com>\", \"Mike Young <mike@h3plastics.com>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"subject\": \"Re: PO MR2503-0158\",\n        \"date\": \"2025-04-07T10:54:00+07:00\",\n        \"body\": \"Hi all,Please refer to this for PO #MR2503-0158, Item: BW-225-PET, Picking up: 4/7Tall Grass Freight team will provide the BOL and assign the pickup\\nWhen the COC/Packing is ready to be released, please follow the instructions below:\\nIMPORTANT: OUR RECEIVING TEAM WILL REJECT ALL SHIPMENTS WITHOUT PROPER DOCUMENTATION Please send the digital PDF packing slip & CoC to RP.ReceivingTeam@rpi.inc,  prior to ship date to make sure our receiving team has the necessary documents\\nPlease forward all invoices to accountpayable@rpi.inc\\nThank you,\\nAden Lam\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0158-4\",\n        \"from\": \"Kody Nguyen <kodynguyen@rpi.inc>\",\n        \"to\": [\"Aden Lam <AdenLam@rpi.inc>\", \"Kassidy Francis <kassidy@h3plastics.com>\", \"Chandler Labrum <chandler@h3plastics.com>\", \"Felisha Jones <felisha.jones@tallgrassfreight.com>\"],\n        \"cc\": [\"Shipping <shipping@h3plastics.com>\", \"Mike Young <mike@h3plastics.com>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"Account Payable <ap@h3plastics.com>\"],\n        \"subject\": \"Re: PO MR2503-0158\",\n        \"date\": \"2025-04-10T09:10:00+07:00\",\n        \"body\": \"Hi H3 AP Team,\\nCould you please send a revised COC that includes the date of manufacture for my QC team to log this shipment in.Thank you!\\nBest regards,\\nKody Nguyen\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-MR2503-0156\",\n    \"order_id\": \"MR2503-0156\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0156-1\",\n        \"from\": \"Dennis Nguyen <DennisNguyen@rpi.inc>\",\n        \"to\": [\"Jeanette Terraciano <Jterraciano@axiumplastics.com>\", \"Chelsea Bullock <cbullock@axiumplastics.com>\"],\n        \"cc\": [\"Kody Nguyen <kodynguyen@rpi.inc>\"],\n        \"subject\": \"MR2503-0156\",\n        \"date\": \"2025-03-17T20:13:00+07:00\",\n        \"body\": \"Hello,\\nPlease process the order attached and confirm the soonest ETA.***a confirmed ETA must be provided within 48 hours after the PO placement. If there is no feedback, the buyer will assume the vendor can meet the required ETA mentioned on the PO. Thank Thanks you!***\\n\\nBest Regards,\\nDennis Nguyen\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-2\",\n        \"from\": \"Jeanette Terraciano <Jterraciano@axiumplastics.com>\",\n        \"to\": [\"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"Chelsea Bullock <cbullock@axiumplastics.com>\"],\n        \"cc\": [\"Kody Nguyen <kodynguyen@rpi.inc>\"],\n        \"subject\": \"RE: MR2503-0156\",\n        \"date\": \"2025-03-19T08:38:00+07:00\",\n        \"body\": \"Good morning,\\nYour order has been received and processed. We expect to meet your due date of 4/7.\\nPlease adjust quantity for item BG-200-PET-PP to 32,760 for full pallets\\nCurrent shipment availability, subject to change:\\n4/6 shipment availability for item BG-200-PET-PP\\n3/22 shipment availability for item BG-300-PET-PP\\n3/22 shipment availability for item BG-150-PET-PP\\n\\nHave a great day,\\nJeanette Terraciano\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-3\",\n        \"from\": \"Kody Nguyen <kodynguyen@rpi.inc>\",\n        \"to\": [\"Jeanette Terraciano <Jterraciano@axiumplastics.com>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Aden Lam <AdenLam@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: MR2503-0156\",\n        \"date\": \"2025-03-19T12:44:00+07:00\",\n        \"body\": \"Hi Jeanette,\\nThank you for the update. I've updated the shipping dates in our system and have informed our logistics @Aden Lam. Could you please let me know the quantity of the next pallet size down. 32,760 is a bit to much for our warehouse to take in.\\n\\nBest regards,\\nKody Nguyen\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-4\",\n        \"from\": \"Jeanette Terraciano <Jterraciano@axiumplastics.com>\",\n        \"to\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\", \"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Aden Lam <AdenLam@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"RE: MR2503-0156\",\n        \"date\": \"2025-03-19T10:02:00+07:00\",\n        \"body\": \"Kody,\\nQuantity would be 26,208 – 8 pallets.\\n\\nHave a great day,\\nJeanette Terraciano\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-5\",\n        \"from\": \"Aden Lam <AdenLam@rpi.inc>\",\n        \"to\": [\"Jeanette Terraciano <Jterraciano@axiumplastics.com>\", \"Kody Nguyen <kodynguyen@rpi.inc>\", \"DennisNguyen <DennisNguyen@rpi.inc>\", \"Chelsea Bullock <cbullock@axiumplastics.com>\"],\n        \"cc\": [],\n        \"subject\": \"Re: MR2503-0156\",\n        \"date\": \"2025-03-19T13:33:00+07:00\",\n        \"body\": \"Hi Jeannette,\\nHope all is well,\\nWhen the information is available, may you please help fill in the following table for any missing details so that I can schedule the pickup with my carrier?\\nSchedule pick up\\nPick up Date  3/26/25\\nCompany name  Axium Plastics\\nWarehouse address  2010 Spillman DriveBethlehem PA 43054\\nWarehouse hours  8am – 3pm\\nPoint of contact name  Reema\\nPoint of contact phone#  484-705-5499\\nPick up# (OR RPI PO#)   REFERENCE/PU#?RPI P.O. # MR2503-0156\\nTotal pallets  14\\nGross weight with pallet(s) LBS 6,500\\nPallet Dimensions  48 x 40 x 96\\nClass #  NFMC Code:I can fill this in\\nCommodity name   BR-150-PET-PP, BG-300-PET-PP (Plastic Bottles)Additional\\nNOTE  SHIP TO ROBINSON PHARMA, INC.  1683 SUNFLOWER AVE  COSTA MESA, CA 92626\\n\\nThank you,\\nAden Lam\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-6\",\n        \"from\": \"Jeanette Terraciano <Jterraciano@axiumplastics.com>\",\n        \"to\": [\"Aden Lam <AdenLam@rpi.inc>\", \"Kody Nguyen <kodynguyen@rpi.inc>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"RE: MR2503-0156\",\n        \"date\": \"2025-03-25T15:39:00+07:00\",\n        \"body\": \"Good afternoon,\\nPlease see below.\\nHave a great day,\\nJeanette Terraciano\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-7\",\n        \"from\": \"Jeanette Terraciano <Jterraciano@axiumplastics.com>\",\n        \"to\": [\"Aden Lam <AdenLam@rpi.inc>\", \"Kody Nguyen <kodynguyen@rpi.inc>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"RE: MR2503-0156\",\n        \"date\": \"2025-03-31T10:40:00+07:00\",\n        \"body\": \"Good afternoon,\\nSchedule pick up\\nPick up Date  3/31/25\\nCompany name  Axium Plastics\\nWarehouse address  2010 Spillman DriveBethlehem PA 43054\\nWarehouse hours  8am – 3pm\\nPoint of contact name  Reema\\nPoint of contact phone#  484-705-5499\\nPick up# (OR RPI PO#)   REFERENCE/PU#?80307936 RPI P.O. # MR2503-0156\\nTotal pallets  10Gross weight with pallet(s) LBS 2,200\\nPallet Dimensions  48 x 40 x 96\\nClass #  NFMC Code: I can fill this in\\nCommodity name   BG-300-PET-PP (Plastic Bottles)\\nAdditional NOTE  SHIP TO ROBINSON PHARMA, INC.  1683 SUNFLOWER AVE  COSTA MESA, CA 92626\\n\\nHave a great day,\\nJeanette Terraciano\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-8\",\n        \"from\": \"Aden Lam <AdenLam@rpi.inc>\",\n        \"to\": [\"Jeanette Terraciano <Jterraciano@axiumplastics.com>\", \"Kody Nguyen <kodynguyen@rpi.inc>\", \"DennisNguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"Re: MR2503-0156\",\n        \"date\": \"2025-03-31T14:24:00+07:00\",\n        \"body\": \"Hi Jeanette\\nWhat is the pickup# the driver have to refer for this one?\\nThank you,\\nBest Regards,\\nAden Lam\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-9\",\n        \"from\": \"Jeanette Terraciano <Jterraciano@axiumplastics.com>\",\n        \"to\": [\"Aden Lam <AdenLam@rpi.inc>\", \"Kody Nguyen <kodynguyen@rpi.inc>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"RE: MR2503-0156\",\n        \"date\": \"2025-03-31T11:25:00+07:00\",\n        \"body\": \"Hi Aden,\\nApologies I missed that section. 80307936\\nHave a great day,\\nJeanette Terraciano\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-10\",\n        \"from\": \"Aden Lam <AdenLam@rpi.inc>\",\n        \"to\": [\"Jeanette Terraciano <Jterraciano@axiumplastics.com>\", \"Kody Nguyen <kodynguyen@rpi.inc>\", \"DennisNguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"Re: MR2503-0156\",\n        \"date\": \"2025-03-31T14:59:00+07:00\",\n        \"body\": \"Hi Jeanette,\\nPlease see the attached BOL for 4/1 pickup\\nCarrier: TBA\\nIMPORTANT: OUR RECEIVING TEAM WILL REJECT ALL SHIPMENTS WITHOUT PROPER DOCUMENTATION Please send the digital PDF packing slip & CoC to RP.ReceivingTeam@rpi.inc,  prior to ship date to make sure our receiving team has the necessary documents\\nPlease forward all invoices to accountpayable@rpi.inc\\nWarm Regards,\\nAden Lam\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-11\",\n        \"from\": \"Aden Lam <AdenLam@rpi.inc>\",\n        \"to\": [\"Jeanette Terraciano <Jterraciano@axiumplastics.com>\", \"Kody Nguyen <kodynguyen@rpi.inc>\", \"DennisNguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"Re: MR2503-0156\",\n        \"date\": \"2025-03-31T15:42:00+07:00\",\n        \"body\": \"Carrier: Cargo Solution\\nBest Regards,\\nAden Lam\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-12\",\n        \"from\": \"Kody Nguyen <kodynguyen@rpi.inc>\",\n        \"to\": [\"Aden Lam <AdenLam@rpi.inc>\", \"Jeanette Terraciano <Jterraciano@axiumplastics.com>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"Re: MR2503-0156\",\n        \"date\": \"2025-04-07T18:58:00+07:00\",\n        \"body\": \"Hi Jeanette,\\nAre there any updates on the ETA for the Green 200CC PET bottles.\\nBest regards,\\nKody Nguyen\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-13\",\n        \"from\": \"Jeanette Terraciano <Jterraciano@axiumplastics.com>\",\n        \"to\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Aden Lam <AdenLam@rpi.inc>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"RE: MR2503-0156\",\n        \"date\": \"2025-04-08T04:09:00+07:00\",\n        \"body\": \"Good morning,\\nProductions is scheduled for 4/8 – 4/9 with shipment availability 4/10.\\nHave a great day,\\nJeanette Terraciano\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-14\",\n        \"from\": \"Kody Nguyen <kodynguyen@rpi.inc>\",\n        \"to\": [\"Jeanette Terraciano <Jterraciano@axiumplastics.com>\", \"Aden Lam <AdenLam@rpi.inc>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"Re: MR2503-0156\",\n        \"date\": \"2025-04-10T18:43:00+07:00\",\n        \"body\": \"Hi Jeanette, Is this PO ready to ship?\\nBest regards,\\nKody Nguyen\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-15\",\n        \"from\": \"Jeanette Terraciano <Jterraciano@axiumplastics.com>\",\n        \"to\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Aden Lam <AdenLam@rpi.inc>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"RE: MR2503-0156\",\n        \"date\": \"2025-04-11T07:45:00+07:00\",\n        \"body\": \"Good morning,\\nYes, the order is available. Shipping details will be provided shortly.\\nHave a great day\\n\\nJeanette Terraciano\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-16\",\n        \"from\": \"Jeanette Terraciano <Jterraciano@axiumplastics.com>\",\n        \"to\": [\"Kody Nguyen <kodynguyen@rpi.inc>\", \"Aden Lam <AdenLam@rpi.inc>\", \"Dennis Nguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"RE: MR2503-0156\",\n        \"date\": \"2025-04-11T09:21:00+07:00\",\n        \"body\": \"Good afternoon,\\nSchedule pick up\\nPick up Date  4/11/25\\nCompany name  Axium Plastics\\nWarehouse address  2010 Spillman DriveBethlehem PA 43054\\nWarehouse hours  8am – 3pm\\nPoint of contact name  Reema\\nPoint of contact phone#  484-705-5499\\nPick up# (OR RPI PO#)   REFERENCE/PU#? 80310524 RPI P.O. # MR2503-0156\\nTotal pallets  8\\nGross weight with pallet(s) LBS 1,700\\nPallet Dimensions  48 x 40 x 96\\nClass #  NFMC Code: I can fill this in\\nCommodity name   BG-200-PET-PP (Plastic Bottles)\\nAdditional NOTE  SHIP TO ROBINSON PHARMA, INC.  1683 SUNFLOWER AVE  COSTA MESA, CA 92626\\n\\nHave a great day,\\nJeanette Terraciano\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0156-17\",\n        \"from\": \"Aden Lam <AdenLam@rpi.inc>\",\n        \"to\": [\"Jeanette Terraciano <Jterraciano@axiumplastics.com>\", \"Kody Nguyen <kodynguyen@rpi.inc>\", \"DennisNguyen <DennisNguyen@rpi.inc>\"],\n        \"cc\": [\"Chelsea Bullock <cbullock@axiumplastics.com>\", \"Reema Bala <rbala@axiumplastics.com>\"],\n        \"subject\": \"Re: MR2503-0156\",\n        \"date\": \"2025-04-11T10:50:00+07:00\",\n        \"body\": \"Hi Jeanette,\\nPlease see the attached BOL for 4/11 pickup\\nIMPORTANT: OUR RECEIVING TEAM WILL REJECT ALL SHIPMENTS WITHOUT PROPER DOCUMENTATION\\nPlease send the digital PDF packing slip & CoC to RP.ReceivingTeam@rpi.inc,  prior to ship date to make sure our receiving team has the necessary documents\\nPlease forward all invoices to accountpayable@rpi.inc\\nWarm Regards,\\nAden Lam\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2505-8899\",\n    \"order_id\": \"PO-2505-8899\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-8899-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorx.com>\"],\n        \"cc\": [\"Buyer <buyer@rpi.inc>\"],\n        \"subject\": \"PO-2505-8899 Urgent ETA Request\",\n        \"date\": \"2025-05-01T10:00:00+07:00\",\n        \"body\": \"Dear Vendor Team,\\nCould you please provide the ETA for PO-2505-8899 at your earliest convenience?\\nThank you.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-8899-2\",\n        \"from\": \"Vendor Shipping <shipping@vendorx.com>\",\n        \"to\": [\"Our Logistics <logistics@rpi.inc>\"],\n        \"cc\": [\"Buyer <buyer@rpi.inc>\"],\n        \"subject\": \"Re: PO-2505-8899 Urgent ETA Request\",\n        \"date\": \"2025-05-01T14:30:00+07:00\",\n        \"body\": \"Hi,\\nWe are currently experiencing delays in production for PO-2505-8899. We will update you with a confirmed ETA by end of week.\\nThanks.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2506-1234\",\n    \"order_id\": \"PO-2506-1234\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-1234-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendory.com>\"],\n        \"cc\": [],\n        \"subject\": \"New Order PO-2506-1234\",\n        \"date\": \"2025-06-01T09:00:00+07:00\",\n        \"body\": \"Hello,\\nPlease find attached PO-2506-1234. Kindly confirm receipt and earliest ETA.\\nThank you.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-1234-2\",\n        \"from\": \"Vendor Sales <sales@vendory.com>\",\n        \"to\": [\"Our Buyer <buyer@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: New Order PO-2506-1234\",\n        \"date\": \"2025-06-03T11:00:00+07:00\",\n        \"body\": \"Hi,\\nOrder 1234 acknowledged. ETA is June 15, 2025. Attached is the order confirmation.\\nRegards,\\nVendor Sales\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2506-5678\",\n    \"order_id\": \"PO-2506-5678\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-5678-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorz.com>\"],\n        \"cc\": [],\n        \"subject\": \"Follow up on PO-2506-5678\",\n        \"date\": \"2025-06-10T13:00:00+07:00\",\n        \"body\": \"Dear Team,\\nWe are following up on PO-2506-5678. Any updates on the ETA?\\nThanks.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-5678-2\",\n        \"from\": \"Vendor Shipping <shipping@vendorz.com>\",\n        \"to\": [\"Our Logistics <logistics@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: Follow up on PO-2506-5678\",\n        \"date\": \"2025-06-12T09:45:00+07:00\",\n        \"body\": \"Hi Logistics,\\nFor PO-2506-5678, the shipment will leave our facility tomorrow, June 13th. Expect delivery next week.\\nBest regards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-9012\",\n    \"order_id\": \"PO-2507-9012\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-9012-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendorw.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2507-9012 ETA needed\",\n        \"date\": \"2025-07-01T11:00:00+07:00\",\n        \"body\": \"Hello,\\nCould you please provide an ETA for PO-2507-9012? We need to schedule receiving.\\nThanks.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-9012-2\",\n        \"from\": \"Vendor Sales <sales@vendorw.com>\",\n        \"to\": [\"Our Buyer <buyer@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: PO-2507-9012 ETA needed\",\n        \"date\": \"2025-07-02T16:00:00+07:00\",\n        \"body\": \"Dear Buyer,\\nPO-2507-9012 is still in production. We anticipate shipment by end of next month.\\nThank you for your patience.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-3456\",\n    \"order_id\": \"PO-2507-3456\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-3456-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorx.com>\"],\n        \"cc\": [],\n        \"subject\": \"Question about PO-2507-3456\",\n        \"date\": \"2025-07-05T09:30:00+07:00\",\n        \"body\": \"Hi Team,\\nWe received partial shipment for PO-2507-3456. There's a discrepancy in quantity. Please advise.\\nThanks.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-3456-2\",\n        \"from\": \"Vendor Shipping <shipping@vendorx.com>\",\n        \"to\": [\"Our Logistics <logistics@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: Question about PO-2507-3456\",\n        \"date\": \"2025-07-05T11:00:00+07:00\",\n        \"body\": \"Dear Logistics,\\nApologies for the quantity discrepancy on PO-2507-3456. The remaining 500 units will be shipped on July 10th. Please expect two separate deliveries.\\nRegards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-7890\",\n    \"order_id\": \"PO-2507-7890\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-7890-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendory.com>\"],\n        \"cc\": [],\n        \"subject\": \"Feedback on PO-2507-7890\",\n        \"date\": \"2025-07-08T14:00:00+07:00\",\n        \"body\": \"Hello,\\nWe received the items for PO-2507-7890 today. Quality looks good. Thank you for the quick delivery!\\nBest regards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-0011\",\n    \"order_id\": \"PO-2507-0011\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0011-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendorx.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2507-0011\",\n        \"date\": \"2025-07-09T10:00:00+07:00\",\n        \"body\": \"Hi,\\nPlease process attached order 0011. Urgent.\\nThanks.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0011-2\",\n        \"from\": \"Vendor Sales <sales@vendorx.com>\",\n        \"to\": [\"Our Buyer <buyer@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: PO-2507-0011\",\n        \"date\": \"2025-07-09T14:00:00+07:00\",\n        \"body\": \"Acknowledged. ETA is this Friday.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-2233\",\n    \"order_id\": \"PO-2507-2233\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-2233-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorz.com>\"],\n        \"cc\": [],\n        \"subject\": \"Issue with PO-2507-2233\",\n        \"date\": \"2025-07-10T11:00:00+07:00\",\n        \"body\": \"Dear Vendor,\\nOne of the boxes for PO-2507-2233 arrived damaged. Please advise on return/replacement process.\\nThank you.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-4455\",\n    \"order_id\": \"PO-2507-4455\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-4455-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendorw.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2507-4455 ETA update?\",\n        \"date\": \"2025-07-11T09:00:00+07:00\",\n        \"body\": \"Hi Team,\\nAny news on the ETA for PO-2507-4455? It's been a while since the last update.\\nRegards.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-4455-2\",\n        \"from\": \"Vendor Sales <sales@vendorw.com>\",\n        \"to\": [\"Our Buyer <buyer@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: PO-2507-4455 ETA update?\",\n        \"date\": \"2025-07-12T10:00:00+07:00\",\n        \"body\": \"Dear Buyer,\\nPO-2507-4455 is still awaiting raw materials. We expect to ship by next Tuesday.\\nThank you.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-6677\",\n    \"order_id\": \"PO-2507-6677\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-6677-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorx.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2507-6677 delivery confirmation\",\n        \"date\": \"2025-07-15T15:00:00+07:00\",\n        \"body\": \"Hi,\\nWe confirmed delivery of PO-2507-6677. All good. Thank you!\\nBest.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-8899\",\n    \"order_id\": \"PO-2507-8899\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-8899-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendorx.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2507-8899 Price Adjustment?\",\n        \"date\": \"2025-07-16T10:00:00+07:00\",\n        \"body\": \"Hello,\\nWe noticed a price increase on the invoice for PO-2507-8899. Could you clarify the reason for this?\\nThanks.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-8899-2\",\n        \"from\": \"Vendor Sales <sales@vendorx.com>\",\n        \"to\": [\"Our Buyer <buyer@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: PO-2507-8899 Price Adjustment?\",\n        \"date\": \"2025-07-16T14:00:00+07:00\",\n        \"body\": \"Dear Buyer,\\nThe price adjustment for PO-2507-8899 is due to a recent increase in raw material costs, as per our updated terms and conditions shared last month. We apologize for any inconvenience.\\nRegards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-0000\",\n    \"order_id\": \"PO-2507-0000\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0000-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendory.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2507-0000 status\",\n        \"date\": \"2025-07-17T09:00:00+07:00\",\n        \"body\": \"Hi,\\nAny update on PO-2507-0000? We haven't received any shipping notification.\\nThanks.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0000-2\",\n        \"from\": \"Vendor Shipping <shipping@vendory.com>\",\n        \"to\": [\"Our Logistics <logistics@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: PO-2507-0000 status\",\n        \"date\": \"2025-07-18T10:00:00+07:00\",\n        \"body\": \"PO-2507-0000 is still pending. We will send an update early next week. No ETA yet.\\nBest.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-1111\",\n    \"order_id\": \"PO-2507-1111\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-1111-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendorw.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2507-1111 Urgent clarification\",\n        \"date\": \"2025-07-19T14:00:00+07:00\",\n        \"body\": \"Hello,\\nWe need urgent clarification on the quantity for item X in PO-2507-1111. The attached confirmation shows a different amount than ordered.\\nRegards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-3333\",\n    \"order_id\": \"PO-2507-3333\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-3333-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorx.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2507-3333 Delivery ETA\",\n        \"date\": \"2025-07-20T10:00:00+07:00\",\n        \"body\": \"Hi Team,\\nWhat is the ETA for PO-2507-3333?\\nThanks.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-3333-2\",\n        \"from\": \"Vendor Shipping <shipping@vendorx.com>\",\n        \"to\": [\"Our Logistics <logistics@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: PO-2507-3333 Delivery ETA\",\n        \"date\": \"2025-07-21T11:00:00+07:00\",\n        \"body\": \"PO-2507-3333 is estimated to arrive on Thursday, July 25th.\\nBest regards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-5555\",\n    \"order_id\": \"PO-2507-5555\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-5555-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendory.com>\"],\n        \"cc\": [],\n        \"subject\": \"Thank you for PO-2507-5555 confirmation\",\n        \"date\": \"2025-07-22T09:00:00+07:00\",\n        \"body\": \"Thank you for the quick confirmation for PO-2507-5555. Appreciate it!\\nBest regards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-7777\",\n    \"order_id\": \"PO-2507-7777\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-7777-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorz.com>\"],\n        \"cc\": [],\n        \"subject\": \"Delay on PO-2507-7777\",\n        \"date\": \"2025-07-23T14:00:00+07:00\",\n        \"body\": \"Hi Team,\\nWe were expecting PO-2507-7777 today but it hasn't arrived. Can you check its status?\\nThanks.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-7777-2\",\n        \"from\": \"Vendor Shipping <shipping@vendorz.com>\",\n        \"to\": [\"Our Logistics <logistics@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: Delay on PO-2507-7777\",\n        \"date\": \"2025-07-24T09:00:00+07:00\",\n        \"body\": \"Dear Logistics,\\nApologies for the delay on PO-2507-7777. The carrier had an unexpected breakdown. New ETA is July 26th.\\nRegards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2507-9999\",\n    \"order_id\": \"PO-2507-9999\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-9999-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendorw.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2507-9999 - No ETA\",\n        \"date\": \"2025-07-25T11:00:00+07:00\",\n        \"body\": \"Hello,\\nWe still haven't received an ETA for PO-2507-9999. Please provide an update soon.\\nThanks.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2508-0001\",\n    \"order_id\": \"PO-2508-0001\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0001-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorx.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2508-0001 Damaged Item\",\n        \"date\": \"2025-08-01T10:00:00+07:00\",\n        \"body\": \"Hi Team,\\nItem 'X' from PO-2508-0001 arrived damaged. Please advise on next steps.\\nRegards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2508-0002\",\n    \"order_id\": \"PO-2508-0002\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0002-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendory.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2508-0002 confirmation\",\n        \"date\": \"2025-08-02T13:00:00+07:00\",\n        \"body\": \"Hello,\\nPlease confirm PO-2508-0002. We need ETA by end of day.\\nThanks.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0002-2\",\n        \"from\": \"Vendor Sales <sales@vendory.com>\",\n        \"to\": [\"Our Buyer <buyer@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: PO-2508-0002 confirmation\",\n        \"date\": \"2025-08-02T15:30:00+07:00\",\n        \"body\": \"PO-2508-0002 is confirmed. ETA is August 8th.\\nBest.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2508-0003\",\n    \"order_id\": \"PO-2508-0003\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0003-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorz.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2508-0003 - No ETA update\",\n        \"date\": \"2025-08-05T09:00:00+07:00\",\n        \"body\": \"Hi Team,\\nStill no ETA for PO-2508-0003. This is urgent. Please provide one immediately.\\nRegards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2508-0004\",\n    \"order_id\": \"PO-2508-0004\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0004-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendorw.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2508-0004 - Invoice Error\",\n        \"date\": \"2025-08-06T11:00:00+07:00\",\n        \"body\": \"Hello,\\nThere is an error on the invoice for PO-2508-0004. The unit price is incorrect. Please issue a revised invoice.\\nThank you.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2508-0005\",\n    \"order_id\": \"PO-2508-0005\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0005-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorx.com>\"],\n        \"cc\": [],\n        \"subject\": \"Re: PO-2508-0005 - New ETA\",\n        \"date\": \"2025-08-07T14:00:00+07:00\",\n        \"body\": \"Hi Logistics,\\nFor PO-2508-0005, the new ETA is August 10th due to unforeseen circumstances.\\nRegards.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2508-0006\",\n    \"order_id\": \"PO-2508-0006\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0006-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendory.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2508-0006 - Partial Shipment\",\n        \"date\": \"2025-08-08T09:00:00+07:00\",\n        \"body\": \"Hello,\\nWe received a partial shipment for PO-2508-0006 today. When can we expect the rest?\\nThanks.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2508-0007\",\n    \"order_id\": \"PO-2508-0007\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0007-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorz.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2508-0007 - Documents received\",\n        \"date\": \"2025-08-09T10:00:00+07:00\",\n        \"body\": \"Hi Team,\\nWe received the COC for PO-2508-0007. Thank you for providing the necessary documents.\\nBest.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2508-0008\",\n    \"order_id\": \"PO-2508-0008\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0008-1\",\n        \"from\": \"Our Buyer <buyer@rpi.inc>\",\n        \"to\": [\"Vendor Sales <sales@vendorw.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2508-0008 - Question about item X\",\n        \"date\": \"2025-08-10T11:00:00+07:00\",\n        \"body\": \"Hello,\\nRegarding PO-2508-0008, can you confirm the specifications for item 'X'? There seems to be a mismatch.\\nThanks.\",\n        \"is_new_email\": true\n      }\n    ]\n  },\n  {\n    \"thread_id\": \"thread-PO-2508-0009\",\n    \"order_id\": \"PO-2508-0009\",\n    \"emails\": [\n      {\n        \"message_id\": \"msg-0009-1\",\n        \"from\": \"Our Logistics <logistics@rpi.inc>\",\n        \"to\": [\"Vendor Shipping <shipping@vendorx.com>\"],\n        \"cc\": [],\n        \"subject\": \"PO-2508-0009 - Ship Date\",\n        \"date\": \"2025-08-12T13:00:00+07:00\",\n        \"body\": \"Hi Team,\\nWhat is the confirmed ship date for PO-2508-0009?\\nRegards.\",\n        \"is_new_email\": false\n      },\n      {\n        \"message_id\": \"msg-0009-2\",\n        \"from\": \"Vendor Shipping <shipping@vendorx.com>\",\n        \"to\": [\"Our Logistics <logistics@rpi.inc>\"],\n        \"cc\": [],\n        \"subject\": \"Re: PO-2508-0009 - Ship Date\",\n        \"date\": \"2025-08-13T10:00:00+07:00\",\n        \"body\": \"PO-2508-0009 is scheduled to ship on August 15th. ETA is August 20th.\\nBest regards.\",\n        \"is_new_email\": true\n      }\n    ]\n  }\n]\n\nreturn mailData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        1960
+      ],
+      "id": "52f2eaa4-74a6-4f49-9898-ea10cbd29103",
+      "name": "Example Mail Thread"
+    },
+    {
+      "parameters": {
+        "content": "## Mail service trigger\n- Currently example",
+        "height": 580,
+        "width": 5260,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        1620
+      ],
+      "id": "2ad402e0-ee49-4ae4-ade4-ef58476797a5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mails = $input.all().find(x => x.json.emails.some(m => m.is_new_email))\nif (mails) {\n  const firstNewMail = mails.json.emails.find(x => x.is_new_email)\n  return {\n    mail: {\n      thread_id: mails.json.thread_id,\n      ...firstNewMail\n    }\n  }\n}\nreturn { mail: {} }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        1840
+      ],
+      "id": "7e808fe2-5fb4-4359-942d-ee65b9dff0cd",
+      "name": "A mail come in"
+    },
+    {
+      "parameters": {
+        "jsCode": "const order = [\n  {\n    \"order_id\": \"PO-2504-1162\",\n    \"status\": \"Partial Delivery, Awaiting Remaining Shipment Confirmation\",\n    \"acknowledgment_status\": \"Acknowledged\",\n    \"eta\": \"2025-04-11\",\n    \"delivery_status\": \"Partial Shipment\",\n    \"issue_type\": \"Quantity Discrepancy\",\n    \"issue_details\": \"Received 18,000/20,000 units. Awaiting confirmation on remaining bottles or if order is complete.\",\n    \"is_new_issue\": true,\n    \"last_update_date\": \"2025-04-14T13:29:00+07:00\",\n    \"last_update_summary\": \"Received partial shipment (18k/20k). Awaiting clarification on remaining.\"\n  },\n  {\n    \"order_id\": \"MR2503-0325\",\n    \"status\": \"RequestEtaSent\",\n    \"eta\": \"\",\n    \"issue_details\": \"\",\n    \"last_update_date\": \"2025-04-02T14:26:00+07:00\",\n    \"last_update_summary\": [],\n    \"eta_suggested\": \"2025-07-28T07:00:00+07:00\",\n  },\n  {\n    \"order_id\": \"MR2503-0158\",\n    \"status\": \"Ready for Pickup, Awaiting Revised COC\",\n    \"acknowledgment_status\": \"Acknowledged (implicitly by pickup details)\",\n    \"eta\": \"Ready for pickup by 2025-04-08\",\n    \"delivery_status\": \"Ready for Pickup\",\n    \"issue_type\": \"Documentation Incomplete\",\n    \"issue_details\": \"Requested revised Certificate of Compliance (COC) to include date of manufacture.\",\n    \"is_new_issue\": true,\n    \"last_update_date\": \"2025-04-10T09:10:00+07:00\",\n    \"last_update_summary\": \"Requested revised Certificate of Compliance (COC) to include date of manufacture.\",\n    \"pickup_details\": {\n      \"pick_up_date\": \"2025-04-08\",\n      \"company_name\": \"H3 Plastics\",\n      \"warehouse_address\": \"756 E Quality Drive, American Fork UT 84003\",\n      \"warehouse_hours\": \"8:00am - 3:30pm\",\n      \"point_of_contact_name\": \"Gabe Black\",\n      \"point_of_contact_phone\": \"385-327-9141\",\n      \"pick_up_number_or_po\": \"RPI PO-MR2503-0158\",\n      \"total_pallets\": 4,\n      \"gross_weight_lbs\": 1600,\n      \"pallet_dimensions\": \"48x40x103\",\n      \"class_number\": \"175\",\n      \"commodity_name\": \"BA-225-PET(Plastic Bottles)\"\n    }\n  },\n  {\n    \"order_id\": \"MR2503-0156\",\n    \"status\": \"Shipment Scheduled, BOL Sent\",\n    \"acknowledgment_status\": \"Acknowledged\",\n    \"eta\": \"Shipment availability 2025-04-10 (for BG-200-PET-PP) / Pickup 2025-04-11\",\n    \"delivery_status\": \"Shipment Scheduled\",\n    \"issue_type\": null,\n    \"issue_details\": null,\n    \"is_new_issue\": false,\n    \"last_update_date\": \"2025-04-11T10:50:00+07:00\",\n    \"last_update_summary\": \"Bill of Lading (BOL) sent for 4/11 pickup, reminder about document requirements.\",\n    \"pickup_details\": {\n      \"pick_up_date\": \"2025-04-11\",\n      \"company_name\": \"Axium Plastics\",\n      \"warehouse_address\": \"2010 Spillman Drive Bethlehem PA 43054\",\n      \"warehouse_hours\": \"8am – 3pm\",\n      \"point_of_contact_name\": \"Reema\",\n      \"point_of_contact_phone\": \"484-705-5499\",\n      \"pick_up_number_or_po\": \"80310524 RPI P.O. # MR2503-0156\",\n      \"total_pallets\": 8,\n      \"gross_weight_lbs\": 1700,\n      \"pallet_dimensions\": \"48 x 40 x 96\",\n      \"class_number\": \"NFMC Code: I can fill this in\",\n      \"commodity_name\": \"BG-200-PET-PP (Plastic Bottles)\"\n    }\n  },\n  {\n    \"order_id\": \"PO-2505-8899\",\n    \"status\": \"Production Delayed, ETA Pending\",\n    \"acknowledgment_status\": \"Acknowledged (Implicit)\",\n    \"eta\": \"Confirmed ETA by end of week\",\n    \"delivery_status\": \"Production Delayed\",\n    \"issue_type\": \"Production Delay\",\n    \"issue_details\": \"Experiencing delays in production. Confirmed ETA to be updated by end of week.\",\n    \"is_new_issue\": true,\n    \"last_update_date\": \"2025-05-01T14:30:00+07:00\",\n    \"last_update_summary\": \"Production delayed, confirmed ETA to be provided by end of week.\"\n  },\n  {\n    \"order_id\": \"PO-2506-1234\",\n    \"status\": \"Order Confirmed with ETA\",\n    \"acknowledgment_status\": \"Acknowledged\",\n    \"eta\": \"2025-06-15\",\n    \"delivery_status\": \"Confirmed ETA\",\n    \"issue_type\": null,\n    \"issue_details\": null,\n    \"is_new_issue\": false,\n    \"last_update_date\": \"2025-06-03T11:00:00+07:00\",\n    \"last_update_summary\": \"Order acknowledged, ETA confirmed as June 15, 2025.\"\n  },\n  {\n    \"order_id\": \"PO-2506-5678\",\n    \"status\": \"Shipment Confirmed\",\n    \"acknowledgment_status\": \"Acknowledged (Implicit)\",\n    \"eta\": \"Shipment by 2025-06-13, delivery next week\",\n    \"delivery_status\": \"Shipped Soon / In Transit\",\n    \"issue_type\": null,\n    \"issue_details\": null,\n    \"is_new_issue\": false,\n    \"last_update_date\": \"2025-06-12T09:45:00+07:00\",\n    \"last_update_summary\": \"Shipment confirmed to leave facility tomorrow, expecting delivery next week.\"\n  },\n  {\n    \"order_id\": \"PO-2507-9012\",\n    \"status\": \"In Production, Delayed Shipment\",\n    \"acknowledgment_status\": \"Acknowledged (Implicit)\",\n    \"eta\": \"Anticipate shipment by end of August 2025\",\n    \"delivery_status\": \"In Production / Delayed Shipment\",\n    \"issue_type\": \"Production Delay\",\n    \"issue_details\": \"Order is still in production. Anticipate shipment by end of next month.\",\n    \"is_new_issue\": true,\n    \"last_update_date\": \"2025-07-02T16:00:00+07:00\",\n    \"last_update_summary\": \"Order still in production, shipment anticipated by end of next month.\"\n  },\n  {\n    \"order_id\": \"PO-2507-3456\",\n    \"status\": \"Partial Delivery, Remaining Shipment Confirmed\",\n    \"acknowledgment_status\": \"Acknowledged\",\n    \"eta\": \"Remaining 500 units shipped on 2025-07-10\",\n    \"delivery_status\": \"Partial Delivery, Remaining Shipment Scheduled\",\n    \"issue_type\": \"Quantity Discrepancy\",\n    \"issue_details\": \"Received partial shipment. Remaining 500 units will be shipped on July 10th as a separate delivery.\",\n    \"is_new_issue\": true,\n    \"last_update_date\": \"2025-07-05T11:00:00+07:00\",\n    \"last_update_summary\": \"Clarification on quantity discrepancy: remaining 500 units shipping July 10th as a separate delivery.\"\n  },\n  {\n    \"order_id\": \"PO-2507-7890\",\n    \"status\": \"Completed / Delivered\",\n    \"acknowledgment_status\": \"Confirmed Delivery\",\n    \"eta\": \"Delivered 2025-07-08\",\n    \"delivery_status\": \"Delivered, Quality Confirmed\",\n    \"issue_type\": null,\n    \"issue_details\": null,\n    \"is_new_issue\": false,\n    \"last_update_date\": \"2025-07-08T14:00:00+07:00\",\n    \"last_update_summary\": \"Order received, quality confirmed, and quick delivery acknowledged.\"\n  },\n  {\n    \"order_id\": \"PO-2507-0011\",\n    \"status\": \"Order Confirmed with ETA\",\n    \"acknowledgment_status\": \"Acknowledged\",\n    \"eta\": \"2025-07-11 (This Friday)\",\n    \"delivery_status\": \"Confirmed ETA\",\n    \"issue_type\": null,\n    \"issue_details\": null,\n    \"is_new_issue\": false,\n    \"last_update_date\": \"2025-07-09T14:00:00+07:00\",\n    \"last_update_summary\": \"Order acknowledged, ETA confirmed as this Friday.\"\n  },\n  {\n    \"order_id\": \"PO-2507-2233\",\n    \"status\": \"Delivered, Issue Reported (Damaged)\",\n    \"acknowledgment_status\": \"Pending Acknowledgment\",\n    \"eta\": null,\n    \"delivery_status\": \"Delivered with Issue\",\n    \"issue_type\": \"Damaged Goods\",\n    \"issue_details\": \"One box arrived damaged. Seeking return/replacement process.\",\n    \"is_new_issue\": true,\n    \"last_update_date\": \"2025-07-10T11:00:00+07:00\",\n    \"last_update_summary\": \"Reported damaged box upon delivery, seeking return/replacement instructions.\"\n  },\n  {\n    \"order_id\": \"PO-2507-4455\",\n    \"status\": \"Delayed (Raw Materials), New ETA Provided\",\n    \"acknowledgment_status\": \"Acknowledged\",\n    \"eta\": \"Expected to ship by 2025-07-15 (next Tuesday)\",\n    \"delivery_status\": \"Delayed, Awaiting Raw Materials\",\n    \"issue_type\": \"Supply Chain Delay\",\n    \"issue_details\": \"Order delayed due to awaiting raw materials. Expected to ship by next Tuesday.\",\n    \"is_new_issue\": true,\n    \"last_update_date\": \"2025-07-12T10:00:00+07:00\",\n    \"last_update_summary\": \"Order delayed due to awaiting raw materials, expected to ship by next Tuesday.\"\n  },\n  {\n    \"order_id\": \"PO-2507-6677\",\n    \"status\": \"Completed / Delivered\",\n    \"acknowledgment_status\": \"Confirmed Delivery\",\n    \"eta\": \"Delivered 2025-07-15\",\n    \"delivery_status\": \"Delivered, Confirmed\",\n    \"issue_type\": null,\n    \"issue_details\": null,\n    \"is_new_issue\": false,\n    \"last_update_date\": \"2025-07-15T15:00:00+07:00\",\n    \"last_update_summary\": \"Delivery of order confirmed, everything is in order.\"\n  },\n  {\n    \"order_id\": \"PO-2507-8899\",\n    \"status\": \"Price Discrepancy / Pending Clarification\",\n    \"acknowledgment_status\": \"Pending Clarification\",\n    \"eta\": null,\n    \"delivery_status\": null,\n    \"issue_type\": \"Price Discrepancy\",\n    \"issue_details\": \"Noticed a price increase on the invoice, requesting clarification for the reason.\",\n    \"is_new_issue\": false,\n    \"last_update_date\": \"2025-07-16T10:00:00+07:00\",\n    \"last_update_summary\": \"Noticed price increase on invoice, requested clarification.\"\n  }\n]\n\nreturn order"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        -160
+      ],
+      "id": "1715031f-a143-400f-becf-300e731a24af",
+      "name": "Example Order Data"
+    },
+    {
+      "parameters": {
+        "content": "## ERP system\n- Currently example",
+        "height": 320,
+        "width": 5280,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -240
+      ],
+      "id": "c7dc902d-a68e-45f3-b09a-52eb410b0717",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ids = $('Get-PO-ID-Regex').first().json.ids\nconst order = $('Example Order Data').all()\n\nreturn {\n  order: order.find(o => ids.some(id => o.json.order_id.includes(id)))?.json\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        -160
+      ],
+      "id": "932c7ea7-dfc5-42dc-b44a-e804c38422e8",
+      "name": "Get-PO"
+    },
+    {
+      "parameters": {
+        "jsCode": "const thread_id = $input.first().json.mail.thread_id\nconst current_mail_id = $input.first().json.mail.message_id\n\nconst mails_in_thread = $('Example Mail Thread').all().find(x => x.json.thread_id == thread_id)\n\nconst prev_mail = {\n  prev_mail: []\n}\n\nif (mails_in_thread) {\n  for  (const m of mails_in_thread.json.emails) {\n    if (m.message_id !== current_mail_id) {\n      prev_mail.prev_mail.push((m))\n    } else {\n      break\n    }\n  }\n}\n\nreturn prev_mail"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        1980
+      ],
+      "id": "d228303e-e463-4843-ab63-dea4b2b7a6d0",
+      "name": "Get-Thread-Mail"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        1960
+      ],
+      "id": "c50336c9-9065-4e1f-bc4b-de9a35543251",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1760,
+        420
+      ],
+      "id": "5de80851-e80a-4ba7-8e39-3caf35d18eca",
+      "name": "Assemble Data"
+    },
+    {
+      "parameters": {
+        "content": "# Main Handle Incoming Email Flow\n1. Assemble mail, previous mail in thread, PO data\n2. Start handle Logic",
+        "height": 1360,
+        "width": 5320,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        200
+      ],
+      "id": "134ba2d2-12b9-49a0-9de5-2dab56bd692a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const combinedPattern = /(\\d{4}-\\d{4}|[a-zA-Z]{2}\\d{4}-\\d{3,4}|PO-\\d{4}-\\d{3,4})/g;\n\nconst subject = $input.first().json.mail.subject\n\n// Lấy tất cả matches\nconst matches = subject.match(combinedPattern);\n\nreturn {\n  ids: matches\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        440
+      ],
+      "id": "a5270c5e-70d2-4ce4-83e2-3ca4fc4c1e4b",
+      "name": "Get-PO-ID-Regex"
+    },
+    {
+      "parameters": {
+        "jsCode": "const order = $input.all().find(x => x.json.order)\nconst incoming_mail = $input.all().find(x => x.json.mail)\nconst previous_mails = $input.all().find(x =>x.json.prev_mail)\n\nif(!order || !incoming_mail) {\n  return {\n    isFail: true\n  }\n}\n\nlet content = `**Here is order information:\n${JSON.stringify(order.json,null,2)}\n**Here is incoming email:\n${JSON.stringify(incoming_mail.json,null,2)}\n`\n\nif (previous_mails && previous_mails.json.prev_mail.length) {\n  content += `**Here is previous email:\\n`\n  const sortedList = previous_mails.json.prev_mail.sort((a, b) => {\n    return new Date(b.date).getTime() - new Date(a.date).getTime();\n  });  \n  for (let i = 0; i < sortedList.length; i ++) {\n    content += `---Mail: ${i+1}---\n${JSON.stringify(sortedList[i],2,4)}\n`\n  }\n}\n\nreturn {\n  content: content,\n  isFail: false\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        420
+      ],
+      "id": "f2eb1c63-8c5b-455d-8f1a-8a191b4027ae",
+      "name": "Content Processing"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "topK": 20,
+          "topP": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2040,
+        1240
+      ],
+      "id": "96ab331f-a42e-4c39-9bf7-a2b3ee8a548a",
+      "name": "LLM"
+    },
+    {
+      "parameters": {
+        "content": "## LLM provider: For extract and infer\n- Low top-p\n- Low top-k\n",
+        "height": 280,
+        "width": 420,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1880,
+        1080
+      ],
+      "id": "daad8d1a-909f-4731-beff-ebbc76974925",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        3220,
+        280
+      ],
+      "id": "295371bc-46df-4175-8092-345af5ff16d2",
+      "name": "Precise ETA"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3660,
+        -120
+      ],
+      "id": "02605acf-fd19-4758-9423-73debcacb300",
+      "name": "Add_ETA_To_PO"
+    },
+    {
+      "parameters": {
+        "content": "## Follow-up Action Flow (undone)\n1. Build a service (scheduler or consumer)\n2. Push a job to **consumer** or set a flag to **scheduler**\n**Notes**: Using template mail & prompt to generate content ",
+        "height": 420,
+        "width": 1240,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3160,
+        580
+      ],
+      "id": "5e568d3c-803e-4f6f-af40-47311a559091",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Update ETA Flow (undone) ",
+        "height": 340,
+        "width": 1240,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3160,
+        220
+      ],
+      "id": "603b38fe-9365-4528-ba49-999a45a85268",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Other issue Flow (undone)",
+        "height": 260,
+        "width": 1240,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3160,
+        1020
+      ],
+      "id": "4fad8a31-9346-4301-9bbc-169003f7ab39",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const orderId = $('Assemble Data').all()[0].json.order.order_id;\nconst emailId = $(\"A mail come in\").first().json.mail.message_id;\nconst status = 'pending';\nconst issueSummary = $input.first().json.output.otherIssue.replace(/'/g, \"''\");;\nconst retryCount = 0;\nconst createdAt = $now;\nconst query = `\nINSERT INTO \"SentNotificationIssueJobs\" (\"poId\", \"emailId\", \"status\", \"issueSummary\" ,\"retryCount\", \"createdAt\")\nVALUES ('${orderId}','${emailId}','${status}','${issueSummary}','${retryCount}','${createdAt})';\n`\n\nconst log = {\n  time: createdAt,\n  action: \"NOTIFY_ISSUE\",\n  reason: issueSummary\n}\n\n\nreturn {\n  query,\n  log\n}\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3660,
+        1120
+      ],
+      "id": "9155a5d0-8718-472f-908c-dbff7651e0b0",
+      "name": "Notify_Issue"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "779e57fe-a5d1-4994-b607-8ab1fd7776e9",
+              "leftValue": "={{ $json.output.isHasEta }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2900,
+        380
+      ],
+      "id": "628b7656-cef2-47d2-afd9-7d0253f0e6a9",
+      "name": "ETA_Detected"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1b78db5b-e2ca-48fb-8e64-bfe0b90ddd6c",
+              "leftValue": "={{ $json.output.otherIssue }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2940,
+        1140
+      ],
+      "id": "662f3fe4-df16-46b6-b777-6b0c49a892dd",
+      "name": "Other_Issue_Detected"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6240,
+        820
+      ],
+      "id": "d125830a-8d5a-489f-9965-b4ee69b06bd8",
+      "name": "Write_Logs_To_DB"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        520
+      ],
+      "id": "ebfc487f-6ae0-40ae-b978-0085b3c54595",
+      "name": "Information Extractor (deprecated)",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2520,
+        420
+      ],
+      "id": "9b8dc525-1bf2-4981-944f-f1eb14c83dce",
+      "name": "Information Extractor",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        3220,
+        720
+      ],
+      "id": "3b1f94d2-af8e-4414-9726-9dd94e59381f",
+      "name": "Request ETA Decision"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3380,
+        860
+      ],
+      "id": "51683197-11d7-4aee-99b4-1851fbb49ea8",
+      "name": "Decision JSON Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5ae672e0-9d18-4d2a-b74b-84d0d13afa5c",
+              "leftValue": "={{ $json.output.shouldSendRequestEmail }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3540,
+        720
+      ],
+      "id": "27e9587e-252b-454f-8384-1a748183da37",
+      "name": "ShouldSentEmail"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2680,
+        560
+      ],
+      "id": "fb4142f1-2a00-455b-8d9b-ffa09929a171",
+      "name": "IF JSON Output Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3880,
+        880
+      ],
+      "id": "70225a42-f7c8-4ee2-858b-c3a62d1f3949",
+      "name": "Log"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3380,
+        420
+      ],
+      "id": "6f5bb24f-35a2-4025-a828-18044bf7c66e",
+      "name": "Precise ETA JSON Output Parser"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "UpdatePoEtaJobs",
+          "mode": "list",
+          "cachedResultName": "UpdatePoEtaJobs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "retryCount": 0,
+            "poId": "={{ $('Assemble Data').all()[0].json.order.order_id }}",
+            "eta": "={{ $json.output.preciseEta }}",
+            "logSummary": "={{ $json.output.reason }}",
+            "status": "pending",
+            "createdAt": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "poId",
+              "displayName": "poId",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "eta",
+              "displayName": "eta",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "logSummary",
+              "displayName": "logSummary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "retryCount",
+              "displayName": "retryCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updatedAt",
+              "displayName": "updatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4500,
+        240
+      ],
+      "id": "15d1c09d-c35b-484b-ba7b-ba454ed23f5b",
+      "name": "Insert_UpdatePoEtaJobs",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4900,
+        240
+      ],
+      "id": "a4162793-9829-4501-bc5c-aa05d9f3c275",
+      "name": "Update_ETA_Flow_Log",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const orderId = $('Assemble Data').all()[0].json.order.order_id;\nconst eta = $input.first().json.output.preciseEta;\nconst status = 'pending';\nconst logSummary = $input.first().json.output.reason;\nconst retryCount = 0;\nconst createdAt = $now;\nconst query = `\nINSERT INTO UpdatePoEtaJobs (poid, eta, status, retryCount, createdAt)\nVALUES (${orderId},${eta},${status},${retryCount},${createdAt});\n`\n\nconst log = {\n  time: createdAt,\n  action: \"UPDATE_ETA\",\n  reason: logSummary\n}\n\n\nreturn {\n  query,\n  log\n}\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3880,
+        620
+      ],
+      "id": "cabdca58-5bbe-4f60-84ef-98838adc9fd5",
+      "name": "Insert_SentRequestEtaEmailJobs_Query_Log"
+    },
+    {
+      "parameters": {
+        "jsCode": "const orderId = $('Assemble Data').all()[0].json.order.order_id;\nconst eta = $input.first().json.output.preciseEta;\nconst status = 'pending';\nconst logSummary = $input.first().json.output.reason.replace(/'/g, \"''\");;\nconst retryCount = 0;\nconst createdAt = $now;\nconst query = `\nINSERT INTO \"UpdatePoEtaJobs\" (\"poId\", \"eta\", \"status\", \"retryCount\", \"createdAt\")\nVALUES ('${orderId}','${eta}','${status}','${retryCount}','${createdAt}');\n`\n\nconst log = {\n  time: createdAt,\n  action: 'UPDATE_ETA',\n  reason: logSummary\n}\n\n\nreturn {\n  query,\n  log\n}\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4060,
+        260
+      ],
+      "id": "e0bbdcf8-a180-40a6-977e-512d28df1741",
+      "name": "Insert_UpdatePoEtaJobs_Query_Log"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "SentRequestEtaEmailJobs",
+          "mode": "list",
+          "cachedResultName": "SentRequestEtaEmailJobs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "retryCount": 0,
+            "mailHistoryConversation": "={{ JSON.stringify($('Assemble Data').all()[2].json.prev_mail.concat($('Assemble Data').all()[1].json.mail)) }}",
+            "requestWillSendAt": "={{ new Date(Date.now() + $json.output.sentAfter * 60 * 60 * 1000)}}",
+            "prevMailId": "={{ $('Assemble Data').all()[1].json.mail.message_id }}",
+            "status": "pending",
+            "logSummary": "={{ $json.output.reason }}",
+            "poId": "={{ $('Assemble Data').all()[0].json.order.order_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "mailHistoryConversation",
+              "displayName": "mailHistoryConversation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "requestWillSendAt",
+              "displayName": "requestWillSendAt",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "prevMailId",
+              "displayName": "prevMailId",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "logSummary",
+              "displayName": "logSummary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "retryCount",
+              "displayName": "retryCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "poId",
+              "displayName": "poId",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4720,
+        460
+      ],
+      "id": "852ce28a-182b-486d-839a-253022f99980",
+      "name": "InsertSentEmailRequestEtaJobs",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## TODO: Should check if email is reply for an email\n- if yes: SentRequestEtaEmailJobs is schedule job to wait for (a time) then send emails to request vendor for ETA. If mail haven't sent yet but vendor reply with new mail -> Cancel the job",
+        "height": 860,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        2020
+      ],
+      "id": "0582c3d4-ad11-4227-a717-2ac4cb60bf13",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4760,
+        780
+      ],
+      "id": "27e4bdf5-a374-4d03-8eec-8978c82437e3",
+      "name": "Merge_Queries_and_Logs"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.finalQuery }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5160,
+        800
+      ],
+      "id": "750e26a9-1822-4761-bc93-7fe6f57d654f",
+      "name": "Execute a SQL query"
+    },
+    {
+      "parameters": {
+        "jsCode": "const orderId = $('Assemble Data').all()[0].json.order.order_id;\nconst emailId = $(\"A mail come in\").first().json.mail.message_id;\nconst createdAt = $now;\nconst summary = $('Information Extractor').first().json.output.summary.replace(/'/g, \"''\");\n\nconst queriesAndLogs = $input.all();\nconst queries = []\nconst logs = []\nfor (let idx = 0; idx < queriesAndLogs.length; idx++) {\n  const element = queriesAndLogs[idx];\n  queries.push(element.json.query)\n  logs.push(element.json.log)\n}\n\nconst jsonLogs = JSON.stringify(logs)\n\nconst insertEtaHandledLogs = `INSERT INTO \"EtaHandledLogs\" (\"poId\", \"emailId\", \"handledAt\", \"logs\", \"summary\")\nvalues ('${orderId}','${emailId}', '${createdAt}','${jsonLogs}', '${summary}');\n`\n\nconst finalQuery = `\nDO $aaa$ \nBEGIN\n  BEGIN\n    ${queries.join('\\n')}\n    ${insertEtaHandledLogs}\n  RAISE NOTICE 'Transaction completed successfully';\n        \n    EXCEPTION\n        WHEN OTHERS THEN\n            RAISE NOTICE 'Error occurred: %', SQLERRM;\n            RAISE;\n    END;\nEND $aaa$;\n`\n\nreturn {\n  finalQuery\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4960,
+        800
+      ],
+      "id": "2f501005-54b5-4699-86d3-dae4673f5fc1",
+      "name": "Insert_Jobs_and_Logs_Query"
+    },
+    {
+      "parameters": {
+        "content": "## Context aware\n**Todo: Add a Node\n**To check if mail conversation talk about ETA"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        260
+      ],
+      "id": "7e6b5680-f59b-495c-9a87-ceb2757f7903",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3375395c-68b5-4422-b468-d4d06551a731",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3580,
+        280
+      ],
+      "id": "702ade94-9e56-4994-8333-4e7ac6bca1e3",
+      "name": "PrecisedValue"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        940
+      ],
+      "id": "18605488-5f2c-4638-91ad-98589adfa12d",
+      "name": "Microsoft Outlook Trigger",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "OfQvjwJ5NmLVCfnX",
+          "name": "victor-dev"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        1140
+      ],
+      "id": "ef04d384-d954-4773-8eab-9f47a4e5029a",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "E6MYHQ0rXmlI8Ft6",
+          "name": "Victor account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Example Mail Thread": {
+      "main": [
+        [
+          {
+            "node": "A mail come in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A mail come in": {
+      "main": [
+        [
+          {
+            "node": "Get-PO-ID-Regex",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get-Thread-Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Example Order Data": {
+      "main": [
+        [
+          {
+            "node": "Get-PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Example Mail Thread",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get-PO-ID-Regex": {
+      "main": [
+        [
+          {
+            "node": "Example Order Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Other_Issue_Detected": {
+      "main": [
+        [
+          {
+            "node": "Notify_Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ShouldSentEmail": {
+      "main": [
+        [
+          {
+            "node": "Insert_SentRequestEtaEmailJobs_Query_Log",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert_UpdatePoEtaJobs": {
+      "main": [
+        [
+          {
+            "node": "Update_ETA_Flow_Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert_Jobs_and_Logs_Query": {
+      "main": [
+        [
+          {
+            "node": "Write_Logs_To_DB",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PrecisedValue": {
+      "main": [
+        [
+          {
+            "node": "Insert_UpdatePoEtaJobs_Query_Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "a6f7c16c-b63d-4f08-948b-6026c52a006e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-07-22T03:08:36.992Z",
+      "createdAt": "2025-07-22T03:08:36.992Z",
+      "role": "workflow:owner",
+      "workflowId": "sBa6du0eTmVqllJf",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
