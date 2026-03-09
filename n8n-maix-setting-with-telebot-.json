@@ -1,0 +1,1039 @@
+{
+  "updatedAt": "2024-12-19T03:25:52.639Z",
+  "createdAt": "2024-04-30T12:47:50.251Z",
+  "id": "NVoz77CbHOmcvTZn",
+  "name": "Maix - Setting With TeleBot",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code\"].json[\"query\"] }}"
+      },
+      "id": "e41927b6-0c42-4d7e-9560-57fbe2c012df",
+      "name": "Microsoft SQL1",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        2300,
+        1020
+      ],
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Code1\"].json[\"chatId\"] }}",
+        "text": "=```\n{{ $node[\"Code1\"].json[\"telegramMessage\"] }}\n```",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "9600317e-6652-4673-9e1d-e6961c4135cb",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2700,
+        1020
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "mOtZXePGUsBycveh",
+          "name": "Telegram - @MaixSettingBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "47072f00-a5a6-485a-b7a9-f79da0d608bb",
+        "options": {}
+      },
+      "id": "4daed4f1-6d1d-48b2-ae13-348706116361",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        1480,
+        180
+      ],
+      "webhookId": "47072f00-a5a6-485a-b7a9-f79da0d608bb"
+    },
+    {
+      "parameters": {
+        "jsCode": "var text = $node[\"Webhook\"].json[\"body\"][\"message\"][\"text\"];\n\nfunction splitAndRemoveEmpty(str, separator) {\n  return str.split(separator).filter(part => part.trim() !== '');\n}\n\nlet values = splitAndRemoveEmpty(text, \",\");\n\nif(values)\n{\n  if(values[0] == 3) // Luxury\n  {\n    var setting = {\n      WindowTime: values[1],\n      ScoreAtPosition: values[2]\n    };\n  \n  var query = \n`\nUPDATE TradeSignalSetting\nSET Setting = '${ JSON.stringify(setting) }',\n    WindowTime = ${ setting.WindowTime },\n    MinScore = (\n      SELECT TotalScore\n      FROm LeadCopyTrader\n      WHERE [Status] = 'ACTIVE'\n      ORDER BY TotalScore DESC\n      OFFSET (${ setting.ScoreAtPosition - 1 }) ROWS FETCH NEXT 1 ROWS ONLY\n    )\nWHERE Id = ${ values[0] };\n\nSELECT *\nFROM TradeSignalSetting\nWHERE Id = ${ values[0] };\n`;\n  \n  return {\n    query: query\n  }\n  }\n  else{\n  \n  var setting = {\n    MinSignal: values[1],\n    WindowTime: values[2]\n  };\n  \n  var query = \n`\nUPDATE TradeSignalSetting\nSET Setting = '${ JSON.stringify(setting) }',\n    MinSignal = ${ setting.MinSignal },\n    WindowTime = ${ setting.WindowTime }\nWHERE Id = ${ values[0] };\n\nSELECT *\nFROM TradeSignalSetting\nWHERE Id = ${ values[0] };\n`;\n  \n  return {\n    query: query\n  }\n  }\n}"
+      },
+      "id": "0d0f1cca-127f-43d3-9114-4977c0394a0f",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var chatId = $node[\"Webhook\"].json[\"body\"][\"message\"][\"chat\"][\"id\"];\n\nvar telegramMessage = JSON.stringify( $node[\"Microsoft SQL1\"].json, null, 2);\n\nreturn {\n  chatId: chatId,\n  telegramMessage: telegramMessage\n}"
+      },
+      "id": "52cead08-3116-45b5-a391-4685eb7cbacc",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2500,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Help\"].json[\"chatId\"] }}",
+        "text": "={{ $node[\"Help\"].json[\"telegramMessage\"] }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "57c8ca5d-cbf4-4bf5-b768-8b1cfcceaff7",
+      "name": "Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2180,
+        -80
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "mOtZXePGUsBycveh",
+          "name": "Telegram - @MaixSettingBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "var chatId = $node[\"Webhook\"].json[\"body\"][\"message\"][\"chat\"][\"id\"];\n\nvar telegramMessage = \n`\n<b>Hello, I'm Maix Assistant!</b>\nI can help you manage your MaiX System.\n\nYou can control me by sending these commands:\n\n<b>Maix Setting</b>\n/all - return all settings\n/get - return setting values. Params: {id}\n/update - update setting. Params: {string}\n/set - set value. Param: {string}\n\n<b>Others</b>\n/help - get help\n\n<b>Update Command</b>\nPremium - 1,MinSignal,WindowTime\nSignature - 2,MinSignal,WindowTime\nBullhorn - 4,MinSignal,WindowTime,ScoreAtTopPercent,ScoreTimes,DirectionRatio\nWolfpack - 5,MinSignal,WindowTime,ScoreAtTopPercent,ScoreTimes,DirectionRatio\nTurtleshield - 6,MinSignal,WindowTime,ScoreAtTopPercent,ScoreTimes,DirectionRatio\n`\n\nreturn {\n  chatId: chatId,\n  telegramMessage: telegramMessage\n}"
+      },
+      "id": "e393b07c-92bf-45bb-ae39-3b693e043dd8",
+      "name": "Help",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"All\"].json[\"query\"] }}"
+      },
+      "id": "7524291f-0fc4-4de7-8abd-dc8ef51760a5",
+      "name": "Microsoft SQL",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        120
+      ],
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Code3\"].json[\"chatId\"] }}",
+        "text": "={{ $node[\"Code3\"].json[\"telegramMessage\"] }}\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "f237f57d-ba8b-45a9-b55c-cc7752949e41",
+      "name": "Telegram2",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2800,
+        120
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "mOtZXePGUsBycveh",
+          "name": "Telegram - @MaixSettingBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "var chatId = $node[\"Webhook\"].json[\"body\"][\"message\"][\"chat\"][\"id\"];\n\nvar telegramMessage = \n`\n<pre>\n  <code class=\"language-json\">\n    ${ JSON.stringify( $node[\"Aggregate\"].json[\"data\"], null, 2) }\n  </code>\n</pre>\n`\n\nreturn {\n  chatId: chatId,\n  telegramMessage: telegramMessage\n}"
+      },
+      "id": "eccc6212-a07a-4b28-b944-af7f15045ed4",
+      "name": "Code3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2600,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var query = \n`\nSELECT *\nFROM TradeSignalSetting\n`;\n  \nreturn {\n  query: query\n}"
+      },
+      "id": "dccbe84f-88c5-41fe-9de0-d5a29ae968fb",
+      "name": "All",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "6ada40bf-d9dc-42c8-8151-dc970bdb6207",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Get\"].json[\"query\"] }}"
+      },
+      "id": "d3291fe6-2739-4a06-aa64-4c4ab27c146f",
+      "name": "Microsoft SQL2",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        320
+      ],
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Code4\"].json[\"chatId\"] }}",
+        "text": "={{ $node[\"Code4\"].json[\"telegramMessage\"] }}\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "f40b1d4b-78a4-4630-b472-be0cc9d846ed",
+      "name": "Telegram3",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2800,
+        320
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "mOtZXePGUsBycveh",
+          "name": "Telegram - @MaixSettingBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "var chatId = $node[\"Webhook\"].json[\"body\"][\"message\"][\"chat\"][\"id\"];\n\nvar telegramMessage = \n`\n<pre>\n  <code class=\"language-json\">\n    ${ JSON.stringify( $node[\"Aggregate1\"].json[\"data\"], null, 2) }\n  </code>\n</pre>\n`\n\nreturn {\n  chatId: chatId,\n  telegramMessage: telegramMessage\n}"
+      },
+      "id": "7e707651-ecc7-44cd-8b98-bdb9a0c01c68",
+      "name": "Code4",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2600,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "8713ccab-0006-43ea-9f1e-3c31900f9aa9",
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var text = $node[\"Webhook\"].json[\"body\"][\"message\"][\"text\"];\nvar id = text.replace(\"/get\", \"\").trim();\n\nvar query = \n`\nSELECT *\nFROM TradeSignalSetting\nWHERE Id = ${ id }\n`;\n  \nreturn {\n  query: query\n}"
+      },
+      "id": "d6403cea-d990-49e6-bfb3-35217a3ab1c8",
+      "name": "Get",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Setting123\"].json[\"query\"] }}"
+      },
+      "id": "e149c516-324d-4137-9022-a656d4f28146",
+      "name": "Microsoft SQL3",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        520
+      ],
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Code5\"].json[\"chatId\"] }}",
+        "text": "={{ $node[\"Code5\"].json[\"telegramMessage\"] }}\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "f3ce8a09-fd72-4159-9006-17a8851de790",
+      "name": "Telegram4",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        3280,
+        520
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "mOtZXePGUsBycveh",
+          "name": "Telegram - @MaixSettingBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "var chatId = $node[\"Webhook\"].json[\"body\"][\"message\"][\"chat\"][\"id\"];\n\nvar telegramMessage = \n`\n<pre>\n  <code class=\"language-json\">\n    ${ JSON.stringify( $node[\"Aggregate2\"].json[\"data\"], null, 2) }\n  </code>\n</pre>\n`\n\nreturn {\n  chatId: chatId,\n  telegramMessage: telegramMessage\n}"
+      },
+      "id": "343e4d3e-1933-4b5e-84c0-d86aaf911574",
+      "name": "Code5",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3080,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "2c1a53d4-6cff-4827-9564-6aa5deccc710",
+      "name": "Aggregate2",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2880,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var text = $node[\"Webhook\"].json[\"body\"][\"message\"][\"text\"];\ntext = text.replace(\"/update\", \"\").trim();\n\nfunction splitAndRemoveEmpty(str, separator) {\n  return str.split(separator).filter(part => part.trim() !== '');\n}\n\nlet values = splitAndRemoveEmpty(text, \",\");\n\nreturn {\n  id: values[0],\n  data: values\n}"
+      },
+      "id": "ba5ed33c-2b5c-4ce6-bf6b-be5be5d89b5c",
+      "name": "Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var values = $node[\"Update\"].json[\"data\"];\n\nif(values[0] == 3) // Luxury\n{\n    var setting = {\n      WindowTime: values[1],\n      ScoreAtPosition: values[2]\n    };\n  \n    var query = \n    `\n    UPDATE TradeSignalSetting\n    SET Setting = '${ JSON.stringify(setting) }',\n        WindowTime = ${ setting.WindowTime },\n        MinScore = (\n          SELECT TotalScore\n          FROm LeadCopyTrader\n          WHERE [Status] = 'ACTIVE'\n          ORDER BY TotalScore DESC\n          OFFSET (${ setting.ScoreAtPosition - 1 }) ROWS FETCH NEXT 1 ROWS ONLY\n        )\n    WHERE Id = ${ values[0] };\n    \n    SELECT *\n    FROM TradeSignalSetting\n    WHERE Id = ${ values[0] };\n    `;\n  \n    return {\n      query: query\n    }\n}\nelse // Premium, Signature\n{ \n    var setting = {\n      MinSignal: values[1],\n      WindowTime: values[2]\n    };\n    var query = \n    `\n    UPDATE TradeSignalSetting\n    SET Setting = '${ JSON.stringify(setting) }',\n        MinSignal = ${ setting.MinSignal },\n        WindowTime = ${ setting.WindowTime }\n    WHERE Id = ${ values[0] };\n    \n    SELECT *\n    FROM TradeSignalSetting\n    WHERE Id = ${ values[0] };\n    `;\n  \n    return {\n      query: query\n    }\n}"
+      },
+      "id": "cec2bb9a-8347-477b-9c4f-984167e3b624",
+      "name": "Setting123",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $node[\"Update\"].json[\"id\"][\"message\"][\"text\"] }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "d40a9aea-b9be-48d6-916e-9b38df62dd36",
+                    "leftValue": "={{ $node[\"Update\"].json[\"id\"][\"message\"][\"text\"] }}",
+                    "rightValue": 2,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "2"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "cd914a2c-0008-44e5-8ad0-4381ef05657f",
+                    "leftValue": "={{ $node[\"Update\"].json[\"id\"][\"message\"][\"text\"] }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3c33520c-3217-42af-b77c-91b3a30a19a1",
+      "name": "Switch1",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2180,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Set\"].json[\"query\"] }}"
+      },
+      "id": "3b698fec-31f9-418f-bc37-773b521d975b",
+      "name": "Microsoft SQL4",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        720
+      ],
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Code6\"].json[\"chatId\"] }}",
+        "text": "={{ $node[\"Code6\"].json[\"telegramMessage\"] }}\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "87ecb11c-6198-4448-b581-c4ea87f77e7d",
+      "name": "Telegram5",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2800,
+        720
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "mOtZXePGUsBycveh",
+          "name": "Telegram - @MaixSettingBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "var chatId = $node[\"Webhook\"].json[\"body\"][\"message\"][\"chat\"][\"id\"];\n\nvar telegramMessage = \n`\n<pre>\n  <code class=\"language-json\">\n    ${ JSON.stringify( $node[\"Aggregate3\"].json[\"data\"], null, 2) }\n  </code>\n</pre>\n`\n\nreturn {\n  chatId: chatId,\n  telegramMessage: telegramMessage\n}"
+      },
+      "id": "93bc1d1b-3aec-4b46-9718-23cc13a4cb10",
+      "name": "Code6",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2600,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "665cdfb2-4181-467b-8b9e-65c4bde8db3f",
+      "name": "Aggregate3",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var text = $node[\"Webhook\"].json[\"body\"][\"message\"][\"text\"];\ntext = text.replace(\"/set\", \"\").trim();\n\nfunction splitAndRemoveEmpty(str, separator) {\n  return str.split(separator).filter(part => part.trim() !== '');\n}\n\nlet values = splitAndRemoveEmpty(text, \"|\");\n\nvar query = \n`\nUPDATE TradeSignalSetting\nSET Setting = '${ values[1] }'\nWHERE Id = ${ values[0] }\n\nSELECT *\nFROM TradeSignalSetting\nWHERE Id = ${ values[0] }\n`;\n  \nreturn {\n  query: query\n}"
+      },
+      "id": "94783a0e-8eaf-44ff-b108-92dad9568e55",
+      "name": "Set",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $node[\"Webhook\"].json[\"body\"][\"message\"][\"text\"] }}",
+                    "rightValue": "/help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Help"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "497c872f-59bf-4c74-9798-76c2879ed8a5",
+                    "leftValue": "={{ $node[\"Webhook\"].json[\"body\"][\"message\"][\"text\"] }}",
+                    "rightValue": "/all",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "All"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "84bd744b-c58a-4870-b304-916d6f4149a4",
+                    "leftValue": "={{ $node[\"Webhook\"].json[\"body\"][\"message\"][\"text\"] }}",
+                    "rightValue": "/get",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Get"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "8426db71-0a5a-4487-a9cc-1435fc12b7f7",
+                    "leftValue": "={{ $node[\"Webhook\"].json[\"body\"][\"message\"][\"text\"] }}",
+                    "rightValue": "/update",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Update"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "2c846c7f-be3e-4bab-9c71-8d90ee0edf9d",
+                    "leftValue": "={{ $node[\"Webhook\"].json[\"body\"][\"message\"][\"text\"] }}",
+                    "rightValue": "/set",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Set"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d661300c-3515-4d72-9b7d-39b8013f536f",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1700,
+        180
+      ]
+    }
+  ],
+  "connections": {
+    "Microsoft SQL1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Help": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "All": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL3": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Telegram4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setting123": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Setting123",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Setting123",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Setting123",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL4": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Telegram5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Help",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "All",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "tVa1fbkE9BESGesN"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    },
+    "node:Schedule Trigger1": {
+      "recurrencyRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "360a6500-d4ff-48cf-aaca-38694c46ebe6",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-04-30T12:47:50.251Z",
+      "createdAt": "2024-04-30T12:47:50.251Z",
+      "role": "workflow:owner",
+      "workflowId": "NVoz77CbHOmcvTZn",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
