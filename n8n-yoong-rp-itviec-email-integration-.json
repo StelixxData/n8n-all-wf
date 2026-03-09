@@ -1,0 +1,677 @@
+{
+  "updatedAt": "2024-06-09T16:04:08.186Z",
+  "createdAt": "2024-01-31T03:54:46.193Z",
+  "id": "5uwi9iZlJLysiuUS",
+  "name": "Yoong RP - ITViec Email Integration",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "mailbox": "ITViec Candidate",
+        "format": "resolved",
+        "options": {}
+      },
+      "id": "f8621952-f80c-4035-91e7-ef319c52d911",
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        -1860,
+        180
+      ],
+      "credentials": {
+        "imap": {
+          "id": "WGtBECw1EhWW8EqN",
+          "name": "IMAP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json[\"data\"][\"total\"] }}",
+              "operation": "larger",
+              "value2": "=0"
+            }
+          ]
+        }
+      },
+      "id": "d65acf6f-380b-4754-87b0-196717726081",
+      "name": "Có Candidate",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "attachment_0",
+        "name": "={{ $(\"Get Email Data\").item.json[\"candidateName\"] }}_{{ $(\"Get Email Data\").item.json[\"candidateEmail\"] }}_YoongCV.pdf",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1rgkoBKZ_5BmxJhXk7Hj4IwHv-K2S6brE",
+          "mode": "list",
+          "cachedResultName": "Candidates (có thông tin ứng viên)",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rgkoBKZ_5BmxJhXk7Hj4IwHv-K2S6brE"
+        },
+        "options": {}
+      },
+      "id": "bd9f8d92-7f52-48ce-af64-b308126547b9",
+      "name": "Upload CV",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1100,
+        280
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HBZA0wM8yUwuTk3T",
+          "name": "Google Drive - long.le@yoong.vn"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "attachment_0",
+        "name": "={{ $(\"Get Email Data\").item.json[\"candidateName\"] }}_{{ $(\"Get Email Data\").item.json[\"candidateEmail\"] }}_YoongCV.pdf",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1rgkoBKZ_5BmxJhXk7Hj4IwHv-K2S6brE",
+          "mode": "list",
+          "cachedResultName": "Candidates (có thông tin ứng viên)",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rgkoBKZ_5BmxJhXk7Hj4IwHv-K2S6brE"
+        },
+        "options": {}
+      },
+      "id": "7422fe95-6ec9-4efa-9d89-f6e1c97ecf88",
+      "name": "Upload CV1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        360,
+        100
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HBZA0wM8yUwuTk3T",
+          "name": "Google Drive - long.le@yoong.vn"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "var application = {\n  \"fields\": {\n    \"Source\": $(\"Get Email Data\").item.json[\"source\"],\n    \"LinkCV\": {\n      \"text\": $(\"Upload CV1\").item.json[\"name\"],\n      \"link\": $(\"Upload CV1\").item.json[\"webViewLink\"]\n    },\n    \"Applied Date\": $(\"Get Email Data\").item.json[\"appliedDate\"],\n    \"Candidate\": [$(\"Get Candidate\").item.json[\"data\"][\"items\"][\"0\"][\"record_id\"]],\n    \"Job\": [$(\"Get Job\").item.json[\"data\"][\"items\"][\"0\"][\"record_id\"]],\n    \"Parsed Json\": $(\"AI Resume Parser\").item.json[\"error\"] ? null : JSON.stringify($(\"AI Resume Parser\").item.json)\n  }\n};\n\nreturn application;\n\n"
+      },
+      "id": "69159f15-d2fc-4acb-bb2d-5fe57f52964f",
+      "name": "Create Application Json1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "var application = {\n  \"fields\": {\n    \"Source\": $(\"Get Email Data\").item.json[\"source\"],\n    \"LinkCV\": {\n      \"text\": $(\"Upload CV\").item.json[\"name\"],\n      \"link\": $(\"Upload CV\").item.json[\"webViewLink\"]\n    },\n    \"Applied Date\": $(\"Get Email Data\").item.json[\"appliedDate\"],\n    \"Candidate\": [$(\"Create Candidate\").item.json[\"data\"][\"record\"][\"record_id\"]],\n    \"Job\": [$(\"Get Job\").item.json[\"data\"][\"items\"][\"0\"][\"record_id\"]],\n    \"Parsed Json\": $(\"AI Resume Parser\").item.json[\"error\"] ? null : JSON.stringify($(\"AI Resume Parser\").item.json)\n  }\n};\n\nreturn application;\n\n"
+      },
+      "id": "283b52aa-b24e-4fc0-8668-e477dd8311e3",
+      "name": "Create Application Json",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const postData = {\n  app_id: \"cli_a414df8dad78d010\",\n  app_secret: \"2ntkpnCM2b8VrXatxOUc8c2RxrCR8k6v\"\n};\n\nfetch(\"https://open.larksuite.com/open-apis/auth/v3/app_access_token/internal\", {\n  method: \"POST\",\n  headers: {\n    \"Content-Type\": \"application/json\"\n  },\n  body: JSON.stringify(postData)\n})\n.then(response => {\n  if (!response.ok) {\n    throw new Error('Network response was not ok');\n  }\n  return response.json();\n})\n.then(data => {\n  return data;\n})\n.catch(error => {\n  console.error('There was a problem with the fetch operation:', error);\n});\n"
+      },
+      "id": "f2357851-5065-4a37-a44f-09d3b53211ca",
+      "name": "Get Lark Token",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        -280
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const title = $(\"Email Trigger (IMAP)\").item.json[\"subject\"];\n\nconst fileName = $(\"Email Trigger (IMAP)\").item.binary?.attachment_0.fileName;\n\nconst fullNameMatch = fileName.match(/_(.*?)\\.pdf/);\nlet candidateName = \"\";\nif (fullNameMatch && fullNameMatch.length > 1) {\n    candidateName = fullNameMatch[1];\n} else {\n  console.log(\"File name not match the pattern: \", fileName);\n}\n\nconst emailContent = $(\"Email Trigger (IMAP)\").item.json[\"text\"];\nlet email = \"\";\nconst emailMatch = emailContent.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\\.[a-zA-Z0-9_-]+)/);\nif (emailMatch && emailMatch.length > 1) {\n  email = emailMatch[1];\n} else {\n  console.error(\"Email not found in the email content\");\n}\n\nreturn {\n  \"subject\": title,\n  \"candidateName\": candidateName,\n  \"candidateEmail\": email,\n  \"source\": \"ITviec\",\n  \"appliedDate\": Date.parse($node[\"Email Trigger (IMAP)\"].json[\"date\"]), // Format: Seconds\n};"
+      },
+      "id": "02c72a34-03f1-41ed-87c4-98157423542e",
+      "name": "Get Email Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1340,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/auth/v3/app_access_token/internal",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"app_id\" : \"cli_a414df8dad78d010\",\"app_secret\" : \"2ntkpnCM2b8VrXatxOUc8c2RxrCR8k6v\" }",
+        "options": {}
+      },
+      "id": "30ee8deb-4628-4d0d-80f2-6d3639623af2",
+      "name": "Lark Access Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1100,
+        180
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/YyEzbiPzjatLOws2ZDYlklUDgyh/tables/tblhno0MgGjnd73z/records",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "=and(CurrentValue.[Job Title For Search].contains(\"{{$('Get Email Data').item.json[\"subject\"].split(\"applies for\")[1].replace(\" - ITViec\", \"\").replace(\" - ITviec\", \"\").trim()}}\"), CurrentValue.[Status] != \"Closed\")"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark Access Token').item.json[\"app_access_token\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 5
+            }
+          }
+        }
+      },
+      "id": "280cc890-56ba-46b2-b1fc-e6873b38cfb5",
+      "name": "Get Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -860,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/YyEzbiPzjatLOws2ZDYlklUDgyh/tables/tblOldMWe5futt2F/records",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark Access Token').item.json[\"app_access_token\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 5
+            }
+          }
+        }
+      },
+      "id": "fb6e3703-b607-4c91-9b7c-e9e53b0c8c08",
+      "name": "Create Candidate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        560,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/YyEzbiPzjatLOws2ZDYlklUDgyh/tables/tblGXnPbAUndwJIL/records",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark Access Token').item.json[\"app_access_token\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 5
+            }
+          }
+        }
+      },
+      "id": "a2c32990-cbde-4b7f-943b-c6e2a9eb9e95",
+      "name": "Create Application1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        840,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/YyEzbiPzjatLOws2ZDYlklUDgyh/tables/tblGXnPbAUndwJIL/records",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark Access Token').item.json[\"app_access_token\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 5
+            }
+          }
+        }
+      },
+      "id": "208f923c-2cd2-4574-868b-325e4c87a834",
+      "name": "Create Application",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1580,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://open.larksuite.com/open-apis/bitable/v1/apps/YyEzbiPzjatLOws2ZDYlklUDgyh/tables/tblOldMWe5futt2F/records",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "=CurrentValue.[Email]=\"{{ $(\"Get Email Data\").item.json[\"candidateEmail\"] }}\""
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark Access Token').item.json[\"app_access_token\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 5
+            }
+          }
+        }
+      },
+      "id": "8bfcc8ee-8ccd-45e1-881e-5bc3cb692419",
+      "name": "Get Candidate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -600,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.larksuite.com/open-apis/docx/v1/documents",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Lark Access Token').item.json[\"app_access_token\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={    \"folder_token\": \"LEPZf4K7pl9aGvdrrvClxoYggZd\",    \"title\": \"{{ $(\"Get Email Data\").item.json[\"candidateName\"] }} [{{ $(\"Get Email Data\").item.json[\"candidateEmail\"] }}]\"}",
+        "options": {}
+      },
+      "id": "e4959a33-a6ee-47b1-95ae-9c4597c875e6",
+      "name": "Create File Full Notes (doc)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        100,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.docsaar.com/api/chatgpt_resume_parsing",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "8dd5a2fa-ee3a-419c-8c41-12d074d68245"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "chatgpt_resume",
+              "inputDataFieldName": "attachment_0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "21079e6f-81d3-49e9-97fe-26995008a1a3",
+      "name": "AI Resume Parser",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1580,
+        180
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "var candidate = {\n  \"fields\": {\n    \"Full Name\": $(\"Get Email Data\").item.json[\"candidateName\"],\n    \"Phone Number\": $('AI Resume Parser').item.json.error || !$('AI Resume Parser').item.json.output[\"Phone\"] ? null : $('AI Resume Parser').item.json.output[\"Phone\"][\"0\"].replace(/\\D/g, ''),\n    \"Email\": {\n      \"text\": $(\"Get Email Data\").item.json[\"candidateEmail\"],\n      \"link\": $(\"Get Email Data\").item.json[\"candidateEmail\"],\n    },\n    \"Main Position\": $(\"Get Job\").item.json[\"data\"][\"items\"][\"0\"][\"fields\"][\"Position\"],\n    /*\"Full Notes\": {\n      \"text\": $(\"Create File Full Notes (doc)\").item.json[\"data\"][\"document\"][\"title\"],\n      \"link\": $(\"Create File Full Notes (doc)\").item.json[\"data\"][\"document\"][\"document_id\"]\n    }*/\n  }\n};\n\nreturn candidate;\n\n"
+      },
+      "id": "82137801-3c81-4416-a6a5-63bb40997e28",
+      "name": "Create Candidate Json",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return $('Email Trigger (IMAP)').item;"
+      },
+      "id": "572eca68-552e-47d6-a41e-31b40721ac90",
+      "name": "Prepare For Upload1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return $('Email Trigger (IMAP)').item;"
+      },
+      "id": "aa238494-0f94-4ee4-837e-b2d82493fa76",
+      "name": "Prepare For Upload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "AI Resume Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Có Candidate": {
+      "main": [
+        [
+          {
+            "node": "Prepare For Upload1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Candidate Json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload CV": {
+      "main": [
+        [
+          {
+            "node": "Create Application Json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload CV1": {
+      "main": [
+        [
+          {
+            "node": "Create Application Json1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Application Json1": {
+      "main": [
+        [
+          {
+            "node": "Create Application1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Application Json": {
+      "main": [
+        [
+          {
+            "node": "Create Application",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Email Data": {
+      "main": [
+        [
+          {
+            "node": "Lark Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lark Access Token": {
+      "main": [
+        [
+          {
+            "node": "Get Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job": {
+      "main": [
+        [
+          {
+            "node": "Get Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Candidate": {
+      "main": [
+        [
+          {
+            "node": "Prepare For Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Candidate": {
+      "main": [
+        [
+          {
+            "node": "Có Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Resume Parser": {
+      "main": [
+        [
+          {
+            "node": "Get Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Candidate Json": {
+      "main": [
+        [
+          {
+            "node": "Create Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare For Upload1": {
+      "main": [
+        [
+          {
+            "node": "Upload CV1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare For Upload": {
+      "main": [
+        [
+          {
+            "node": "Upload CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "w4dvHDDKdGVZOe0T"
+  },
+  "staticData": {
+    "node:Email Trigger (IMAP)": {
+      "lastMessageUid": 1241
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a380b77e-52a1-4346-8259-2a171ba04e1c",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-01-31T03:54:46.193Z",
+      "createdAt": "2024-01-31T03:54:46.193Z",
+      "role": "workflow:owner",
+      "workflowId": "5uwi9iZlJLysiuUS",
+      "projectId": "hDIKqbgmMJE1kKCr"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
