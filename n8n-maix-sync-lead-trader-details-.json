@@ -1,0 +1,539 @@
+{
+  "updatedAt": "2024-12-19T03:25:55.004Z",
+  "createdAt": "2024-04-22T10:02:52.524Z",
+  "id": "4EJ15yq5xuCwUOTs",
+  "name": "Maix - Sync Lead Trader Details",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ba5c1f0a-fafc-4e22-9856-aec26145b620",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1460,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var detailData = $node[\"HTTP: Details\"].json[\"data\"];\nvar _7d = $node[\"HTTP: Perf 7D\"].json[\"data\"];\nvar _30d = $node[\"HTTP: Perf 30D\"].json[\"data\"];\nvar _90d = $node[\"HTTP: Perf 90D\"].json[\"data\"];\nvar LeadPorfolioId = $node[\"Loop Over Items\"].json[\"LeadPorfolioId\"];\n\nvar jsonData = {\n  detailData: detailData,\n  _7d: _7d,\n  _30d: _30d,\n  _90d: _90d\n}\n\nvar updateQuery = ``;\n\nif(detailData == null)\n{\n  updateQuery = \n`\nUPDATE [LeadCopyTrader]\nSET \n    Status = 'INACTIVE',\n\n    ROI_7D = ${_7d.roi},\n    PNL_7D = ${_7d.pnl},\n    MDD_7D = ${_7d.mdd},\n    WinRate_7D = ${_7d.winRate},\n    WinOrders_7D = ${_7d.winOrders},\n    TotalOrder_7D = ${_7d.totalOrder},\n    SharpRatio_7D = ${_7d.sharpRatio},\n\t\n\t  ROI_30D = ${_30d.roi},\n    PNL_30D = ${_30d.pnl},\n    MDD_30D = ${_30d.mdd},\n    WinRate_30D = ${_30d.winRate},\n    WinOrders_30D = ${_30d.winOrders},\n    TotalOrder_30D = ${_30d.totalOrder},\n    SharpRatio_30D = ${_30d.sharpRatio},\n\t\n\t  ROI_90D = ${_90d.roi},\n    PNL_90D = ${_90d.pnl},\n    MDD_90D = ${_90d.mdd},\n    WinRate_90D = ${_90d.winRate},\n    WinOrders_90D = ${_90d.winOrders},\n    TotalOrder_90D = ${_90d.totalOrder},\n    SharpRatio_90D = ${_90d.sharpRatio},\n    \n    [ExtraDataJson] = N'${JSON.stringify(jsonData).replace(/'/g, \"''\")}',\n    [UpdatedDate] = GETUTCDATE()\nWHERE LeadPorfolioId = '${ LeadPorfolioId }';\n`\n} else {\n\nupdateQuery = \n`\n  UPDATE [LeadCopyTrader]\n  SET \n      [ExtraDataJson] = N'${JSON.stringify(jsonData).replace(/'/g, \"''\")}',\n                \n      UserId = ${ detailData.userId },\n      LeadOwner = '${ detailData.leadOwner }', \n      HasCopy = ${ detailData.hasCopy ? 1 : 0 }, \n      Status = '${ detailData.status }', \n      FavoriteCount = ${ detailData.favoriteCount }, \n      CurrentCopyCount = ${ detailData.currentCopyCount }, \n      MaxCopyCount = ${ detailData.maxCopyCount },\n      TotalCopyCount = ${ detailData.totalCopyCount }, \n      MarginBalance = ${ detailData.marginBalance }, \n      InitInvestAsset = '${ detailData.initInvestAsset }', \n      FuturesType = '${ detailData.futuresType }', \n      AUM = ${ detailData.aumAmount }, \n      CopierPnl = ${ detailData.copierPnl },\n      CopierPnlAsset = '${ detailData.copierPnlAsset }', \n      ProfitSharingRate = ${ detailData.profitSharingRate }, \n      UnrealizedProfitShareAmount = ${ detailData.unrealizedProfitShareAmount }, \n      StartTime = DATEADD(SECOND, ${ detailData.startTime / 1000 }, '19700101 00:00:00'), \n      PositionShow = ${ detailData.positionShow ? 1 : 0 }, \n      MockCopyCount = ${ detailData.mockCopyCount }, \n      FeedAgreement = ${ detailData.feedAgreement ? 1 : 0 }, \n      FeedShareSwitch = ${ detailData.feedShareSwitch ? 1 : 0 }, \n      FeedSharePushLimit = ${ detailData.feedSharePushLimit }, \n      FixedRadioMinCopyUsd = ${ detailData.fixedRadioMinCopyUsd },\n      FixedAmountMinCopyUsd = ${ detailData.fixedAmountMinCopyUsd },\n      PortfolioType = '${ detailData.portfolioType }',\n  \n      ROI_7D = ${_7d.roi},\n      PNL_7D = ${_7d.pnl},\n      MDD_7D = ${_7d.mdd},\n      WinRate_7D = ${_7d.winRate},\n      WinOrders_7D = ${_7d.winOrders},\n      TotalOrder_7D = ${_7d.totalOrder},\n      SharpRatio_7D = ${_7d.sharpRatio},\n  \t\n      ROI_30D = ${_30d.roi},\n      PNL_30D = ${_30d.pnl},\n      MDD_30D = ${_30d.mdd},\n      WinRate_30D = ${_30d.winRate},\n      WinOrders_30D = ${_30d.winOrders},\n      TotalOrder_30D = ${_30d.totalOrder},\n      SharpRatio_30D = ${_30d.sharpRatio},\n  \t\n      ROI_90D = ${_90d.roi},\n      PNL_90D = ${_90d.pnl},\n      MDD_90D = ${_90d.mdd},\n      WinRate_90D = ${_90d.winRate},\n      WinOrders_90D = ${_90d.winOrders},\n      TotalOrder_90D = ${_90d.totalOrder},\n      SharpRatio_90D = ${_90d.sharpRatio},\n  \n      [UpdatedDate] = GETUTCDATE(),\n\n      TagItemVos = '${JSON.stringify(detailData.tagItemVos)}',\n      PublicLeadPortfolioId = '${detailData.publicLeadPortfolioId}',\n      PrivateLeadPortfolioId = '${detailData.privateLeadPortfolioId}'\n\n      \n  WHERE LeadPorfolioId = '${detailData.leadPortfolioId}';\n`\n}\n\nreturn {\n  query: updateQuery,\n}"
+      },
+      "id": "424fdc0e-ea9b-451d-99da-78931a03068a",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3240,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code1\"].json[\"query\"] }}"
+      },
+      "id": "328c0aed-de62-48e6-8121-2be7f0b73342",
+      "name": "Microsoft SQL",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        3500,
+        600
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "={{ $node[\"Get Random Second\"].json[\"random\"] }}",
+        "unit": "seconds"
+      },
+      "id": "1ff8c08d-425d-47dc-aabf-83a6ab27b940",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        3960,
+        600
+      ],
+      "webhookId": "f582fbd5-30e5-45d3-bd56-9f22045373b1"
+    },
+    {
+      "parameters": {
+        "jsCode": "function randomIntFromInterval(min, max) { // min and max included \n  return Math.floor(Math.random() * (max - min + 1) + min)\n}\n\nvar rndInt = randomIntFromInterval(1, 2)\n\nreturn {\n  random: rndInt\n}"
+      },
+      "id": "a16140a0-0740-4348-b27c-0309cf6f4192",
+      "name": "Get Random Second",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3720,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://www.binance.com/bapi/futures/v1/public/future/copy-trade/lead-portfolio/performance?portfolioId={{ $node[\"Loop Over Items\"].json[\"LeadPorfolioId\"] }}&timeRange=7D",
+        "options": {}
+      },
+      "id": "41dc1594-1192-4c47-906d-7443ca9243ab",
+      "name": "HTTP: Perf 7D",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2320,
+        600
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "amount": 0.1,
+        "unit": "seconds"
+      },
+      "id": "36523a79-7558-4370-b6a1-7b30dc2582aa",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        600
+      ],
+      "webhookId": "439b39db-a4d9-45ac-9a59-6dfbcce99fb8"
+    },
+    {
+      "parameters": {
+        "amount": 0.2,
+        "unit": "seconds"
+      },
+      "id": "eb7ebfb4-8a66-403a-881e-dee2725f61c2",
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        2820,
+        600
+      ],
+      "webhookId": "439b39db-a4d9-45ac-9a59-6dfbcce99fb8"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.binance.com/bapi/futures/v1/public/future/copy-trade/lead-portfolio/performance?portfolioId={{ $node[\"Loop Over Items\"].json[\"LeadPorfolioId\"] }}&timeRange=90D",
+        "options": {}
+      },
+      "id": "c55155f0-8178-44fb-b3bc-f2a3133295d7",
+      "name": "HTTP: Perf 90D",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3000,
+        600
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "=https://www.binance.com/bapi/futures/v1/public/future/copy-trade/lead-portfolio/performance?portfolioId={{ $node[\"Loop Over Items\"].json[\"LeadPorfolioId\"] }}&timeRange=30D",
+        "options": {}
+      },
+      "id": "93dfa204-3e84-44ab-9955-e9139c5acbf7",
+      "name": "HTTP: Perf 30D",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2660,
+        600
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "amount": 0.1,
+        "unit": "seconds"
+      },
+      "id": "b3e53805-0e29-4e40-af07-872f5a19cc03",
+      "name": "Wait3",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        2140,
+        600
+      ],
+      "webhookId": "1e21abe5-4e3c-4f3c-94aa-e071ac7bf81f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "735f41f5-90f8-4fbf-9cff-c84ee0b7b4db",
+              "leftValue": "={{ $node[\"HTTP: Details\"].json[\"data\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5b4632ba-6835-4d2f-b445-90997420ca58",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $node[\"Code2\"].json[\"query\"] }}"
+      },
+      "id": "017cb1b5-697b-414a-bff0-0a39487d2419",
+      "name": "Microsoft SQL2",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [
+        2300,
+        840
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "microsoftSql": {
+          "id": "JmVTGGXrVvhOpoEZ",
+          "name": "Microsoft SQL - 62.72.45.242 - yoongdev - Y_MaixSignal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "seconds"
+      },
+      "id": "171d9153-ff16-4f0b-90a9-5cbd8fc5c477",
+      "name": "Wait4",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        840
+      ],
+      "webhookId": "f582fbd5-30e5-45d3-bd56-9f22045373b1"
+    },
+    {
+      "parameters": {
+        "jsCode": "var detailData = $node[\"HTTP: Details\"].json[\"data\"];\n\nvar LeadPorfolioId = $node[\"Loop Over Items\"].json[\"LeadPorfolioId\"];\n\nvar updateQuery = ``;\n\nif(detailData == null)\n{\n  updateQuery = \n`\nUPDATE [LeadCopyTrader]\nSET \n    Status = 'INACTIVE',\n\n   \n    [UpdatedDate] = GETUTCDATE()\nWHERE LeadPorfolioId = '${ LeadPorfolioId }';\n`\n} \n\nreturn {\n  query: updateQuery,\n}"
+      },
+      "id": "84d69e06-946f-4f92-b54d-4daf785e61af",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2120,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://www.binance.com/bapi/futures/v1/friendly/future/copy-trade/lead-portfolio/detail?portfolioId={{ $node[\"Loop Over Items\"].json[\"LeadPorfolioId\"] }}",
+        "options": {}
+      },
+      "id": "55e8dbe8-d1ae-4f46-b766-4dbf8b8a69ee",
+      "name": "HTTP: Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1700,
+        600
+      ],
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "9a46d05d-d96d-4fd8-aff9-aa7efd0f5f47",
+        "options": {}
+      },
+      "id": "28115f0e-b4ee-45ef-9ca2-b855c3afbcc3",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        480
+      ],
+      "webhookId": "9a46d05d-d96d-4fd8-aff9-aa7efd0f5f47"
+    },
+    {
+      "parameters": {
+        "jsCode": "var pages = $node[\"Webhook\"].json[\"body\"][\"pages\"]\n\nreturn [].concat(pages)"
+      },
+      "id": "751ed7b2-1be3-4f01-8886-74a1214729b8",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP: Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "main": [
+        [
+          {
+            "node": "Get Random Second",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Random Second": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Perf 7D": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Perf 30D",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Perf 90D",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Perf 30D": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Perf 90D": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Perf 7D",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL2": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Microsoft SQL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Details": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrencyRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b48dfa14-b85f-4ad5-a2c1-61d47520520b",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2024-04-22T10:02:52.524Z",
+      "createdAt": "2024-04-22T10:02:52.524Z",
+      "role": "workflow:owner",
+      "workflowId": "4EJ15yq5xuCwUOTs",
+      "projectId": "0P6Dr8EAKcX0vQwh"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
